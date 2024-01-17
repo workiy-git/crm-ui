@@ -1,0 +1,151 @@
+.login-page-main {
+    background-color: #98bbfd;
+    height: 100vh;
+    margin: 0;
+}
+
+.welcome-back-div {
+    background: #98bbfd;
+    color: white;
+    margin-top: 10%;
+    font-weight: bold;
+    width: 76.5%;
+    border-top-right-radius: 10px;
+    border-bottom-right-radius: 10px;
+}
+
+.welcome-back-div p {
+    padding: 3%;
+}
+
+.log-in-main-div2 {
+    text-align: center;
+    width: 350px;
+}
+
+.log-in-main {
+    background: white;
+    border-radius: 50px;
+    display: flex;
+    margin: auto;
+    width: fit-content;
+    margin-top: 7%;
+    position: absolute;
+    margin-left: 390px;
+    box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.4);
+    height: 510px;
+}
+
+.login-form input {
+    display: block;
+    border: none;
+    border-bottom: 1px solid black;
+}
+
+.login-robo-img {
+    height: 510px;
+    width: auto;
+}
+
+.forgot-pws {
+    color: black;
+    text-decoration: none;
+}
+
+.login-form div {
+    display: flex;
+    margin-top: 10%;
+    justify-content: center;
+}
+
+.login-form div img {
+    height: 30px;
+    width: auto;
+    margin-right: 10px;
+}
+
+.login-submit-button {
+    background: rgba(41, 113, 220, 0.732);
+    border-radius: 7px;
+    width: 30%;
+    padding: 7px;
+    margin: auto;
+    left: 10px;
+    margin-bottom: 7%;
+    font-weight: bold;
+}
+
+.login-submit-button img {
+    height: 17px !important;
+}
+
+.login-submit-button input {
+    background-color: transparent;
+    border: none;
+    color: white;
+    font-weight: bold;
+}
+
+.login-form {
+    margin-top: 65px;
+}
+
+.login-form input:focus {
+    outline: none;
+}
+
+/* Media Queries for Responsive Design */
+@media (max-width: 1200px) {
+    .log-in-main {
+        margin-left: 15%;
+    }
+}
+
+@media (max-width: 768px) {
+    .log-in-main {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .login-robo-img {
+        height: auto;
+        width: 100%;
+    }
+
+    .log-in-main {
+        margin: 7% auto;
+    }
+}
+
+/* Add this to your CSS file or style tag in your component */
+.modal {
+    position: fixed;
+    left: 80%;
+    top: -175px;
+    width: 20%;
+    height: 21%;
+    overflow: auto;
+}
+
+.modal-content {
+    position: relative;
+    margin: 10% auto;
+    padding: 20px;
+    width: 80%;
+    background-color: #389ce4;
+    border-radius: 15px;
+}
+
+.close {
+    position: absolute;
+    top: -5px;
+    right: 0;
+    padding: 10px;
+    cursor: pointer;
+    color: rgb(254, 254, 254);
+}
+
+.error-message {
+    top: -10px;
+    color: white;
+}
