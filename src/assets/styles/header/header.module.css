@@ -1,0 +1,554 @@
+.headerChild {
+    position: absolute;
+    top: 1px;
+    left: 0;
+    background-color: #fff;
+    width: 1440px;
+    height: 74px;
+  }
+  .profile1,
+  .profileChild {
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+  .profileChild {
+    height: 100%;
+    width: 100%;
+    right: 0;
+    bottom: 0;
+    max-width: 100%;
+    overflow: hidden;
+    max-height: 100%;
+    object-fit: cover;
+  }
+  .profile1 {
+    cursor: pointer;
+    border: 0;
+    padding: 0;
+    background-color: transparent;
+    height: 18.43%;
+    width: 20.33%;
+    right: 79.67%;
+    bottom: 81.57%;
+  }
+  .profileItem {
+    height: 77.95%;
+    width: 85.33%;
+    top: 22.05%;
+    right: 0;
+    bottom: 0;
+    left: 14.67%;
+    border-radius: 20px;
+    background-color: #fff;
+    box-shadow: 0 12px 20px rgba(0, 0, 0, 0.3);
+  }
+  .profileInner,
+  .profileItem,
+  .userName {
+    position: absolute;
+    display: none;
+  }
+  .profileInner {
+    height: 10.27%;
+    width: 11.33%;
+    top: 27.79%;
+    right: 67%;
+    bottom: 61.93%;
+    left: 21.67%;
+    max-width: 100%;
+    overflow: hidden;
+    max-height: 100%;
+    object-fit: cover;
+  }
+  .userName {
+    top: 29.61%;
+    left: 43%;
+    font-weight: 800;
+  }
+  .myProfile {
+    top: 44.41%;
+    left: 44%;
+  }
+  .dashboardFilter,
+  .dayoutlogout,
+  .logout,
+  .myProfile {
+    position: absolute;
+    font-weight: 800;
+    display: none;
+  }
+  .dashboardFilter {
+    top: 58.01%;
+    left: 43%;
+  }
+  .dayoutlogout,
+  .logout {
+    left: 45%;
+  }
+  .logout {
+    top: 70.09%;
+    color: #c50e0e;
+  }
+  .dayoutlogout {
+    top: 85.8%;
+  }
+  .accountCircleIcon,
+  .addRoadIcon,
+  .logoutIcon,
+  .logoutIcon1,
+  .polygonIcon {
+    position: absolute;
+    height: 7.85%;
+    width: 12%;
+    top: 18.13%;
+    right: 61%;
+    bottom: 74.02%;
+    left: 27%;
+    max-width: 100%;
+    overflow: hidden;
+    max-height: 100%;
+    display: none;
+  }
+  .accountCircleIcon,
+  .addRoadIcon,
+  .logoutIcon,
+  .logoutIcon1 {
+    height: 7.25%;
+    width: 8%;
+    top: 43.2%;
+    right: 59.67%;
+    bottom: 49.55%;
+    left: 32.33%;
+  }
+  .addRoadIcon,
+  .logoutIcon,
+  .logoutIcon1 {
+    top: 57.4%;
+    right: 60.33%;
+    bottom: 35.35%;
+    left: 31.67%;
+  }
+  .logoutIcon,
+  .logoutIcon1 {
+    top: 69.18%;
+    right: 58%;
+    bottom: 23.56%;
+    left: 34%;
+  }
+  .logoutIcon1 {
+    top: 84.89%;
+    bottom: 7.85%;
+  }
+  .profile {
+    position: absolute;
+    top: 9px;
+    left: 36px;
+    width: 300px;
+    height: 331px;
+  }
+  .brandLogo,
+  .logoRemovebgPreview150x832Icon {
+    position: absolute;
+    width: 123.19px;
+    height: 58.96px;
+  }
+  .logoRemovebgPreview150x832Icon {
+    top: 0;
+    left: 0;
+    border-radius: 10px;
+    object-fit: cover;
+  }
+  .brandLogo {
+    cursor: pointer;
+    border: 0;
+    padding: 0;
+    background-color: transparent;
+    top: 10px;
+    left: 1200.41px;
+  }
+  .vectorIcon {
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    max-width: 100%;
+    overflow: hidden;
+    max-height: 100%;
+  }
+  .fullScreen {
+    cursor: pointer;
+    border: 0;
+    padding: 0;
+    background-color: transparent;
+    position: absolute;
+    height: 5.26%;
+    width: 1.53%;
+    top: 7.18%;
+    right: 83.26%;
+    bottom: 87.56%;
+    left: 15.21%;
+  }
+  .listOneChild {
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    border-radius: 20px;
+    background-color: #fff;
+  }
+  .listOneChild1,
+  .listOneChild2,
+  .listOneInner,
+  .listOneItem,
+  .rectangleDiv {
+    position: absolute;
+    height: 12.88%;
+    width: 87.18%;
+    top: 6.44%;
+    right: 6.15%;
+    bottom: 80.69%;
+    left: 6.67%;
+    border-radius: 5px;
+    background-color: #00aef8;
+  }
+  .listOneChild1,
+  .listOneChild2,
+  .listOneInner,
+  .rectangleDiv {
+    top: 24.89%;
+    bottom: 62.23%;
+  }
+  .listOneChild1,
+  .listOneChild2,
+  .rectangleDiv {
+    top: 43.35%;
+    bottom: 43.78%;
+  }
+  .listOneChild1,
+  .listOneChild2 {
+    top: 61.8%;
+    bottom: 25.32%;
+  }
+  .listOneChild2 {
+    top: 80.26%;
+    bottom: 6.87%;
+  }
+  .analytics,
+  .marketing,
+  .others,
+  .sales,
+  .tools {
+    position: absolute;
+    top: 9.01%;
+    left: 51.28%;
+    font-weight: 800;
+  }
+  .analytics,
+  .others,
+  .sales,
+  .tools {
+    top: 26.61%;
+    left: 53.33%;
+  }
+  .analytics,
+  .others,
+  .tools {
+    top: 46.35%;
+    left: 51.79%;
+  }
+  .others,
+  .tools {
+    top: 64.81%;
+    left: 50.26%;
+  }
+  .tools {
+    top: 82.4%;
+    left: 51.79%;
+  }
+  .vectorIcon1,
+  .vectorIcon2,
+  .vectorIcon3,
+  .vectorIcon4,
+  .vectorIcon5 {
+    position: absolute;
+    height: 8.75%;
+    width: 10.38%;
+    top: 63.73%;
+    right: 77.56%;
+    bottom: 27.52%;
+    left: 12.05%;
+    max-width: 100%;
+    overflow: hidden;
+    max-height: 100%;
+  }
+  .vectorIcon2,
+  .vectorIcon3,
+  .vectorIcon4,
+  .vectorIcon5 {
+    height: 9.13%;
+    width: 12.26%;
+    top: 82.99%;
+    right: 75.92%;
+    bottom: 7.88%;
+    left: 11.82%;
+  }
+  .vectorIcon3,
+  .vectorIcon4,
+  .vectorIcon5 {
+    height: 9.66%;
+    width: 11.54%;
+    top: 26.72%;
+    right: 78.65%;
+    bottom: 63.63%;
+    left: 9.81%;
+  }
+  .vectorIcon4,
+  .vectorIcon5 {
+    height: 8.58%;
+    width: 9.23%;
+    top: 46.35%;
+    right: 78.97%;
+    bottom: 45.06%;
+    left: 11.79%;
+  }
+  .vectorIcon5 {
+    height: 7.73%;
+    width: 12.31%;
+    top: 9.01%;
+    right: 76.41%;
+    bottom: 83.26%;
+    left: 11.28%;
+  }
+  .listOne,
+  .listTwoChild {
+    position: absolute;
+    left: 0;
+  }
+  .listOne {
+    height: 61.34%;
+    width: 31.5%;
+    top: 34.19%;
+    right: 68.5%;
+    bottom: 4.48%;
+    display: none;
+  }
+  .listTwoChild {
+    height: 87.27%;
+    width: 50.62%;
+    top: 0;
+    right: 49.38%;
+    bottom: 12.73%;
+    border-radius: 20px;
+    background-color: #fff;
+  }
+  .callLog,
+  .enquriy,
+  .whatsappTemplate {
+    position: absolute;
+    top: 6.36%;
+    left: 14.71%;
+    font-weight: 600;
+  }
+  .enquriy,
+  .whatsappTemplate {
+    top: 18.18%;
+  }
+  .whatsappTemplate {
+    top: 31.82%;
+    left: 14.46%;
+  }
+  .attendances,
+  .notification,
+  .trackLocation {
+    position: absolute;
+    top: 44.09%;
+    left: 14.71%;
+    font-weight: 600;
+  }
+  .notification,
+  .trackLocation {
+    top: 56.82%;
+    left: 14.46%;
+  }
+  .notification {
+    top: 69.55%;
+  }
+  .bxlwhatsapp,
+  .mdilocationIcon {
+    position: absolute;
+    height: 9.09%;
+    width: 4.99%;
+    overflow: hidden;
+  }
+  .mdilocationIcon {
+    top: 56.36%;
+    right: 89.28%;
+    bottom: 34.55%;
+    left: 5.74%;
+    max-width: 100%;
+    max-height: 100%;
+  }
+  .bxlwhatsapp {
+    top: 90.91%;
+    right: 0;
+    bottom: 0;
+    left: 95.01%;
+  }
+  .vectorIcon6,
+  .vectorIcon7,
+  .vectorIcon8 {
+    position: absolute;
+    height: 6.86%;
+    width: 3.75%;
+    top: 32.27%;
+    right: 89.52%;
+    bottom: 60.87%;
+    left: 6.73%;
+    max-width: 100%;
+    overflow: hidden;
+    max-height: 100%;
+  }
+  .vectorIcon7,
+  .vectorIcon8 {
+    height: 3.12%;
+    width: 0.79%;
+    top: 71.81%;
+    right: 92.89%;
+    bottom: 25.07%;
+    left: 6.31%;
+  }
+  .vectorIcon8 {
+    height: 7.48%;
+    width: 3.15%;
+    top: 72.12%;
+    right: 90.2%;
+    bottom: 20.4%;
+    left: 6.65%;
+  }
+  .iconamoonattentionCircle,
+  .materialSymbolscallIcon,
+  .mdicartIcon,
+  .vectorIcon9 {
+    position: absolute;
+    height: 3.12%;
+    width: 0.8%;
+    top: 71.81%;
+    right: 89.85%;
+    bottom: 25.07%;
+    left: 9.35%;
+    max-width: 100%;
+    overflow: hidden;
+    max-height: 100%;
+  }
+  .iconamoonattentionCircle,
+  .materialSymbolscallIcon,
+  .mdicartIcon {
+    height: 8.64%;
+    width: 4.74%;
+    top: 18.18%;
+    right: 88.53%;
+    bottom: 73.18%;
+    left: 6.73%;
+  }
+  .iconamoonattentionCircle,
+  .materialSymbolscallIcon {
+    top: 5%;
+    right: 88.28%;
+    bottom: 86.36%;
+    left: 6.98%;
+  }
+  .iconamoonattentionCircle {
+    height: 9.55%;
+    width: 5.24%;
+    top: 43.64%;
+    right: 89.03%;
+    bottom: 46.82%;
+    left: 5.74%;
+  }
+  .listTwo {
+    position: absolute;
+    height: 57.92%;
+    width: 64.78%;
+    top: 42.08%;
+    right: 0;
+    bottom: 0;
+    left: 35.22%;
+    display: none;
+    color: #000;
+  }
+  .listIcone {
+    cursor: pointer;
+    border: 0;
+    padding: 0;
+    background-color: transparent;
+    position: absolute;
+    height: 3.06%;
+    width: 2.96%;
+    top: 0;
+    right: 92.98%;
+    bottom: 96.94%;
+    left: 4.06%;
+  }
+  .listMenu {
+    position: absolute;
+    top: 38px;
+    left: 129px;
+    width: 619px;
+    height: 379.86px;
+    font-size: 15px;
+    color: #fff;
+  }
+  .workiyHap,
+  .workiyHapChild {
+    position: absolute;
+    width: 64px;
+    height: 64px;
+  }
+  .workiyHapChild {
+    top: 0;
+    left: 0;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+  .workiyHap {
+    cursor: pointer;
+    border: 0;
+    padding: 0;
+    background-color: transparent;
+    top: 6px;
+    left: 1344px;
+  }
+  .line {
+    position: absolute;
+    top: -1.5px;
+    left: 1322.5px;
+    border-right: 3px dashed rgba(0, 0, 0, 0.5);
+    box-sizing: border-box;
+    width: 3px;
+    height: 77px;
+  }
+  .headerItem {
+    position: absolute;
+    top: 6px;
+    left: 714px;
+    width: 100px;
+    height: 100px;
+    overflow: hidden;
+  }
+  .header {
+    width: 100%;
+    position: relative;
+    height: 417.86px;
+    text-align: left;
+    font-size: 16px;
+    color: #212529;
+    font-family: Roboto;
+  }
+  

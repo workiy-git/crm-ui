@@ -1,0 +1,93 @@
+.dashBoradChild {
+    position: absolute;
+    top: 0;
+    left: 0;
+    background-color: #fff;
+    width: 138px;
+    height: 842px;
+  }
+  .settingIcon {
+    position: absolute;
+    top: 525px;
+    left: 50px;
+    width: 100px;
+    height: 82px;
+    object-fit: cover;
+  }
+  .reportIcon {
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    max-width: 100%;
+    overflow: hidden;
+    max-height: 100%;
+  }
+  .calls,
+  .enquriy,
+  .home,
+  .leads,
+  .report {
+    cursor: pointer;
+    border: 0;
+    padding: 0;
+    background-color: transparent;
+    position: absolute;
+    height: 7.59%;
+    width: 39.68%;
+    top: 82.78%;
+    right: 26.98%;
+    bottom: 9.62%;
+    left: 33.33%;
+  }
+  .calls,
+  .enquriy,
+  .home,
+  .leads {
+    height: 6.84%;
+    width: 42.86%;
+    top: 42.78%;
+    right: 38.1%;
+    bottom: 50.38%;
+    left: 19.05%;
+  }
+  .calls,
+  .home,
+  .leads {
+    height: 5.57%;
+    width: 46.03%;
+    top: 64.81%;
+    right: 34.92%;
+    bottom: 29.62%;
+  }
+  .calls,
+  .home {
+    height: 6.84%;
+    width: 42.86%;
+    top: 22.28%;
+    right: 38.1%;
+    bottom: 70.89%;
+  }
+  .home {
+    height: 7.34%;
+    width: 50.79%;
+    top: 0;
+    bottom: 92.66%;
+    left: 11.11%;
+  }
+  .dashBoard {
+    position: absolute;
+    top: 121px;
+    left: 60px;
+    width: 63px;
+    height: 395px;
+  }
+  .dashBorad {
+    width: 100%;
+    position: relative;
+    height: 842px;
+  }
+  
