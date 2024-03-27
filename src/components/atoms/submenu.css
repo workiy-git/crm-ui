@@ -1,0 +1,74 @@
+.subnav {
+
+    background: linear-gradient(to right, #12E5E5, #98BCFD);
+    width: 100%;
+    padding-top: 3px;
+    padding-bottom: 22px;
+
+}
+
+
+.filter {
+
+    background-color: white;
+    width: fit-content;
+    height: fit-content;
+    border-radius: 5px;
+    margin-left: 10%;
+    display: flex;
+    padding: 5px;
+    padding-left: 5px;
+    margin-top: 20px;
+
+
+}
+
+.add_filter1 {
+    width: 24px;
+    height: 24px;
+    padding: 5px 5px 5px 15px;
+    margin: auto;
+}
+
+.add_filter2 {
+    width: 24px;
+    height: 24px;
+    padding: 5px;
+}
+
+.add_filter3 {
+    width: 24px;
+    height: 24px;
+    padding: 5px;
+}
+
+.add_filter4 {
+    width: 24px;
+    height: 24px;
+    padding: 5px 5px 5px 5px;
+}
+
+
+.dashboard_main:hover {
+    background-color: #00AEF8;
+    width: max-content;
+    padding-right: 10px;
+    border-radius: 5px;
+
+}
+
+.dashboard_main p {
+    font-weight: 700;
+    display: none;
+}
+
+.dashboard_main:hover p {
+    margin: 0px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.dashboard_main {
+    display: flex;
+}
