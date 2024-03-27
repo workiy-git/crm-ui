@@ -1,0 +1,126 @@
+.menu {
+    display: flex;
+    flex-wrap: wrap; 
+    justify-content: flex-start; 
+    gap: 50px; 
+    width: calc(100% + 50px); 
+    padding: 0 25px; 
+    background-color: #D9D9D9;
+    height: 63px;    
+  }
+  
+  .menu > div {
+    display: flex;
+    align-items: center;
+    padding-left: 70%;
+  }
+  
+  .menu img {
+    max-width: 100%;
+   padding: 20px;
+   
+  }
+
+  .img1 {
+    position: relative; /* Set position relative */
+    left: -30px; /* Adjust left position as per your requirement */
+  }
+  
+  
+  .text{
+    background-color: rgb(141, 183, 141);
+    padding: 5px;
+    border-radius: 5px;
+    width: 70px;
+    text-align: center;
+    position: relative; /* Set position relative */
+    left: -10px; /* Adjust left position as per your requirement */
+
+  }
+
+  .container {
+  position: absolute;
+  top: 60%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 760px;
+  background-color: rgb(84, 84, 169);
+  border-radius: 5px;
+  padding: 10px;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
+  display: flex;
+  flex-direction: column;
+}
+
+.checkbox-container {
+    margin-left: -10px; /* Adjust this value as needed */
+  }
+  
+
+#checkbox {
+  display: flex;
+  justify-content: space-between;
+}
+
+.container p {
+  margin: 0;
+  color: white;
+}
+
+.container .content {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.container .content > div {
+  width: 100%; /* Adjust the width for full width */
+  padding: 5px;
+}
+.left {
+    width: 50%; /* Adjust this value as needed */
+    height: 50px;
+    background-color: rgba(132, 96, 51, 0.667);
+    border-radius: 5px;
+    margin-bottom: 10px; /* Add margin between left and right containers */
+    margin-left: -5px;
+   
+  }
+  
+  .right {
+    width: 50%; /* Adjust this value as needed */
+    height: 50px;
+    background-color: rgba(132, 96, 51, 0.667);
+    border-radius: 5px;
+    margin-left: 325px; /* Adjust this value as needed */
+    margin-top: -60px; /* Move the container to the top */
+    margin-bottom: 10px; /* Add margin between left and right containers */
+    margin-left: 51%; /* Add margin to the left side */
+  }
+  
+
+.buttons {
+  margin-top: auto;
+  display: flex;
+  justify-content: center;
+}
+
+.buttons button {
+  margin: 0 5px;
+  padding: 10px 20px;
+  background-color: #007bff; /* Adjust button background color as needed */
+  color: white; /* Adjust button text color as needed */
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.buttons button:hover {
+  background-color: #0056b3; /* Adjust button hover background color as needed */
+}
+
+.feature-text {
+    text-align: center;
+    padding-top: 15px; /* Adjusted padding-top value */
+  }
+  
+  
