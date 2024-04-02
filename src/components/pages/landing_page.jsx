@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
+import Header from '../organism/header';
+import SideMenu from "../organism/sidemenu"; 
 import MenuComponent from "../organism/menu";
-
-
 import BackgroundColorChanger from '../atoms/BackgroundColorChanger';
 
 function LandingPage() {
@@ -33,12 +33,18 @@ function LandingPage() {
   ];
 
   return (
-    
-          <div style={{  }}>
-            <MenuComponent backgroundColor={backgroundColor} />
-          </div>
-      
-    
+    <div style={{ height: '100vh', display: "flex", flexDirection: "column", overflow: 'hidden', backgroundColor: backgroundColor }}>
+      <Header />
+      <div style={{ width: '85px', overflow: 'hidden', backgroundColor: "white" }}>
+        <SideMenu />
+      </div>
+      <div>
+        <MenuComponent backgroundColor={backgroundColor} />
+      </div>
+      <div>
+        <BackgroundColorChanger colors={colors} onChange={handleColorChange} />
+      </div>
+    </div>
   );
 }
 
