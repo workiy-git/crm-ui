@@ -93,7 +93,7 @@ const AddFeature = ({ onSaveSelectedText, storedSelectedTexts }) => {
               <Grid item xs={6} key={index}>
                 <Box
                   sx={{
-                    bgcolor: 'skyblue',
+                    bgcolor: 'red',
                     borderRadius: 2,
                     mb: 1,
                     p: 1,
