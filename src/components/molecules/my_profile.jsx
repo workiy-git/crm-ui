@@ -114,7 +114,7 @@ export default function Myprofile({ backgroundColor }) {
                 }}
               >
                 {open && myprofileData[0].menu.header.myprofile && (
-                  <Box style={{display:'grid'}}>
+                  <Box style={{display:'grid', padding:'15px'}}>
                     {Object.keys(myprofileData[0].menu.header.myprofile)
                       .filter(key => key !== 'profile_image')
                       .map((key, index) => (
