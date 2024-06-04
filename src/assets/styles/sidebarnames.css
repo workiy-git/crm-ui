@@ -1,0 +1,16 @@
+.side-bar-name {
+    background-color: blue;
+    margin: 0;
+    height: 23%;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white; /* Added for better text visibility against blue background */
+}
+
+.side-bar-text {
+    font-family: 'Arial', sans-serif; /* Example font family */
+    font-size: 20px; /* Example font size in points */
+
+}

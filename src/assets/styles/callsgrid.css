@@ -1,0 +1,282 @@
+.CallsGrid {
+  font-family: Arial, Helvetica, sans-serif;
+  display: flex;
+  flex-direction: column;
+  height: 95%; /* Full viewport height */
+  padding: 10px;
+  color: #333;
+  width: 99%;
+ margin-top: -7rem;
+
+}
+
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #f9f9f9;
+  padding: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.letter {
+  font-size: 14px;
+  color: #555;
+  padding: 5px 10px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, color 0.3s ease;
+  border-radius: 3px;
+}
+
+.letter:hover {
+  background-color: #e0e0e0;
+}
+
+.selectedLetter {
+  background-color: #04AA6D;
+  color: white;
+}
+
+.table-wrapper {
+  overflow-y: auto; /* Vertical scroll */
+  flex-grow: 1; /* Takes remaining height */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: #f2f2f2;
+}
+
+.table th,
+.table td {
+  padding: 12px 16px; /* Increase padding to add more space */
+  border-bottom: 1px solid #ddd;
+  white-space: nowrap;
+  text-align: center; /* Center-align text */
+}
+
+.table th {
+  padding-top: 12px;
+  padding-bottom: 12px;
+  text-align: center; /* Center-align text */
+  background-color: #04AA6D;
+  color: white;
+  position: sticky; /* Sticky headers */
+  top: 0;
+  z-index: 2;
+  text-transform: capitalize; /* Capitalize column names */
+}
+
+.table tr:nth-child(even) {
+  background-color: #e0e0e0;
+}
+
+.table tr:hover {
+  background-color: #c8c8c8;
+}
+
+.actions {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  width: 80%;
+  max-width: 600px;
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.error {
+  color: red;
+  margin-bottom: 15px;
+}
+
+.btn {
+  background-color: #04AA6D;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.btn:hover {
+  background-color: #039958;
+}
+
+.checkbox-popup {
+  position: absolute;
+  top: 40px;
+  right: 10px;
+  width: 400px;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  padding: 15px;
+  z-index: 1000;
+}
+
+.checkbox-popup .header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 10px;
+  margin-bottom: 10px;
+}
+
+.checkbox-popup .scroll-bar {
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.checkbox-popup label {
+  display: flex;
+  align-items: center;
+  padding: 5px 10px;
+  cursor: pointer;
+}
+
+.checkbox-popup label:hover {
+  background: #f1f1f1;
+}
+
+.checkbox-popup .btn {
+  background-color: #04AA6D;
+  color: white;
+  padding: 5px 15px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.checkbox-popup .btn:hover {
+  background-color: #039958;
+}
+
+/* Scrollbar Styles */
+.table-wrapper::-webkit-scrollbar,
+.checkbox-popup .scroll-bar::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+.table-wrapper::-webkit-scrollbar-thumb,
+.checkbox-popup .scroll-bar::-webkit-scrollbar-thumb {
+  background-color: #04AA6D;
+  border-radius: 10px;
+}
+
+.table-wrapper::-webkit-scrollbar-track,
+.checkbox-popup .scroll-bar::-webkit-scrollbar-track {
+  background: #e0e0e0;
+}
+
+/* Sticky Column */
+.table th.sticky-column,
+.table td.sticky-column {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  background-color: #04AA6D; /* Background color of the sticky column */
+  color: white; /* Text color of the sticky column */
+}
+
+.Appbar{
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  background-color: white;
+  
+}
+
+.dropdown{
+  margin-left: 40%;
+  margin-top: -75px;
+  padding-bottom: 20px;
+  color: white;
+  border: white;
+}
+
+.Action-Button{
+  margin-top: 50px;
+  margin-left: 5%;
+  padding-bottom: 20px;
+}
+
+
+.Pagination{
+  margin-left: 70%;
+  margin-top: -5%;
+  padding-bottom: 40px;
+}
+
+
+.Appbar2{
+  width: 100%;
+  height: 150px;
+  background-color: white;
+  border-bottom-left-radius: 5px;
+  border-bottom-right-radius: 5px;
+
+  
+}
+
+.dropdown{
+  margin-left: 40%;
+  margin-top: -75px;
+  padding-bottom: 20px;
+  color: white;
+  border: white;
+}
+
+.Action-Button{
+  margin-left: 5%;
+  padding-bottom: 20px;
+}
+
+
+.Pagination{
+  margin-left: 70%;
+  margin-top: -5%;
+
+}
