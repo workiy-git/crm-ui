@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import Header from '../../organism/header';
-import MenuComponent from "../../organism/menu";
-import SideMenu from "../../organism/sidemenu";
-import Submenu from '../../organism/submenu';
-import BackgroundColorChanger from '../../atoms/BackgroundColorChanger';
+import Header from '../../organism/SuperadminHeader';
+import SideMenu from "../../organism/SuperadminsecondaryMenu";
 import Footer from '../../atoms/Footer';
+import PieArcLabel from '../../atoms/piechart';
+import BarChaer from '../../atoms/barChart';
+import ParentChartComponent from '../../molecules/ParentChartComponent';
 
 function Home() {
   const [backgroundColor, setBackgroundColor] = useState(() => {
@@ -47,23 +47,19 @@ function Home() {
   }
 
   return (
-    <div style={{ height: '100vh', display: "flex", flexDirection: "column", overflow: 'hidden', backgroundColor: "gray" ,paddingLeft:0 }}>
+    <div style={{ height: '100vh', display: "flex", flexDirection: "column", overflow: 'hidden', backgroundColor: "#f1f2f6" ,paddingLeft:0 }}>
       
-      <div style={{ display: 'flex', height: '-webkit-fill-available', overflow: 'hidden' }}>
-        <div style={{ width: '10vh', overflow: 'hidden', backgroundColor: "#0d2d4e" }}>
+      <div style={{ display: 'flex', height: '-webkit-fill-available', overflow: 'hidden', padding:'20px 0 10px 50px'  }}>
+        <div style={{  overflow: 'hidden', backgroundColor: "#0d2d4e", padding:'10px', borderRadius:'10px'}}>
           <SideMenu backgroundColor={backgroundColor} />
         </div>
           <div style={{ width: '100%', marginRight: "-10px", backgroundColor: backgroundColor, overflow: 'hidden' }}>
             <div>
               <Header backgroundColor={backgroundColor} />
-            <BackgroundColorChanger colors={randomGradientColors} onColorChange={handleColorChange} />
 
             </div>
-            <div>
-              <MenuComponent  onSaveSelectedText={handleSaveSelectedText} backgroundColor={backgroundColor} />
-            </div>
-            <div>
-              <Submenu backgroundColor={backgroundColor} />
+            <div style={{display:'flex', width:'100%'}}>
+              <ParentChartComponent />
             </div>
           </div>
       </div>
