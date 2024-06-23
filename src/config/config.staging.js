@@ -1,6 +1,6 @@
 // config.Staging.js
 const stageConfig = {
-  apiUrl: 'https://staging-api-url/api', //we need replace our staging api url here
+  apiUrl: "https://7t7rw6av2l.execute-api.us-east-1.amazonaws.com/dev/api/",
   // other staging configurations...
 };
 
