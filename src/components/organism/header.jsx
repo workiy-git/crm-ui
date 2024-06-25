@@ -1,5 +1,5 @@
-// src/components/Header.js
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
 import Badge from '@mui/material/Badge';
@@ -10,10 +10,23 @@ import Search from '../atoms/search';
 import Notification from '../atoms/notification';
 import Dayin from '../atoms/dayin';
 import WindowControls from '../atoms/minimize';
+import config from '../../config/config';
 
-function Header() {
+const Header = () => {
   const [isMinimized, setIsMinimized] = useState(false);
   const [isMaximized, setIsMaximized] = useState(false);
+  const [headerData, setHeaderData] = useState(null);
+
+  useEffect(() => {
+    axios.get(`${config.apiUrl}/menus`)
+      .then(response => {
+        const headerData = response.data.data.find(menu => menu.menu === 'header');
+        setHeaderData(headerData);
+      })
+      .catch(error => {
+        console.error('Error fetching header data:', error);
+      });
+  }, []);
 
   const handleMinimizeClick = () => {
     setIsMinimized(true);
@@ -25,7 +38,6 @@ function Header() {
 
   const handleCloseClick = () => {
     console.log('Window closed');
-    // You can add any additional logic needed for the close action
   };
 
   if (isMinimized) {

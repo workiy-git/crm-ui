@@ -13,11 +13,18 @@ const AddFeature = ({ onSaveSelectedText, storedSelectedTexts }) => {
   useEffect(() => {
     const fetchMenuData = async () => {
       try {
-        const response = await axios.get(`${config.apiUrl}/menudata`);
-        setMenuData(response.data);
+        const response = await axios.get(`${config.apiUrl}/menus`);
+        const menuData = response.data.data.find(menu => menu.menu === 'addfeatures');
+        if (menuData) {
+          setMenuData(Object.entries(menuData).filter(([key]) => key !== 'menu' && key !== '_id').map(([key, menuItem]) => ({
+            ...menuItem,
+            path: `/${key}`
+          })));
+        }
         setLoading(false);
       } catch (error) {
         setLoading(false);
+        console.error('Error fetching menu data:', error);
       }
     };
 
@@ -50,7 +57,7 @@ const AddFeature = ({ onSaveSelectedText, storedSelectedTexts }) => {
     let updatedSelectedTexts = [...selectedTexts];
 
     if (checked) {
-      updatedSelectedTexts.push({ title, icon: selectedMenuItem.menu.menu_bar.add_features_values[title] });
+      updatedSelectedTexts.push({ title, icon: selectedMenuItem.add_features_values[title] });
     } else {
       updatedSelectedTexts = updatedSelectedTexts.filter(item => item.title !== title);
     }
@@ -59,8 +66,8 @@ const AddFeature = ({ onSaveSelectedText, storedSelectedTexts }) => {
   };
 
   const handleSelectAll = () => {
-    const allValues = Object.keys(selectedMenuItem.menu.menu_bar.add_features_values || {});
-    setSelectedTexts(allValues.map(title => ({ title, icon: selectedMenuItem.menu.menu_bar.add_features_values[title] })));
+    const allValues = Object.keys(selectedMenuItem.add_features_values || {});
+    setSelectedTexts(allValues.map(title => ({ title, icon: selectedMenuItem.add_features_values[title] })));
   };
 
   const handleReset = () => {
@@ -76,7 +83,7 @@ const AddFeature = ({ onSaveSelectedText, storedSelectedTexts }) => {
             <Grid item key={index}>
               <Button onClick={() => handleButtonClick(menuItem)}>
                 <img
-                  src={menuItem.menu.menu_bar.menu_images.add_icon.icon}
+                  src={menuItem.menu_bar.menu_images.add_icon.icon}
                   alt='icon'
                   style={{ width: '30px', height: 'auto' }} 
                 />
@@ -89,7 +96,7 @@ const AddFeature = ({ onSaveSelectedText, storedSelectedTexts }) => {
         <DialogTitle sx={{ textAlign: 'center' }}>Add Menus</DialogTitle>
         <DialogContent dividers>
           <Grid container spacing={1}>
-            {selectedMenuItem && selectedMenuItem.menu.menu_bar.add_features_values && Object.entries(selectedMenuItem.menu.menu_bar.add_features_values).map(([title, value], index) => (
+            {selectedMenuItem && selectedMenuItem.add_features_values && Object.entries(selectedMenuItem.add_features_values).map(([title, value], index) => (
               <Grid item xs={6} key={index}>
                 <Box
                   sx={{
