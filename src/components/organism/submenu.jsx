@@ -1,174 +1,139 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { Avatar, Button, Dialog, DialogTitle, DialogContent, DialogActions, FormControl, InputLabel, Select, MenuItem, TextField } from '@mui/material';
+import { Container, Grid, CircularProgress, Button, Dialog, DialogTitle, DialogContent, DialogActions, Checkbox, FormControlLabel, Box } from '@mui/material';
 import config from '../../config/config';
 
-const SubMenu = () => {
-  const [subMenuData, setSubMenuData] = useState([]);
-  const [selectedOptionIndex, setSelectedOptionIndex] = useState(0); // Default to the first option
-  const [hoveredIndex, setHoveredIndex] = useState(null);
-  const [isOpen, setIsOpen] = useState(false);
-  const [dropdown1Value, ] = useState('');
-  const [dropdown2Value, setDropdown2Value] = useState('');
-  const [description, setDescription] = useState('');
-
-  const handleChange = (e) => {
-    setFormState({ ...formState, [e.target.name]: e.target.value });
-  };
-
-  const [formState, setFormState] = useState({
-    page: "",
-    description: "",
-    status: "live",
-    author: "",
-    createdDate: "",
-    fromDate: "",
-    toDate: ""
-  });
+const SubMenu = ({ onSaveSelectedText, storedSelectedTexts }) => {
+  const [menuData, setMenuData] = useState([]);
+  const [open, setOpen] = useState(false);
+  const [selectedMenuItem, setSelectedMenuItem] = useState(null);
+  const [selectedTexts, setSelectedTexts] = useState(storedSelectedTexts || []);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    axios.get(`${config.apiUrl}/menudata`)
-      .then((response) => {
-        console.log('Menu data received:', response.data);
-        const menuData = response.data[0];
-        if (menuData && menuData.menu && menuData.menu.submenu) {
-          setSubMenuData(menuData.menu.submenu);
+    const fetchMenuData = async () => {
+      try {
+        const response = await axios.get(`${config.apiUrl}/menus`);
+        const menuData = response.data.data.find(menu => menu.menu === 'addfeatures');
+        if (menuData) {
+          setMenuData(Object.entries(menuData).filter(([key]) => key !== 'menu' && key !== '_id').map(([key, menuItem]) => ({
+            ...menuItem,
+            path: `/${key}`
+          })));
         }
-      })
-      .catch((error) => {
+        setLoading(false);
+      } catch (error) {
+        setLoading(false);
         console.error('Error fetching menu data:', error);
-      });
+      }
+    };
+
+    fetchMenuData();
   }, []);
 
-  const handleMouseEnter = (index) => {
-    setHoveredIndex(index);
+  useEffect(() => {
+    setSelectedTexts(storedSelectedTexts);
+  }, [storedSelectedTexts]);
+
+  const handleButtonClick = (menuItem) => {
+    setSelectedMenuItem(menuItem);
+    setOpen(true);
   };
 
-  const handleMouseLeave = () => {
-    setHoveredIndex(null);
+  const handleClose = () => {
+    setOpen(false);
   };
 
-  const handleSubmit = () => {
-    // Handle submission logic here
-    console.log('Dropdown 1:', dropdown1Value);
-    console.log('Dropdown 2:', dropdown2Value);
-    console.log('Description:', description);
-    setIsOpen(false);
+  const handleSave = () => {
+    const uniqueSelectedTexts = selectedTexts.filter((text, index, self) =>
+      index === self.findIndex((t) => t.title === text.title)
+    );
+
+    onSaveSelectedText(uniqueSelectedTexts);
+    handleClose();
   };
 
-  const handleMenuItemClick = (index) => {
-    // Check if the clicked menu item is "Filter"
-    const selectedItem = Object.values(subMenuData)[index];
-    if (selectedItem.title === "Filter") {
-      setSelectedOptionIndex(index);
-      setIsOpen(true);
+  const handleCheckboxChange = (title, checked) => {
+    let updatedSelectedTexts = [...selectedTexts];
+
+    if (checked) {
+      updatedSelectedTexts.push({ title, icon: selectedMenuItem.add_features_values[title] });
     } else {
-      // For other options, do nothing
-      setSelectedOptionIndex(index);
+      updatedSelectedTexts = updatedSelectedTexts.filter(item => item.title !== title);
     }
+
+    setSelectedTexts(updatedSelectedTexts);
   };
-  
+
+  const handleSelectAll = () => {
+    const allValues = Object.keys(selectedMenuItem.add_features_values || {});
+    setSelectedTexts(allValues.map(title => ({ title, icon: selectedMenuItem.add_features_values[title] })));
+  };
+
+  const handleReset = () => {
+    setSelectedTexts([]);
+  };
 
   return (
-    <div>
-      <div position="static" style={{ height: '70px', display: 'flex', alignItems: 'center' }}>
-        <div style={{ width: 'fit-content', textAlign: 'center', display: 'flex', background: 'white', borderRadius: '5px', margin: '10px 0 10px 50px' }}>
-          {Object.entries(subMenuData).map(([key, menuItem], index) => (
-            <div style={{ width: 'fit-content' }} key={key}>
-              <div
-                style={{
-                  display: 'flex',
-                  background: selectedOptionIndex === index ? '#ff3f14' : hoveredIndex === index ? '#ff3f14' : 'transparent',
-                  borderRadius: '5px',
-                  paddingRight: selectedOptionIndex === index || hoveredIndex === index ? '10px' : '0',
-                  fontWeight: 'bold',
-                  fontSize: '12px'
-                }}
-                onClick={() => handleMenuItemClick(index)}
-                onMouseEnter={() => handleMouseEnter(index)}
-                onMouseLeave={handleMouseLeave}
-              >
-                <Avatar
-                  src={menuItem.icon}
-                  alt={menuItem.title}
-                  sx={{
-                    width: 20,
-                    height: 20,
-                    cursor: 'pointer',
-                    borderRadius: '0',
-                    margin: '10px',
-                    transition: 'transform 0.3s ease',
-                    transform: selectedOptionIndex === index || hoveredIndex === index ? 'scale(1.1)' : 'scale(1)',
-                  }}
+    <Container>
+      {loading && <CircularProgress />}
+      {!loading && (
+        <Grid container spacing={1} justifyContent="center">
+          {menuData.map((menuItem, index) => (
+            <Grid item key={index}>
+              <Button onClick={() => handleButtonClick(menuItem)}>
+                <img
+                  src={menuItem.menu_bar.menu_images.add_icon.icon}
+                  alt='icon'
+                  style={{ width: '30px', height: 'auto' }} 
                 />
-                {selectedOptionIndex === index && (
-                  <p
-                    sx={{
-                      transform: 'translateX(-50%)',
-                      transition: 'color 0.3s ease',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      justifyContent: 'center',
-                      padding: '5px',
-                      color: 'black',
-                      fontSize: '12px'
-                    }}
-                  >
-                    {menuItem.title}
-                  </p>
-                )}
-              </div>
-            </div>
+              </Button>
+            </Grid>
           ))}
-        </div>
-      </div>
-      {/* MUI Dialog */}
-      <Dialog open={isOpen} onClose={() => setIsOpen(false)} style={{ boxShadow: '10px 10px 10px 10px #000000' }}>
-        <div style={{padding:'0px  50px'}}>
-          <DialogTitle style={{fontWeight:'bolder'}}>Filter</DialogTitle>
-          <DialogContent style={{ padding: '20px', overflow: 'hidden' }}>
-            <div className="form-group">
-              <label htmlFor="fromDate">From</label>
-              <input
-                type="date"
-                name="fromDate"
-                onChange={handleChange}
-                value={formState.fromDate}
-              />
-            </div>
-            <div className="form-group">
-              <label htmlFor="toDate">To</label>
-              <input
-                type="date"
-                name="toDate"
-                onChange={handleChange}
-                value={formState.toDate}
-              />
-            </div>
-            <FormControl fullWidth style={{ marginTop: '20px' }}>
-              <InputLabel>Telecallers(0 Of 10 Users)</InputLabel>
-              <Select value={dropdown2Value} onChange={(e) => setDropdown2Value(e.target.value)}>
-                <MenuItem value={'option1'}>Hari</MenuItem>
-                <MenuItem value={'option2'}> brabhu</MenuItem>
-              </Select>
-            </FormControl>
-            <TextField
-              multiline
-              fullWidth
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              label="Description"
-              placeholder="Enter description..."
-              style={{ marginTop: '20px' }}
-            />
-          </DialogContent>
-          <DialogActions style={{display:'flex', justifyContent:"space-between", width:'50%', margin:'auto'}}>       
-            <Button onClick={() => setIsOpen(false)} style={{ background: '#ffffff', opacity: '100%', color: '#000000', borderRadius: '5px',  boxShadow:'2px 2px 5px 1px #808080' }}>Close</Button>
-            <Button onClick={handleSubmit} color="primary" style={{ background: '#12e5e5', opacity: '100%', color: '#ffffff', borderRadius: '5px', boxShadow:'2px 2px 5px 1px #808080'  }}>Submit</Button>
-          </DialogActions>
-        </div>
+        </Grid>
+      )}
+      <Dialog open={open} onClose={handleClose}>
+        <DialogTitle sx={{ textAlign: 'center' }}>Add Menus</DialogTitle>
+        <DialogContent dividers>
+          <Grid container spacing={1}>
+            {selectedMenuItem && selectedMenuItem.add_features_values && Object.entries(selectedMenuItem.add_features_values).map(([title, value], index) => (
+              <Grid item xs={6} key={index}>
+                <Box
+                  sx={{
+                    bgcolor: 'red',
+                    borderRadius: 2,
+                    mb: 1,
+                    p: 1,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    boxShadow: 3,
+                    transition: 'transform 0.3s, box-shadow 0.3s',
+                    '&:hover': {
+                      transform: 'scale(1.05)',
+                      boxShadow: 6
+                    }
+                  }}
+                >
+                  <img src={value} alt={title} style={{ width: '30px', height: 'auto', marginRight: '8px' }} />
+                  <span>{title}</span>
+                  <FormControlLabel
+                    control={<Checkbox checked={selectedTexts.some(item => item.title === title)} onChange={(e) => handleCheckboxChange(title, e.target.checked)} />}
+                    label=""
+                  />
+                </Box>
+              </Grid>
+            ))}
+          </Grid>
+        </DialogContent>
+        <DialogActions sx={{ justifyContent: 'center' }}>
+          <Button onClick={handleSelectAll} sx={{ bgcolor: '#0057b7', color: 'white', '&:hover': { bgcolor: '#003f8a', color: 'white' } }}>Select All</Button>
+          <Button onClick={handleReset} sx={{ bgcolor: '#666666', color: 'white', '&:hover': { bgcolor: '#4d4d4d', color: 'white' } }}>Reset</Button>
+          <Button onClick={handleSave} sx={{ bgcolor: '#2e7d32', color: 'white', '&:hover': { bgcolor: '#1b5e20', color: 'white' } }}>Save</Button>
+          <Button onClick={handleClose} sx={{ bgcolor: '#d32f2f', color: 'white', '&:hover': { bgcolor: '#b71c1c', color: 'white' } }}>Close</Button>
+        </DialogActions>
       </Dialog>
-    </div>
+    </Container>
   );
 };
 

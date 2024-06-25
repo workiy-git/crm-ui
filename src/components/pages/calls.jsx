@@ -3,7 +3,7 @@ import { Typography } from '@mui/material';
 
 import Header from '../organism/header';
 import SideMenu from "../organism/sidemenu";
-import CallsGrid from '../molecules/call_app_bar';
+import Grid from '../organism/grid';
 
 function Calls() {
   // const [backgroundColor, setBackgroundColor] = useState(() => {
@@ -63,7 +63,7 @@ function Calls() {
           calls
         </Typography>
         </div>
-       <CallsGrid />
+       <Grid />
           
         </div>
       </div>

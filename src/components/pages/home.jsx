@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
+import axios from 'axios';
 import Header from '../organism/header';
 import MenuComponent from "../organism/menu";
 import SideMenu from "../organism/sidemenu";
 import Submenu from '../organism/submenu';
 import BackgroundColorChanger from '../atoms/BackgroundColorChanger';
 import Footer from '../atoms/Footer';
-import CreateWidget from '../atoms/create_widgets';
+import config from '../../config/config';
 
 function Home() {
   const [backgroundColor, setBackgroundColor] = useState(() => {
@@ -13,16 +14,28 @@ function Home() {
   });
 
   const [selectedWidgets, setSelectedWidgets] = useState([]);
+  const [homeData, setHomeData] = useState(null);
 
   useEffect(() => {
     document.title = 'Home';
+
+    axios.get(`${config.apiUrl}/pages`)
+      .then((response) => {
+        console.log('Data received:', response.data);
+        const pages = response.data.data;
+        const homeDoc = pages.find(doc => doc.title === 'Home');
+        if (homeDoc) {
+          setHomeData(homeDoc);
+        }
+      })
+      .catch((error) => {
+        console.error('Error fetching data:', error);
+      });
 
     return () => {
       document.title = 'Default Title';
     };
   }, []);
-
-
 
   const handleSaveSelectedText = (texts) => {
     setSelectedWidgets(texts);
@@ -47,30 +60,33 @@ function Home() {
     randomGradientColors.push(linearGradient);
   }
 
+  if (!homeData) {
+    return <div>Loading...</div>;
+  }
+
   return (
-    <div style={{ height: '100vh', display: "flex", flexDirection: "column", overflow: 'hidden', backgroundColor: "gray" ,paddingLeft:0 }}>
-      
+    <div style={{ height: '100vh', display: "flex", flexDirection: "column", overflow: 'hidden', backgroundColor: "gray", paddingLeft: 0 }}>
       <div style={{ display: 'flex', height: '-webkit-fill-available', overflow: 'hidden' }}>
         <div style={{ width: '10vh', overflow: 'hidden', backgroundColor: "#0d2d4e" }}>
           <SideMenu backgroundColor={backgroundColor} />
         </div>
-          <div style={{ width: '100%', marginRight: "-10px", backgroundColor: backgroundColor, overflow: 'hidden' }}>
-            <div>
-              <Header backgroundColor={backgroundColor} />
+        <div style={{ width: '100%', marginRight: "-10px", backgroundColor: backgroundColor, overflow: 'hidden' }}>
+          <div>
+            <Header backgroundColor={backgroundColor} />
             <BackgroundColorChanger colors={randomGradientColors} onColorChange={handleColorChange} />
-
-            </div>
-            <div>
-              <MenuComponent  onSaveSelectedText={handleSaveSelectedText} backgroundColor={backgroundColor} />
-            </div>
-            <div>
-              <Submenu backgroundColor={backgroundColor} />
-            </div>
-            <div>
-              <CreateWidget backgroundColor={backgroundColor} />  
-            </div>
-            
           </div>
+          <div>
+            <MenuComponent onSaveSelectedText={handleSaveSelectedText} backgroundColor={backgroundColor} />
+          </div>
+          <div>
+            <Submenu backgroundColor={backgroundColor} />
+          </div>
+          <div style={{ padding: '20px' }}>
+            <h1>{homeData.title}</h1>
+            <p>{homeData.description}</p>
+            <div>{homeData.content}</div>
+          </div>
+        </div>
       </div>
       <Footer />
     </div>

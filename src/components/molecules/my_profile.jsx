@@ -26,7 +26,7 @@ export default function Myprofile({ backgroundColor }) {
 
 
   useEffect(() => {
-    axios.get(`${config.apiUrl}/menudata`)
+    axios.get(`${config.apiUrl}/menu`)
       .then((response) => {
         console.log('Data received:', response.data);
         setMyprofileData(response.data);
