@@ -4,7 +4,6 @@ import Header from '../organism/header';
 import MenuComponent from "../organism/menu";
 import SideMenu from "../organism/sidemenu";
 import Submenu from '../organism/submenu';
-import BackgroundColorChanger from '../atoms/BackgroundColorChanger';
 import Footer from '../atoms/Footer';
 import config from '../../config/config';
 
@@ -60,10 +59,6 @@ function Home() {
     randomGradientColors.push(linearGradient);
   }
 
-  if (!homeData) {
-    return <div>Loading...</div>;
-  }
-
   return (
     <div style={{ height: '100vh', display: "flex", flexDirection: "column", overflow: 'hidden', backgroundColor: "gray", paddingLeft: 0 }}>
       <div style={{ display: 'flex', height: '-webkit-fill-available', overflow: 'hidden' }}>
@@ -73,18 +68,12 @@ function Home() {
         <div style={{ width: '100%', marginRight: "-10px", backgroundColor: backgroundColor, overflow: 'hidden' }}>
           <div>
             <Header backgroundColor={backgroundColor} />
-            <BackgroundColorChanger colors={randomGradientColors} onColorChange={handleColorChange} />
           </div>
           <div>
             <MenuComponent onSaveSelectedText={handleSaveSelectedText} backgroundColor={backgroundColor} />
           </div>
           <div>
             <Submenu backgroundColor={backgroundColor} />
-          </div>
-          <div style={{ padding: '20px' }}>
-            <h1>{homeData.title}</h1>
-            <p>{homeData.description}</p>
-            <div>{homeData.content}</div>
           </div>
         </div>
       </div>
