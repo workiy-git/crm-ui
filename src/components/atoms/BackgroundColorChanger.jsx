@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import theme1 from "../../assets/images/kk.png";
+// import theme1 from "../../assets/images/kk.png";
 
 const BackgroundColorChanger = ({ colors, onColorChange, isFullScreen }) => {
   // const [marginTop, setMarginTop] = useState("20%");
@@ -22,7 +22,7 @@ const BackgroundColorChanger = ({ colors, onColorChange, isFullScreen }) => {
   return (
     <div style={{marginRight:'23em', marginTop:'-3rem', float:'right', position:'relative',zIndex:'10'}}>
       <img
-        src={theme1}
+        // src={theme1}
         onClick={handleClick}
         style={{
           width: "30px",

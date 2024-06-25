@@ -85,7 +85,7 @@ const SideMenu = () => {
                   height: 20,
                   cursor: 'pointer',
                   borderRadius: '0',
-                  margin: '10px',
+                  margin: '10px auto',
                 }}
               />
               <Typography

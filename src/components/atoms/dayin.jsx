@@ -4,14 +4,14 @@ import { Container, Grid, Dialog, DialogContent, Button, Typography } from '@mui
 import config from '../../config/config'; // Import the configuration file
 
 const Dayin = () => {
-  const [menuData, setMenuData] = useState([]);
+  const [menuData, setMenuData] = useState(null); // Initialize as null to handle loading state
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   useEffect(() => {
-    axios.get(`${config.apiUrl}/menudata`) // Use apiUrl from the configuration file
+    axios.get(`${config.apiUrl}/menus/menu_bar`) // Use apiUrl from the configuration file
       .then((response) => {
-        console.log('Data received:', response.data);
-        setMenuData(response.data);
+        console.log('dayData received:', response.data.data.menu_text);
+        setMenuData(response.data.data.menu_text);
       })
       .catch((error) => {
         console.error('Error fetching data:', error);
@@ -42,11 +42,22 @@ const Dayin = () => {
     <Container>
       <div style={{ cursor: 'pointer' }} onClick={handleOpenDialog}>
         <Grid container spacing={2}>
-          {menuData.map((menuItem, index) => (
-            <Grid item key={index}>
-              <h5 style={{ backgroundColor: 'green', padding: '5px', borderRadius: "5px", width: "50px",fontSize:'12px', textAlign: "center", }}>{menuItem.menu.menu_bar.menu_text.title}</h5>
-            </Grid>
-          ))}
+          <Grid item>
+            {menuData?.title && ( // Use optional chaining to safely access menuData.title
+              <h5
+                style={{
+                  backgroundColor: 'green',
+                  padding: '5px',
+                  borderRadius: "5px",
+                  width: "50px",
+                  fontSize: '12px',
+                  textAlign: "center",
+                }}
+              >
+                {menuData.title}
+              </h5>
+            )}
+          </Grid>
         </Grid>
       </div>
       <Dialog open={isDialogOpen} onClose={handleCloseDialog} fullWidth maxWidth="xs">

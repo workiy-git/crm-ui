@@ -13,7 +13,8 @@ const AddFeature = ({ onSaveSelectedText, storedSelectedTexts }) => {
   useEffect(() => {
     const fetchMenuData = async () => {
       try {
-        const response = await axios.get(`${config.apiUrl}/menus`);
+        const response = await axios.get(`${config.apiUrl}/menus/menu_bar`);
+        console.log('addData received:', response.data);
         const menuData = response.data.data.find(menu => menu.menu === 'addfeatures');
         if (menuData) {
           setMenuData(Object.entries(menuData).filter(([key]) => key !== 'menu' && key !== '_id').map(([key, menuItem]) => ({
