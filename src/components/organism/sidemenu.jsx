@@ -4,6 +4,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import MyProfile from '../molecules/my_profile';
 import config from '../../config/config';
 import axios from 'axios';
+import '../../assets/styles/Sidemenu.css';
 
 const SideMenu = () => {
   const navigate = useNavigate();
@@ -46,9 +47,9 @@ const SideMenu = () => {
   };
 
   return (
-    <div style={{ backgroundColor: "#0d2d4e" }}>
+    <div className="scrollable-container" style={{ backgroundColor: "#0d2d4e" ,overflowY:'auto', maxHeight:'80vh' ,overflowX:'hidden' }}>
       <MyProfile />
-      <div style={{ width: 'fit-content', textAlign: 'center', margin: 'auto' }}>
+      <div style={{ width: 'fit-content', textAlign: 'center', margin: 'auto'}}>
         {menuItems.map((menuItem, index) => {
           const isSelected = selectedOptionIndex === index || (location.pathname === "/" && index === 0);
           return (
@@ -85,7 +86,7 @@ const SideMenu = () => {
                   height: 20,
                   cursor: 'pointer',
                   borderRadius: '0',
-                  margin: '10px',
+                  margin: '10px auto',
                 }}
               />
               <Typography
