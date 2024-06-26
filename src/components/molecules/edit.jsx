@@ -8,11 +8,11 @@ import {
   TextField,
 } from "@mui/material";
 
-const EditDialog = ({ row, onSave, onClose, allKeys }) => {
-  const [editedRow, setEditedRow] = useState(row);
+const EditDialog = ({ row, onSave, onClose }) => {
+  const [editedRow, setEditedRow] = useState({ ...row });
 
   useEffect(() => {
-    setEditedRow(row);
+    setEditedRow({ ...row });
   }, [row]);
 
   const handleChange = (event) => {
@@ -27,15 +27,15 @@ const EditDialog = ({ row, onSave, onClose, allKeys }) => {
 
   return (
     <Dialog open onClose={onClose}>
-      <DialogTitle>{row._id ? "Edit Row" : "Add New Row"}</DialogTitle>
+      <DialogTitle>Edit Row</DialogTitle>
       <DialogContent>
-        {allKeys.map((key) => (
+        {Object.entries(editedRow).map(([key, value]) => (
           <TextField
             key={key}
             margin="dense"
             name={key}
             label={key}
-            value={editedRow[key] || ""}
+            value={value}
             onChange={handleChange}
             fullWidth
           />
@@ -52,3 +52,4 @@ const EditDialog = ({ row, onSave, onClose, allKeys }) => {
 };
 
 export default EditDialog;
+

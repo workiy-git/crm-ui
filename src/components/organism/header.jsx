@@ -55,13 +55,13 @@ const Header = () => {
           <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
             <Search />
           </Box>
-          <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
+          {/* <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
             <WindowControls
               onMinimize={handleMinimizeClick}
               onMaximize={handleMaximizeClick}
               onClose={handleCloseClick}
             />
-          </Box>
+          </Box> */}
           <Box sx={{ flexGrow: 1 }} />
           <Box sx={{ display: 'flex'  }}>
             <Box sx={{ margin: 'auto' }}>
