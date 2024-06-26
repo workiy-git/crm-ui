@@ -67,28 +67,30 @@ function Home() {
   return (
     <div style={{ height: '100vh', display: "flex", flexDirection: "column", overflow: 'hidden', backgroundColor: "gray", paddingLeft: 0 }}>
       <div style={{ display: 'flex', height: '-webkit-fill-available', overflow: 'hidden' }}>
-        <div style={{ width: '10vh', backgroundColor: "#0d2d4e" }}>
-          <SideMenu backgroundColor={backgroundColor} />
-        </div>
-        <div style={{ width: '100%', marginRight: "-10px", backgroundColor: backgroundColor, overflow: 'hidden' }}>
+        <SideMenu menuItems={homeData.menuItems} />
+        <div style={{ flex: 1, overflow: 'auto' }}>
+          <Header />
+          <MenuComponent
+            selectedOptions={selectedWidgets}
+            onSaveSelectedText={handleSaveSelectedText}
+            backgroundColor={backgroundColor}
+          />
+          <BackgroundColorChanger onColorChange={handleColorChange} />
           <div>
-            <Header backgroundColor={backgroundColor} />
-            <BackgroundColorChanger colors={randomGradientColors} onColorChange={handleColorChange} />
+            {Array.isArray(homeData.content) ? (
+              homeData.content.map((section, index) => (
+                <div key={index} style={{ background: randomGradientColors[index % randomGradientColors.length] }}>
+                  <h2>{section.title}</h2>
+                  <p>{section.body}</p>
+                </div>
+              ))
+            ) : (
+              <p>No content available</p>
+            )}
           </div>
-          <div>
-            <MenuComponent onSaveSelectedText={handleSaveSelectedText} backgroundColor={backgroundColor} />
-          </div>
-          <div>
-            <Submenu backgroundColor={backgroundColor} />
-          </div>
-          <div style={{ padding: '20px' }}>
-            <h1>{homeData.title}</h1>
-            <p>{homeData.description}</p>
-            <div>{homeData.content}</div>
-          </div>
+          <Footer />
         </div>
       </div>
-      <Footer />
     </div>
   );
 }
