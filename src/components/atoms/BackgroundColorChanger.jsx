@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import theme1 from "../../assets/images/kk.png";
+// import theme1 from "../../assets/images/kk.png";
 
 const BackgroundColorChanger = ({ colors, onColorChange, isFullScreen }) => {
   // const [marginTop, setMarginTop] = useState("20%");
