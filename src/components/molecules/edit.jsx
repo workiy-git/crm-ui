@@ -1,45 +1,55 @@
-import React from 'react';
-import { Box, Button, Modal, Typography, TextField } from '@mui/material';
+import React, { useState, useEffect } from "react";
+import {
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  TextField,
+} from "@mui/material";
 
-const EditModal = ({ open, onClose, row, handleSave, handleChange }) => {
+const EditDialog = ({ row, onSave, onClose }) => {
+  const [editedRow, setEditedRow] = useState({ ...row });
+
+  useEffect(() => {
+    setEditedRow({ ...row });
+  }, [row]);
+
+  const handleChange = (event) => {
+    const { name, value } = event.target;
+    setEditedRow((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleSave = () => {
+    console.log("Saving edited row:", editedRow);
+    onSave(editedRow);
+  };
+
   return (
-    <Modal open={open} onClose={onClose}>
-      <Box sx={{
-        position: 'absolute',
-        top: '50%',
-        left: '50%',
-        transform: 'translate(-50%, -50%)',
-        width: 400,
-        bgcolor: 'background.paper',
-        border: '2px solid #000',
-        boxShadow: 24,
-        p: 4,
-        columnCount:'2'
-      }}>
-        <Typography variant="h6" component="h2">
-          Edit Record
-        </Typography>
-        {row && Object.keys(row).map((key) => (
-          key !== '_id' && (
-            <TextField
-              key={key}
-              margin="normal"
-              fullWidth
-              label={key.replace(/_/g, ' ')}
-              name={key}
-              value={row[key]}
-              onChange={handleChange}
-            />
-          )
+    <Dialog open onClose={onClose}>
+      <DialogTitle>Edit Row</DialogTitle>
+      <DialogContent>
+        {Object.entries(editedRow).map(([key, value]) => (
+          <TextField
+            key={key}
+            margin="dense"
+            name={key}
+            label={key}
+            value={value}
+            onChange={handleChange}
+            fullWidth
+          />
         ))}
-        <Box sx={{ mt: 2, display: 'flex', justifyContent: 'flex-end' }}>
-          <Button variant="contained" color="primary" onClick={handleSave}>
-            Save
-          </Button>
-        </Box>
-      </Box>
-    </Modal>
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={onClose}>Cancel</Button>
+        <Button onClick={handleSave} color="primary">
+          Save
+        </Button>
+      </DialogActions>
+    </Dialog>
   );
 };
 
-export default EditModal;
+export default EditDialog;
+
