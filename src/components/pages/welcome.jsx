@@ -3,6 +3,7 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import Button from '@mui/material/Button';
 import config from '../../config/config';
+import '../../assets/styles/welcome.css';
 
 const Welcome = () => {
   const navigate = useNavigate();
@@ -32,17 +33,17 @@ const Welcome = () => {
   }
 
   return (
-    <div style={{ display: 'flex', width: '100%', height: '100vh' }}>
-      <div style={{ width: '50%', display: 'flex', justifyContent: 'center', alignItems: 'center', overflow: 'hidden' }}>
-        <img alt="" src={welcomeData.Images.welcome_bg_img} style={{ width: '100%' }} />
+    <div className="welcome-container">
+      <div className="welcome-image-container">
+        <img alt="" src={welcomeData.Images.welcome_bg_img} className="welcome-image" />
       </div>
-      <div style={{ width: '50%', display: 'flex', justifyContent: 'space-around', alignItems: 'center', flexDirection: 'column' }}>
+      <div className="welcome-content">
         <div className="signin-signup">
           <form action="#" className="sign-in-form">
-            <div style={{ textAlign: 'center' }}>
-              <h1 style={{ fontSize: '60px', textAlign: 'left' }}>{welcomeData.Texts.text1}</h1>
-              <h4 style={{ fontSize: '25px', lineHeight: '2', textAlign: 'left', marginTop: '50px', fontWeight: '400' }}>{welcomeData.Texts.text2}</h4>
-              <Button sx={{ fontSize: '20px', mt: '40px' }} variant="contained" color="primary" onClick={handleButtonClick}>
+            <div className="welcome-form-container">
+              <h1 className="welcome-title">{welcomeData.Texts.text1}</h1>
+              <h4 className="welcome-subtitle">{welcomeData.Texts.text2}</h4>
+              <Button className="welcome-button" variant="contained" color="primary" onClick={handleButtonClick}>
                 {welcomeData.Texts.text3}
               </Button>
             </div>

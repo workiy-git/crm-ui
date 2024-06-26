@@ -16,10 +16,10 @@ function Companylogo() {
     }, []);
 
     useEffect(() => {
-        axios.get(`${config.apiUrl}/menudata`) // Use apiUrl from the configuration file
+        axios.get(`${config.apiUrl}/menus/header`) // Use apiUrl from the configuration file
             .then((response) => {
                 console.log('Data received:', response.data);
-                setcompanylogoData(response.data);
+                setcompanylogoData(response.data.data.company_logo);
             })
             .catch((error) => {
                 console.error('Error fetching data:', error);
@@ -36,19 +36,16 @@ function Companylogo() {
 
     return (
         <div>
-            {companylogoData.map((item, index) => (
-
-                <div key ={index}>
-                    <Box sx={{ display: { md: 'flex' } }}>
+                <div>
+                    <Box sx={{ display: 'flex'  }}>
                     <IconButton size="large" color="inherit" style={dashedBorderStyle}>
-                    <img alt="" src={item.menu.header.company_logo.business_logo} style={logoHeightStyle} />
+                    <img alt="" src={companylogoData.business_logo} style={logoHeightStyle} />
                     </IconButton>
                     <IconButton size="large" color="inherit">
-                    <img alt="" src={item.menu.header.company_logo.product_logo} style={logoHeightStyle} />
+                    <img alt="" src={companylogoData.product_logo} style={logoHeightStyle} />
                     </IconButton>
                     </Box>
                 </div>
-            ))}
         </div>
     );
 }

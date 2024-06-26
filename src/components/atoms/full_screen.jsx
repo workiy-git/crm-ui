@@ -66,10 +66,10 @@ const FullScreen = () => {
   }, [handleResize]);
 
   useEffect(() => {
-    axios.get(`${config.apiUrl}/menudata`) // Use apiUrl from the configuration file
+    axios.get(`${config.apiUrl}/menus/header`) // Use apiUrl from the configuration file
       .then((response) => {
         console.log('Data received:', response.data);
-        setLogoData(response.data);
+        setLogoData(response.data.data.full_screen);
       })
       .catch((error) => {
         console.error('Error fetching data:', error);
@@ -78,8 +78,8 @@ const FullScreen = () => {
 
   return (
     <div className='header_button'>
-      {logoData.map((item, index) => (
-        <div key={index} className="fullscreen" >
+      
+        <div className="fullscreen" >
           <Button
             id="exitFullscreenButton"
             className="header_buttons"
@@ -87,10 +87,9 @@ const FullScreen = () => {
            
            
           >
-            <img className="full_screen_img" alt="" src={item.menu.header.full_screen.full_screen_icon}  style={{ height: 20, padding:'30px 15px' }} />
+            <img className="full_screen_img" alt="" src={logoData.full_screen_icon}  style={{ height: 20, padding:'30px 15px' }} />
           </Button>
         </div>
-      ))}
     </div>
   );
 };

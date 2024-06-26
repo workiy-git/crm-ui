@@ -1,35 +1,36 @@
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import Box from '@mui/material/Box';
-import {  ThemeProvider, createTheme } from '@mui/material/styles';
-// import List from '@mui/material/List';
+import List from '@mui/material/List';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import Avatar from '@mui/material/Avatar';
+import Paper from '@mui/material/Paper';
+import { ThemeProvider, createTheme } from '@mui/material/styles';
 import config from '../../config/config'; // Import the configuration file
 
-// const FireNav = styled(List)({
-//   '& .MuiListItemIcon-root': {
-//     minWidth: 0,
-//     marginRight: 16,
-//   },
-//   '& .MuiSvgIcon-root': {
-//     fontSize: 20,
-//   },
-// });
+const theme = createTheme({
+  components: {
+    MuiListItemButton: {
+      defaultProps: {
+        disableTouchRipple: true,
+      },
+    },
+  },
+  palette: {},
+});
 
 export default function Myprofile({ backgroundColor }) {
   const [open, setOpen] = useState(false);
   const menuRef = useRef(null);
-  const [myprofileData, setMyprofileData] = useState([]);
-
+  const [myprofileData, setMyprofileData] = useState({});
 
   useEffect(() => {
-    axios.get(`${config.apiUrl}/menu`)
+    axios.get(`${config.apiUrl}/menus/header`)
       .then((response) => {
-        console.log('Data received:', response.data);
-        setMyprofileData(response.data);
+        console.log('myprofile Data received:', response.data);
+        setMyprofileData(response.data.data.myprofile);
       })
       .catch((error) => {
         console.error('Error fetching data:', error);
@@ -42,9 +43,7 @@ export default function Myprofile({ backgroundColor }) {
         setOpen(false);
       }
     }
-  
     document.body.addEventListener('click', handleClickOutside);
-  
     return () => {
       document.body.removeEventListener('click', handleClickOutside);
     };
@@ -67,77 +66,61 @@ export default function Myprofile({ backgroundColor }) {
   ];
 
   return (
-    <Box sx={{ display: 'flex', justifyContent:'center'}}>
-      <ThemeProvider
-        theme={createTheme({
-          components: {
-            MuiListItemButton: {
-              defaultProps: {
-                disableTouchRipple: true,
-              },
-            },
-          },
-          palette: {},
-        })}
-      >
+    <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+      <ThemeProvider theme={theme}>
         <div elevation={0} sx={{ maxWidth: 256, backgroundColor: 'transparent' }}>
-          <div component="nav" disablePadding className="FireNav" ref={menuRef}>
-            {myprofileData.map((item, index) => (
-              <ListItemButton
-                alignItems="flex-start"
-                onClick={handleToggle}
-                sx={{
-                  '&:hover, &:focus': { '& svg': { opacity: open ? 1 : 0 },background:'none' },
-                }}
-                style={{padding:'15px'}}
-                key={index}
-              >
-                <div style={{borderRadius:'100px', }}>
-                <Avatar
-                  alt="Build"
-                  src={item.menu.header.myprofile.profile_image}
-                  sx={{ width: 40, height: 40, outline: 'white 2px solid', }}
-                /></div>
-              </ListItemButton>
-            ))}
-            <Box>
+          <List component="nav" disablePadding ref={menuRef}>
+            <ListItemButton
+              alignItems="flex-start"
+              onClick={handleToggle}
+              sx={{
+                '&:hover, &:focus': { '& svg': { opacity: open ? 1 : 0 }, background: 'none' },
+              }}
+              style={{ padding: '15px' }}
+            >
+              <Avatar
+                alt="Profile"
+                src={myprofileData.profile_image}
+                sx={{ width: 40, height: 40, outline: 'white 2px solid' }}
+              />
+            </ListItemButton>
+            {open && (
               <Box
                 sx={{
-                  bgcolor: open ? 'white' : null,
+                  bgcolor: 'white',
                   borderRadius: '10px',
-                  pb: open ? 2 : 0,
-                  pt: open ? 2 : 0,
-                  position: open ? 'absolute' : 'static',
+                  pb: 2,
+                  pt: 2,
+                  position: 'absolute',
                   boxShadow: '2px 2px 19px 0px black',
-                  zIndex: '10',
-                  marginLeft:'20px',
+                  zIndex: 10,
+                  marginLeft: '20px',
+                  width: 'max-content',
                 }}
               >
-                {open && myprofileData[0].menu.header.myprofile && (
-                  <Box style={{display:'grid', padding:'15px'}}>
-                    {Object.keys(myprofileData[0].menu.header.myprofile)
-                      .filter(key => key !== 'profile_image')
-                      .map((key, index) => (
-                        <ListItemButton
-                          key={index}
-                          sx={{ py: 0, minHeight: 32, color: 'rgba(255,255,255,.8)' }}
-                          onClick={buttonFunctions[index]} // Set appropriate click handlers
-                          style={index === 0 ? { borderBottom:'1px dashed black', paddingBottom:'10px'} : {}}
-                        >
-                          <ListItemIcon sx={{ color: 'inherit', minWidth:'fit-content', marginRight:'15px' }}  style={index === 0 ? { height:'40px', padding:'0px'} : {}}>
-                            <img src={myprofileData[0].menu.header.myprofile[key].icon} alt="" />
-                          </ListItemIcon>
-                          <ListItemText
-                            primary={myprofileData[0].menu.header.myprofile[key].title}
-                            primaryTypographyProps={{ fontSize: 14, fontWeight: 'medium', color: 'black' }}
-                          />
-                        </ListItemButton>
-                      ))}
-                  </Box>
-                )}
+                <Box style={{ display: 'grid', padding: '15px' }}>
+                  {Object.keys(myprofileData)
+                    .filter(key => key !== 'profile_image')
+                    .map((key, index) => (
+                      <ListItemButton
+                        key={index}
+                        sx={{ py: 0, minHeight: 32, color: 'rgba(255,255,255,.8)' }}
+                        onClick={buttonFunctions[index]} // Set appropriate click handlers
+                        style={index === 0 ? { borderBottom: '1px dashed black', paddingBottom: '10px' } : {}}
+                      >
+                        <ListItemIcon sx={{ color: 'inherit', minWidth: 'fit-content', marginRight: '15px' }} style={index === 0 ? { height: '40px', padding: '0px' } : {}}>
+                          <img src={myprofileData[key].icon} alt="" />
+                        </ListItemIcon>
+                        <ListItemText
+                          primary={myprofileData[key].title}
+                          primaryTypographyProps={{ fontSize: 14, fontWeight: 'medium', color: 'black' }}
+                        />
+                      </ListItemButton>
+                    ))}
+                </Box>
               </Box>
-            </Box>
-          </div>
+            )}
+          </List>
         </div>
       </ThemeProvider>
     </Box>

@@ -63,12 +63,13 @@ const Header = () => {
             />
           </Box> */}
           <Box sx={{ flexGrow: 1 }} />
-          <Box sx={{ display: { md: 'flex' } }}>
+          <Box sx={{ display: 'flex'  }}>
             <Box sx={{ margin: 'auto' }}>
               <Dayin />
             </Box>
             <Box sx={{ margin: 'auto 20px auto auto' }}>
-              <Badge badgeContent={7} color="error">
+              {/* <Badge badgeContent={7} color="error"> */}
+              <Badge>
                 <Notification />
               </Badge>
             </Box>
