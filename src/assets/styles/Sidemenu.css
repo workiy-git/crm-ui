@@ -1,0 +1,30 @@
+::-webkit-scrollbar {
+    width: 2px;
+     /* Width of the scrollbar */
+  }
+  
+  ::-webkit-scrollbar-track {
+    background: #0d2d4e; /* Background color of the track */
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    background-color: #fff; /* Color of the scrollbar thumb */
+    border-radius: 10px; /* Rounded corners */
+   /* Padding around the thumb */
+  }
+  .side-bar-name {
+    background-color: blue;
+    margin: 0;
+    height: 10%;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white; /* Added for better text visibility against blue background */
+}
+
+.side-bar-text {
+    font-family: 'Arial', sans-serif; /* Example font family */
+    font-size: 20px; /* Example font size in points */
+
+}
