@@ -47,9 +47,9 @@ const SideMenu = () => {
   };
 
   return (
-    <div className="scrollable-container" style={{ backgroundColor: "#0d2d4e" ,overflowY:'auto', maxHeight:'80vh' ,overflowX:'hidden' }}>
+    <div className="scrollable-container" style={{ backgroundColor: "#0d2d4e" , }}>
       <MyProfile />
-      <div style={{ width: 'fit-content', textAlign: 'center', margin: 'auto'}}>
+      <div style={{ width: 'fit-content', textAlign: 'center', margin: 'auto', overflowY:'auto', maxHeight:'70vh' ,overflowX:'hidden'}}>
         {menuItems.map((menuItem, index) => {
           const isSelected = selectedOptionIndex === index || (location.pathname === "/" && index === 0);
           return (

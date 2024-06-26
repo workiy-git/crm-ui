@@ -64,7 +64,7 @@ const Header = () => {
           </Box> */}
           <Box sx={{ flexGrow: 1 }} />
           <Box sx={{ display: 'flex'  }}>
-            <Box sx={{ margin: 'auto' }}>
+            <Box sx={{ margin: 'auto', display:{xs : 'none'} }}>
               <Dayin />
             </Box>
             <Box sx={{ margin: 'auto 20px auto auto' }}>

@@ -6,6 +6,9 @@ import List from '@mui/material/List';
 import ListItemButton from '@mui/material/ListItemButton';
 import Collapse from '@mui/material/Collapse';
 import config from '../../config/config'; // Import the configuration file
+import useMediaQuery from '@mui/material/useMediaQuery';
+import { useTheme } from '@mui/material/styles';
+import MoreVertIcon from '@mui/icons-material/MoreVert';
 
 const FireNav = styled(List)({
   '& .MuiListItemIcon-root': {
@@ -19,6 +22,8 @@ const FireNav = styled(List)({
 
 export default function Hamburger() {
   const [open, setOpen] = useState(false);
+  const theme = useTheme();
+  const isMdUp = useMediaQuery(theme.breakpoints.up('md'));
   const [hamburgerData, setHamburgerData] = useState([]);
   const [openItemIndex, setOpenItemIndex] = useState(null); // Track index of the currently open submenu
   const menuRef = useRef(null);
@@ -82,22 +87,22 @@ export default function Hamburger() {
       >
         <div elevation={0} sx={{ maxWidth: 256, backgroundColor: 'transparent' }}>
           <FireNav component="nav" disablePadding className="FireNav" ref={menuRef}>
-            {/* {Object.keys(hamburgerData).map((item, index) => ( */}
-              <ListItemButton
-                alignItems="flex-start"
-                onClick={() => setOpen(!open)}
-                sx={{
-                  padding: 0,
-                  '&:hover, &:focus': { '& svg': { opacity: open ? 1 : 0 }, background: 'none' },
-                }}
-              >
-                <img
-                  alt={hamburgerData.hamburger_image} // Provide meaningful alt text
-                  src={hamburgerData.hamburger_image}
-                  style={{ height: 20, padding: '30px 15px' }}
-                />
-              </ListItemButton>
-            {/* ))} */}
+            <ListItemButton
+              alignItems="flex-start"
+              onClick={() => setOpen(!open)}
+              sx={{
+                padding: 0,
+                margin:'15px',
+                '&:hover, &:focus': { '& svg': { opacity: open ? 1 : 0 }, background: 'none' },
+                height:{xs : '30px', md :'20px'}
+              }}
+            >
+              <img
+                alt={hamburgerData.hamburger_image} // Provide meaningful alt text
+                src={isMdUp ? hamburgerData.hamburger_image : hamburgerData.hamburger_md_image}
+                style={{ height: "100%", padding:'' }}
+              />
+            </ListItemButton>
             <Box>
               <Box
                 sx={{
@@ -115,6 +120,7 @@ export default function Hamburger() {
                   <Box>
                     {Object.keys(hamburgerData)
                       .filter((key) => key !== 'hamburger_image')
+                      .filter((key) => key !== 'hamburger_md_image')
                       .map((key, index) => {
                         const menuItem = hamburgerData[key];
                         return (

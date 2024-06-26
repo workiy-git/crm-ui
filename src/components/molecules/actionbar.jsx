@@ -40,4 +40,3 @@ function Calls() {
 }
 
 export default Calls;
-Actions
