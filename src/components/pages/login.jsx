@@ -51,7 +51,7 @@ function Loginpage() {
 
   return (
     <div>
-      {companylogoData && companylogoData.background  (
+      {companylogoData && companylogoData.background ? (
         <div className="login-container">
           <img
             src={companylogoData.background.BG}
@@ -186,8 +186,10 @@ function Loginpage() {
             </div>
           </div>
         </div>
-
-      ) }
+      ) : (
+        <div >
+        </div>
+      )}
     </div>
   );
 }

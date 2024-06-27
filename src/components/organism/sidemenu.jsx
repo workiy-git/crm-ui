@@ -4,7 +4,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import MyProfile from '../molecules/my_profile';
 import config from '../../config/config';
 import axios from 'axios';
-import '../../assets/styles/sidemenu.css';
+import '../../assets/styles/Sidemenu.css';
 
 const SideMenu = () => {
   const navigate = useNavigate();
