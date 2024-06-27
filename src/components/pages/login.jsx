@@ -432,7 +432,7 @@ function Loginpage() {
 
   return (
     <div>
-      {companylogoData ? (
+      {companylogoData (
         <div className="login-container">
           <img
             src={companylogoData.background.bg}
@@ -610,8 +610,6 @@ function Loginpage() {
             </div>
           </div>
         </div>
-      ) : (
-        <p>No data available</p> // Fallback UI or message
       )}
     </div>
   );
