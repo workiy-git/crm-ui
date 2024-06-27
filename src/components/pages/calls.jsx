@@ -32,7 +32,7 @@ function Calls() {
   }
 
   return (
-    <div style={{ height: '100vh', display: "flex", flexDirection: "column", overflow: 'hidden', backgroundColor: "gray" }}>
+    <div style={{ height: '100vh', display: "flex", flexDirection: "column", overflow: 'hidden' }}>
       <div style={{ display: 'flex', height: '-webkit-fill-available', overflow: 'hidden' }}>
         <div style={{ width: '10vh', overflow: 'hidden', backgroundColor: "#0d2d4e" }}>
           <SideMenu backgroundColor={backgroundColor} />

@@ -14,6 +14,7 @@ import { useNavigate } from 'react-router-dom';
 // import EditModal from '../molecules/edit';
 import DownloadDoneRoundedIcon from '@mui/icons-material/DownloadDoneRounded';
 import AddTaskRoundedIcon from '@mui/icons-material/AddTaskRounded';
+import "../../assets/styles/callsgrid.css";
 
 const Grid = ({ endpoint }) => {
   const navigate = useNavigate();
@@ -161,21 +162,22 @@ const Grid = ({ endpoint }) => {
   };
 
   return (
-    <div style={{ margin: '-140px 10px 10px 10px' }}>
+    <div className="CallsGrid" style={{ margin: '-140px 10px 10px 10px' }}>
       <Toolbar />
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
+      <Box className="Appbar" sx={{ display: 'flex', justifyContent: 'space-around' }}>
         <ActionButton />
         <Dropdown />
-        <Callfilter />
+        {/* <Callfilter /> */}
         <Pagination />
       </Box>
-      <Box sx={{ display: 'flex', justifyContent: 'space-evenly', alignItems: 'center', mb: 2 }}>
-        <IconButton onClick={toggleCheckboxes}>
+      <Box className="navbar" sx={{ display: 'flex', justifyContent: 'space-evenly', alignItems: 'center' }}>
+        <IconButton className="icon-button" onClick={toggleCheckboxes}>
           <WidgetsOutlinedIcon />
         </IconButton>
         {alphabet.map(letter => (
           <Typography
             key={letter}
+            className={`letter ${selectedLetter === letter ? "selectedLetter" : ""}`}
             sx={{
               padding: '5px',
               cursor: 'pointer',
@@ -285,8 +287,8 @@ const Grid = ({ endpoint }) => {
             </div>
           </div>
         )}
-      <TableContainer component={Paper}>
-        <Table stickyHeader aria-label="sticky table">
+      <TableContainer className="table-wrapper" component={Paper}>
+        <Table className="table" stickyHeader aria-label="sticky table">
           <TableHead>
             <TableRow>
               <TableCell>Actions</TableCell>

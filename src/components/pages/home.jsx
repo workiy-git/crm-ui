@@ -73,7 +73,6 @@ function Home() {
         <div style={{ width: '100%', marginRight: "-10px", backgroundColor: backgroundColor, overflow: 'hidden' }}>
           <div>
             <Header backgroundColor={backgroundColor} />
-            <BackgroundColorChanger colors={randomGradientColors} onColorChange={handleColorChange} />
           </div>
           <div>
             <MenuComponent onSaveSelectedText={handleSaveSelectedText} backgroundColor={backgroundColor} />

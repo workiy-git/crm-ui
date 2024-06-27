@@ -161,7 +161,7 @@ function Loginpage() {
             </div>
             <div className="login-center">
               {allFieldsFilled ? (
-                <Link to="/welcome" className="login-link">
+                <Link to="/home" className="login-link">
                   <Button
                     variant="contained"
                     color="primary"

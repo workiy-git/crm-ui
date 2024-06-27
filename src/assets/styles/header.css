@@ -4,3 +4,7 @@ height: 74px;
 background-color: blue;
 
 }
+.hamburger_list:hover{
+    background-color: rgb(173, 206, 235);
+    border-radius: 10px;
+}
