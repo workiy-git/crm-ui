@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import config from '../../config/config';
 import { Button, Dialog, DialogTitle, DialogContent, DialogActions, Checkbox, FormControlLabel, IconButton } from '@mui/material';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import axios from 'axios';
@@ -14,7 +15,7 @@ const AddFeature = ({ onSaveSelectedText, storedSelectedTexts }) => {
 
   const fetchMenuData = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/menus');
+      const response = await axios.get(`${config.apiUrl}/menus`)
       const menus = response.data.data;
 
       // Extracting the add_features_values from the menu_bar
