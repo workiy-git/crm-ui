@@ -60,9 +60,6 @@ function Home() {
     randomGradientColors.push(linearGradient);
   }
 
-  if (!homeData) {
-    return <div>Loading...</div>;
-  }
 
   return (
     <div style={{ height: '100vh', display: "flex", flexDirection: "column", overflow: 'hidden', backgroundColor: "gray", paddingLeft: 0 }}>
@@ -77,6 +74,7 @@ function Home() {
           />
           <BackgroundColorChanger onColorChange={handleColorChange} />
           <div>
+
             {Array.isArray(homeData.content) ? (
               homeData.content.map((section, index) => (
                 <div key={index} style={{ background: randomGradientColors[index % randomGradientColors.length] }}>
