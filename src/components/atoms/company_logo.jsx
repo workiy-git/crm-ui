@@ -31,17 +31,17 @@ function Companylogo() {
         borderRadius: '0',
       };
     const logoHeightStyle = {
-        height: '40px',
+        height: '100%',
       };
 
     return (
         <div>
                 <div>
                     <Box sx={{ display: 'flex'  }}>
-                    <IconButton size="large" color="inherit" style={dashedBorderStyle}>
-                    <img alt="" src={companylogoData.business_logo} style={logoHeightStyle} />
+                    <IconButton size="large" color="inherit" style={dashedBorderStyle} sx={{  height:{xs : '50px', md :'70px'} }}>
+                    <img alt="" src={companylogoData.business_logo}  style={logoHeightStyle}/>
                     </IconButton>
-                    <IconButton size="large" color="inherit">
+                    <IconButton size="large" color="inherit" sx={{  height:{xs : '50px', md :'70px'} }}> 
                     <img alt="" src={companylogoData.product_logo} style={logoHeightStyle} />
                     </IconButton>
                     </Box>

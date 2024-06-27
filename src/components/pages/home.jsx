@@ -60,9 +60,6 @@ function Home() {
     randomGradientColors.push(linearGradient);
   }
 
-  if (!homeData) {
-    return <div>Loading...</div>;
-  }
 
   return (
     <div style={{ height: '100vh', display: "flex", flexDirection: "column", overflow: 'hidden', backgroundColor: "gray", paddingLeft: 0 }}>
@@ -80,11 +77,6 @@ function Home() {
           </div>
           <div>
             <Submenu backgroundColor={backgroundColor} />
-          </div>
-          <div style={{ padding: '20px' }}>
-            <h1>{homeData.title}</h1>
-            <p>{homeData.description}</p>
-            <div>{homeData.content}</div>
           </div>
         </div>
       </div>
