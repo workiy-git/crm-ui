@@ -1,140 +1,100 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import { Container, Grid, Button, Dialog, DialogTitle, DialogContent, DialogActions, Checkbox, FormControlLabel, Box, CircularProgress } from '@mui/material';
 import config from '../../config/config';
+import { Button, Dialog, DialogTitle, DialogContent, DialogActions, Checkbox, FormControlLabel, IconButton } from '@mui/material';
+import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
+import axios from 'axios';
 
 const AddFeature = ({ onSaveSelectedText, storedSelectedTexts }) => {
-  const [menuData, setMenuData] = useState([]);
-  const [open, setOpen] = useState(false);
-  const [selectedMenuItem, setSelectedMenuItem] = useState(null);
-  const [selectedTexts, setSelectedTexts] = useState(storedSelectedTexts || []);
-  const [loading, setLoading] = useState(true);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [options, setOptions] = useState([]);
+  const [selectedOptions, setSelectedOptions] = useState(storedSelectedTexts || []);
 
   useEffect(() => {
-    const fetchMenuData = async () => {
-      try {
-        const response = await axios.get(`${config.apiUrl}/menus/menu_bar`);
-        console.log('addData received:', response.data);
-        const menuData = response.data.data.find(menu => menu.menu === 'addfeatures');
-        if (menuData) {
-          setMenuData(Object.entries(menuData).filter(([key]) => key !== 'menu' && key !== '_id').map(([key, menuItem]) => ({
-            ...menuItem,
-            path: `/${key}`
-          })));
-        }
-        setLoading(false);
-      } catch (error) {
-        setLoading(false);
-        console.error('Error fetching menu data:', error);
-      }
-    };
-
     fetchMenuData();
   }, []);
 
-  useEffect(() => {
-    setSelectedTexts(storedSelectedTexts);
-  }, [storedSelectedTexts]);
+  const fetchMenuData = async () => {
+    try {
+      const response = await axios.get(`${config.apiUrl}/menus`)
+      const menus = response.data.data;
 
-  const handleButtonClick = (menuItem) => {
-    setSelectedMenuItem(menuItem);
-    setOpen(true);
-  };
+      // Extracting the add_features_values from the menu_bar
+      const menuBar = menus.find(menu => menu.menu === 'menu_bar');
+      const addFeaturesValues = menuBar?.add_features_values || {};
 
-  const handleClose = () => {
-    setOpen(false);
-  };
+      const flattenedOptions = Object.keys(addFeaturesValues).map(key => ({
+        title: key,
+        icon: addFeaturesValues[key],
+      }));
 
-  const handleSave = () => {
-    const uniqueSelectedTexts = selectedTexts.filter((text, index, self) =>
-      index === self.findIndex((t) => t.title === text.title)
-    );
-
-    onSaveSelectedText(uniqueSelectedTexts);
-    handleClose();
-  };
-
-  const handleCheckboxChange = (title, checked) => {
-    let updatedSelectedTexts = [...selectedTexts];
-
-    if (checked) {
-      updatedSelectedTexts.push({ title, icon: selectedMenuItem.add_features_values[title] });
-    } else {
-      updatedSelectedTexts = updatedSelectedTexts.filter(item => item.title !== title);
+      setOptions(flattenedOptions);
+    } catch (error) {
+      console.error('Error fetching menu data:', error);
     }
+  };
 
-    setSelectedTexts(updatedSelectedTexts);
+  const handleOpenDialog = () => {
+    setDialogOpen(true);
+  };
+
+  const handleCloseDialog = () => {
+    setDialogOpen(false);
   };
 
   const handleSelectAll = () => {
-    const allValues = Object.keys(selectedMenuItem.add_features_values || {});
-    setSelectedTexts(allValues.map(title => ({ title, icon: selectedMenuItem.add_features_values[title] })));
+    setSelectedOptions(options);
   };
 
   const handleReset = () => {
-    setSelectedTexts([]);
+    setSelectedOptions([]);
+  };
+
+  const handleSave = () => {
+    onSaveSelectedText(selectedOptions);
+    handleCloseDialog();
+  };
+
+  const handleCheckboxChange = (option) => {
+    if (selectedOptions.some(selected => selected.title === option.title)) {
+      setSelectedOptions(selectedOptions.filter((selected) => selected.title !== option.title));
+    } else {
+      setSelectedOptions([...selectedOptions, option]);
+    }
   };
 
   return (
-    <Container>
-      {loading && <CircularProgress />}
-      {!loading && (
-        <Grid container spacing={1} justifyContent="center">
-          {menuData.map((menuItem, index) => (
-            <Grid item key={index}>
-              <Button onClick={() => handleButtonClick(menuItem)}>
-                <img
-                  src={menuItem.menu_bar.menu_images.add_icon.icon}
-                  alt='icon'
-                  style={{ width: '30px', height: 'auto' }} 
+    <div>
+      <IconButton onClick={handleOpenDialog}>
+        <AddCircleOutlineIcon />
+      </IconButton>
+      <Dialog open={dialogOpen} onClose={handleCloseDialog}>
+        <DialogTitle>Select Features</DialogTitle>
+        <DialogContent>
+          {options.map((option, index) => (
+            <FormControlLabel
+              key={index}
+              control={
+                <Checkbox
+                  checked={selectedOptions.some(selected => selected.title === option.title)}
+                  onChange={() => handleCheckboxChange(option)}
                 />
-              </Button>
-            </Grid>
+              }
+              label={
+                <div>
+                  <img src={option.icon} alt={option.title} style={{ width: '20px', height: 'auto', marginRight: '8px' }} />
+                  {option.title}
+                </div>
+              }
+            />
           ))}
-        </Grid>
-      )}
-      <Dialog open={open} onClose={handleClose}>
-        <DialogTitle sx={{ textAlign: 'center' }}>Add Menus</DialogTitle>
-        <DialogContent dividers>
-          <Grid container spacing={1}>
-            {selectedMenuItem && selectedMenuItem.add_features_values && Object.entries(selectedMenuItem.add_features_values).map(([title, value], index) => (
-              <Grid item xs={6} key={index}>
-                <Box
-                  sx={{
-                    bgcolor: 'red',
-                    borderRadius: 2,
-                    mb: 1,
-                    p: 1,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    boxShadow: 3,
-                    transition: 'transform 0.3s, box-shadow 0.3s',
-                    '&:hover': {
-                      transform: 'scale(1.05)',
-                      boxShadow: 6
-                    }
-                  }}
-                >
-                  <img src={value} alt={title} style={{ width: '30px', height: 'auto', marginRight: '8px' }} />
-                  <span>{title}</span>
-                  <FormControlLabel
-                    control={<Checkbox checked={selectedTexts.some(item => item.title === title)} onChange={(e) => handleCheckboxChange(title, e.target.checked)} />}
-                    label=""
-                  />
-                </Box>
-              </Grid>
-            ))}
-          </Grid>
         </DialogContent>
-        <DialogActions sx={{ justifyContent: 'center' }}>
-          <Button onClick={handleSelectAll} sx={{ bgcolor: '#0057b7', color: 'white', '&:hover': { bgcolor: '#003f8a', color: 'white' } }}>Select All</Button>
-          <Button onClick={handleReset} sx={{ bgcolor: '#666666', color: 'white', '&:hover': { bgcolor: '#4d4d4d', color: 'white' } }}>Reset</Button>
-          <Button onClick={handleSave} sx={{ bgcolor: '#2e7d32', color: 'white', '&:hover': { bgcolor: '#1b5e20', color: 'white' } }}>Save</Button>
-          <Button onClick={handleClose} sx={{ bgcolor: '#d32f2f', color: 'white', '&:hover': { bgcolor: '#b71c1c', color: 'white' } }}>Close</Button>
+        <DialogActions>
+          <Button onClick={handleSelectAll}>Select All</Button>
+          <Button onClick={handleReset}>Reset</Button>
+          <Button onClick={handleSave}>Save</Button>
         </DialogActions>
       </Dialog>
-    </Container>
+    </div>
   );
 };
 
