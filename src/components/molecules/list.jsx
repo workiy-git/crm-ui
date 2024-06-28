@@ -9,6 +9,7 @@ import config from '../../config/config'; // Import the configuration file
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useTheme } from '@mui/material/styles';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
+import "../../assets/styles/header.css"
 
 const FireNav = styled(List)({
   '& .MuiListItemIcon-root': {
@@ -25,12 +26,7 @@ export default function Hamburger() {
   const theme = useTheme();
   const isMdUp = useMediaQuery(theme.breakpoints.up('md'));
   const [hamburgerData, setHamburgerData] = useState([]);
-  const [openItemIndex, setOpenItemIndex] = useState(null); // Track index of the currently open submenu
   const menuRef = useRef(null);
-
-  const handleCollapseClick = (index) => {
-    setOpenItemIndex(openItemIndex === index ? null : index); // Toggle the open submenu index
-  };
 
   const handleMenuItemClick = (menuItem, menuIndex, menuItemIndex) => {
     console.log('Clicked on:', menuItem.title, 'from menu', menuIndex, 'item index', menuItemIndex);
@@ -41,6 +37,9 @@ export default function Hamburger() {
         break;
       case 'Enquiry':
         window.location.href = '/enquiry';
+        break;
+      case 'Calls':
+        window.location.href = '/calls';
         break;
       // Add more cases for other menu items if needed
       default:
@@ -71,6 +70,55 @@ export default function Hamburger() {
     };
   }, []);
 
+  const renderNestedItems = (menuItem) => {
+    return (
+      <ul
+        style={{
+          listStyle: 'none',
+          padding: '0px 10px',
+          margin: '5px 0',
+          width: '100%',
+          lineHeight: '2',
+        }}
+      >
+        {Object.keys(menuItem)
+          .filter((subKey) => subKey !== 'title' && subKey !== 'icon')
+          .map((subKey, subIndex) => (
+            <li
+            className='hamburger_list'
+              onClick={() =>
+                handleMenuItemClick(menuItem[subKey], 0, subIndex)
+              }
+              style={{
+                cursor: 'pointer',
+                display: 'flex',
+                width: 'max-content',
+                lineHeight: 2.5,
+                padding:'0 15px',
+                margin:'0 10px'
+              }}
+              key={subIndex}
+            >
+              <img
+                alt={menuItem[subKey].title} // Provide meaningful alt text
+                src={menuItem[subKey].icon}
+                style={{
+                  margin: 'auto 15px auto 0',
+                  width: '20px',
+                }}
+              />
+              {menuItem[subKey].title}
+              {menuItem[subKey].children && (
+                <Collapse in={true} timeout="auto" unmountOnExit>
+                  {renderNestedItems(menuItem[subKey].children)}
+                </Collapse>
+              )}
+            </li>
+          ))}
+      </ul>
+    );
+  };
+
   return (
     <Box sx={{ display: 'flex' }}>
       <ThemeProvider
@@ -92,15 +140,15 @@ export default function Hamburger() {
               onClick={() => setOpen(!open)}
               sx={{
                 padding: 0,
-                margin:'15px',
+                margin: '15px',
                 '&:hover, &:focus': { '& svg': { opacity: open ? 1 : 0 }, background: 'none' },
-                height:{xs : '30px', md :'20px'}
+                height: { xs: '30px', md: '20px' }
               }}
             >
               <img
                 alt={hamburgerData.hamburger_image} // Provide meaningful alt text
                 src={isMdUp ? hamburgerData.hamburger_image : hamburgerData.hamburger_md_image}
-                style={{ height: "100%", padding:'' }}
+                style={{ height: "100%", padding: '', }}
               />
             </ListItemButton>
             <Box>
@@ -117,100 +165,46 @@ export default function Hamburger() {
                 }}
               >
                 {open && (
-                  <Box>
+                  <Box sx={{ display: "flex" }}>
                     {Object.keys(hamburgerData)
                       .filter((key) => key !== 'hamburger_image')
                       .filter((key) => key !== 'hamburger_md_image')
                       .map((key, index) => {
                         const menuItem = hamburgerData[key];
                         return (
-                          <ListItemButton
-                            sx={{ py: 0, minHeight: 40, color: 'rgba(255,255,255,.8)' }}
-                            key={index}
-                            onClick={() => handleCollapseClick(index)}
-                          >
-                            <ul
-                              style={{
-                                listStyle: 'none',
-                                color: 'black',
-                                padding: '0px 10px',
-                                margin: 0,
-                                width: '100%',
-                              }}
+                          <div key={index}>
+                            <ListItemButton
+                              sx={{ py: 0, minHeight: 40, color: 'rgba(255,255,255,.8)', display: 'flex', flexDirection: 'column' }}
                             >
-                              <li
-                                style={{ display: 'flex', width: '100%' }}
-                              >
-                                <img
-                                  alt={menuItem.title} // Provide meaningful alt text
-                                  src={menuItem.icon}
-                                  style={{ marginRight: '15px', width: '20px' }}
-                                />
-                                {menuItem.title}
-                              </li>
-                            </ul>
-                          </ListItemButton>
-                        );
-                      })}
-                  </Box>
-                )}
-              </Box>
-              <Box
-                sx={{
-                  bgcolor: open ? 'white' : null,
-                  borderRadius: '10px',
-                  position: open ? 'absolute' : 'static',
-                  boxShadow: '2px 2px 19px 0px black',
-                  zIndex: '10',
-                  marginLeft: open ? '12rem' : '10px',
-                }}
-              >
-                {open && (
-                  <Box>
-                    {Object.keys(hamburgerData)
-                      .filter((key) => key !== 'hamburger_image')
-                      .map((key, index) => {
-                        const menuItem = hamburgerData[key];
-                        return (
-                          <ListItemButton sx={{ py: 0, color: 'black' }} key={index}>
-                            <Collapse in={openItemIndex === index} timeout="auto" unmountOnExit>
                               <ul
                                 style={{
                                   listStyle: 'none',
+                                  color: 'black',
                                   padding: '0px 10px',
-                                  lineHeight: '2',
+                                  margin: 0,
+                                  width: '100%',
+                                  display: 'flex',
+                                  
+                                  
                                 }}
                               >
-                                {key &&
-                                  Object.keys(menuItem)
-                                    .filter((subKey) => subKey !== 'title' && subKey !== 'icon')
-                                    .map((subKey, subIndex) => (
-                                      <li
-                                        onClick={() =>
-                                          handleMenuItemClick(menuItem[subKey], 0, subIndex)
-                                        }
-                                        style={{
-                                          cursor: 'pointer',
-                                          display: 'flex',
-                                          width: 'max-content',
-                                          lineHeight: 2.5,
-                                        }}
-                                        key={subIndex}
-                                      >
-                                        <img
-                                          alt={menuItem[subKey].title} // Provide meaningful alt text
-                                          src={menuItem[subKey].icon}
-                                          style={{
-                                            margin: 'auto 15px auto 0',
-                                            width: '20px',
-                                          }}
-                                        />
-                                        {menuItem[subKey].title}
-                                      </li>
-                                    ))}
+                                <li
+                                  style={{ display: 'flex', width: '100%', background:'#0c2d4e', color:'white', padding:'15px', borderRadius:'10px' }}
+                                >
+                                  <img
+                                    alt={menuItem.title} // Provide meaningful alt text
+                                    src={menuItem.icon}
+                                    style={{ marginRight: '15px', width: '20px', 
+                                      filter: 'brightness(0) invert(1)' }}
+                                  />
+                                  {menuItem.title}
+                                </li>
                               </ul>
+                            </ListItemButton>
+                            <Collapse in={open} timeout="auto" unmountOnExit>
+                              {renderNestedItems(menuItem)}
                             </Collapse>
-                          </ListItemButton>
+                          </div>
                         );
                       })}
                   </Box>

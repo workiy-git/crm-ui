@@ -46,7 +46,7 @@ const Header = () => {
 
   return (
     <Box sx={{ flexGrow: 1 }}>
-      <div position="static" style={{ background: "white", color: 'black', boxShadow: 'none', padding: '0px 5px' }}>
+      <div position="static" style={{ background: "white", color: 'black', boxShadow: '0px 0px 15px gray', padding: '0px 5px' }}>
         <Toolbar sx={{ flexGrow: 1, height: '10vh' }}>
           <Hamburger />
           <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
