@@ -10,12 +10,10 @@ const localStorageKey = 'selectedTexts';
 const useStyles = makeStyles((theme) => ({
   grow: {
     flexGrow: 1,
-  
   },
   appBar: {
     backgroundColor: '#D9D9D9',
     boxShadow: 'none',
-  
   },
   iconButton: {
     color: 'white',
@@ -30,11 +28,10 @@ const useStyles = makeStyles((theme) => ({
   selectedTextItem: {
     display: 'flex',
     alignItems: 'center',
-    margin:'10px',
-    padding:'5px',
-    borderRadius:'10px',
-    boxShadow:'0px 0px 3px 1px gray'
-
+    margin: '10px',
+    padding: '5px',
+    borderRadius: '10px',
+    boxShadow: '0px 0px 3px 1px gray',
   },
   selectedTextIcon: {
     width: '30px',
@@ -47,7 +44,7 @@ const useStyles = makeStyles((theme) => ({
     alignItems: 'center',
     overflowX: 'hidden',
     width: '80%',
-    marginLeft:'40px'
+    marginLeft: '40px',
   },
   slideButton: {
     width: '40px',
@@ -98,21 +95,21 @@ const MenuComponent = ({ backgroundColor, onSaveSelectedText }) => {
   };
 
   const handleScrollRight = () => {
-    setScrollIndex(Math.min(selectedTexts.length - 9, scrollIndex + 1));
+    setScrollIndex(Math.min(selectedTexts.length - 6, scrollIndex + 1));
   };
 
   return (
     <AppBar position="static" className={classes.appBar} style={{ background: "rgb(13, 45, 78)" }}>
       <Toolbar className={classes.toolbar}>
         <Box className={classes.selectedTextContainer}>
-          {selectedTexts.slice(scrollIndex, scrollIndex + 9).map((text, index) => (
+          {selectedTexts.slice(scrollIndex, scrollIndex + 6).map((text, index) => (
             <Box key={index} className={classes.selectedTextItem}>
               <img src={text.icon} alt={text.title} className={classes.selectedTextIcon} />
               <Typography style={{ width: 'max-content' }} variant="body2">{text.title}</Typography>
             </Box>
           ))}
         </Box>
-        {selectedTexts.length > 9 && (
+        {selectedTexts.length > 6 && (
           <Box className={classes.buttonGroup}>
             <SlideButton onScrollLeft={handleScrollLeft} direction="left" />
             <SlideButton onScrollRight={handleScrollRight} direction="right" />
