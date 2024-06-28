@@ -102,7 +102,7 @@ const MenuComponent = ({ backgroundColor, onSaveSelectedText }) => {
   };
 
   return (
-    <AppBar position="static" className={classes.appBar} style={{ background: backgroundColor }}>
+    <AppBar position="static" className={classes.appBar} style={{ background: "rgb(13, 45, 78)" }}>
       <Toolbar className={classes.toolbar}>
         <Box className={classes.selectedTextContainer}>
           {selectedTexts.slice(scrollIndex, scrollIndex + 9).map((text, index) => (
