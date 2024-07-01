@@ -11,7 +11,7 @@ import Pagination from '../atoms/pagination';
 import Callfilter from "../atoms/callfilter";
 import config from '../../config/config';
 import { useNavigate } from 'react-router-dom';
-// import EditModal from '../molecules/edit';
+import EditModal from '../molecules/edit';
 import DownloadDoneRoundedIcon from '@mui/icons-material/DownloadDoneRounded';
 import AddTaskRoundedIcon from '@mui/icons-material/AddTaskRounded';
 import "../../assets/styles/callsgrid.css";
@@ -162,12 +162,12 @@ const Grid = ({ endpoint }) => {
   };
 
   return (
-    <div className="CallsGrid" style={{ margin: '-140px 10px 10px 10px' }}>
+    <div className="CallsGrid" style={{ margin: '-160px 0px 10px 0px' }}>
       <Toolbar />
       <Box className="Appbar" sx={{ display: 'flex', justifyContent: 'space-around' }}>
         <ActionButton />
         <Dropdown />
-        {/* <Callfilter /> */}
+        <Callfilter />
         <Pagination />
       </Box>
       <Box className="navbar" sx={{ display: 'flex', justifyContent: 'space-evenly', alignItems: 'center' }}>
@@ -181,7 +181,8 @@ const Grid = ({ endpoint }) => {
             sx={{
               padding: '5px',
               cursor: 'pointer',
-              fontWeight: selectedLetter === letter ? 'bold' : 'normal'
+              fontWeight: selectedLetter === letter ? 'bold' : 'normal',
+              border: '1px solid black'
             }}
             onClick={() => setSelectedLetter(letter)}
           >

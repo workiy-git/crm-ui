@@ -33,13 +33,13 @@ function Calls() {
 
   return (
     <div style={{ height: '100vh', display: "flex", flexDirection: "column", overflow: 'hidden' }}>
-      <div style={{ display: 'flex', height: '-webkit-fill-available', overflow: 'hidden' }}>
-        <div style={{ width: '10vh', overflow: 'hidden', backgroundColor: "#0d2d4e" }}>
+      <div  style={{ display: 'flex', height: '-webkit-fill-available', overflow: 'hidden' }}>
+        <div style={{ width: '10vh', backgroundColor: "#0d2d4e" }}>
           <SideMenu backgroundColor={backgroundColor} />
         </div>
         <div style={{ width: '100%', marginRight: "-10px", backgroundColor: backgroundColor, overflow: 'hidden' }}>
           <Header backgroundColor={backgroundColor} />
-          <Typography style={{ height: '10rem', color: 'white', padding: '10px', fontSize: '30px', backgroundColor }}>
+          <Typography style={{ height: '10rem', color: 'white', padding: '10px', fontSize: '30px', background: 'linear-gradient(90deg, rgba(12,45,78,1) 0%, rgba(28,104,180,1) 100%)' }}>
             Calls
           </Typography>
           <Grid endpoint="/appdata" />

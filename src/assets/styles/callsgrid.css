@@ -3,7 +3,7 @@
   display: flex;
   flex-direction: column;
   height: 95%; /* Full viewport height */
-  padding: 10px;
+  /* padding: 10px; */
   color: #333;
   width: 99%;
  margin-top: -7rem;
@@ -33,7 +33,7 @@
 }
 
 .selectedLetter {
-  background-color: #04AA6D;
+  background-color: #D9D9D9;
   color: white;
 }
 
@@ -61,7 +61,7 @@
   padding-top: 12px;
   padding-bottom: 12px;
   text-align: center; /* Center-align text */
-  background-color: #04AA6D;
+  background-color: #A9A8A7;
   color: white;
   position: sticky; /* Sticky headers */
   top: 0;
@@ -70,7 +70,7 @@
 }
 
 .table tr:nth-child(even) {
-  background-color: #e0e0e0;
+  background-color: #EBF3F1;
 }
 
 .table tr:hover {
@@ -128,7 +128,7 @@
 }
 
 .btn {
-  background-color: #04AA6D;
+  background-color: #D9D9D9;
   color: white;
   padding: 10px 20px;
   border: none;
@@ -138,7 +138,7 @@
 }
 
 .btn:hover {
-  background-color: #039958;
+  background-color: #D9D9D9;
 }
 
 .checkbox-popup {
@@ -180,7 +180,7 @@
 }
 
 .checkbox-popup .btn {
-  background-color: #04AA6D;
+  background-color: #D9D9D9;
   color: white;
   padding: 5px 15px;
   border: none;
@@ -202,7 +202,7 @@
 
 .table-wrapper::-webkit-scrollbar-thumb,
 .checkbox-popup .scroll-bar::-webkit-scrollbar-thumb {
-  background-color: #04AA6D;
+  background-color: #D9D9D9;
   border-radius: 10px;
 }
 
@@ -217,7 +217,7 @@
   position: sticky;
   left: 0;
   z-index: 1;
-  background-color: #04AA6D; /* Background color of the sticky column */
+  background-color: #D9D9D9; /* Background color of the sticky column */
   color: white; /* Text color of the sticky column */
 }
 
