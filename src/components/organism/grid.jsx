@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useRef } from "react";
 import axios from 'axios';
-import { Box, Button, Container, IconButton, Menu, MenuItem, Modal, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Toolbar, Typography, Paper } from '@mui/material';
+import { Box, Button, Container, IconButton, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Toolbar, Typography } from '@mui/material';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
-import WidgetsOutlinedIcon from '@mui/icons-material/WidgetsOutlined';
 import CloseIcon from '@mui/icons-material/Close';
+import WidgetsOutlinedIcon from '@mui/icons-material/WidgetsOutlined';
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
 import Dropdown from '../atoms/dropdown';
 import ActionButton from '../atoms/actionbutton';
@@ -11,19 +11,12 @@ import Pagination from '../atoms/pagination';
 import Callfilter from "../atoms/callfilter";
 import config from '../../config/config';
 import { useNavigate } from 'react-router-dom';
-// import EditModal from '../molecules/edit';
-import DownloadDoneRoundedIcon from '@mui/icons-material/DownloadDoneRounded';
-import AddTaskRoundedIcon from '@mui/icons-material/AddTaskRounded';
 
 const Grid = ({ endpoint }) => {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
-  const [modalOpen, setModalOpen] = useState(false);
   const [rows, setRows] = useState([]);
   const [showColumns, setShowColumns] = useState({});
-  const [rowToEdit, setRowToEdit] = useState(null);
-  const [formState, setFormState] = useState({});
-  const [errors, setErrors] = useState("");
   const [showCheckboxes, setShowCheckboxes] = useState(false);
   const [pageNumber, setPageNumber] = useState(1);
   const [recordsPerPage, setRecordsPerPage] = useState(20);
@@ -39,18 +32,17 @@ const Grid = ({ endpoint }) => {
     const fetchData = async () => {
       try {
         const response = await axios.get(`${config.apiUrl}${endpoint}`);
-
         const initialShowColumnsState = {};
         response.data.data.forEach(row => {
           Object.keys(row).forEach(key => {
-            if (!initialShowColumnsState.hasOwnProperty(key) && key !== "_id") {
+            if (!initialShowColumnsState.hasOwnProperty(key) && key !== "key") {
               initialShowColumnsState[key] = true;
             }
           });
         });
         setShowColumns(initialShowColumnsState);
         setRows(response.data.data);
-        console.log("users",response.data.data);
+        console.log("users", response.data.data);
       } catch (error) {
         console.error('Error fetching user data:', error);
       }
@@ -66,37 +58,12 @@ const Grid = ({ endpoint }) => {
     setShowColumns({ ...showColumns, [columnName]: !showColumns[columnName] });
   };
 
-  const handleChange = e => {
-    setFormState({ ...formState, [e.target.name]: e.target.value });
-  };
-
-  const handleSave = async e => {
-    e.preventDefault();
-    try {
-      if (rowToEdit === null) {
-        const response = await axios.post(`${config.apiUrl}${endpoint}`, formState);
-        setRows([...rows, response.data.userData]);
-      } else {
-        const updatedRow = { ...formState };
-        await axios.put(`${config.apiUrl}${endpoint}${updatedRow._id}`, updatedRow);
-        setRows(rows.map((currRow, idx) => {
-          if (idx !== rowToEdit) return currRow;
-          return updatedRow;
-        }));
-      }
-      setModalOpen(false);
-    } catch (error) {
-      console.error('Error saving user data:', error);
-    }
-  };
-
   const totalPages = Math.ceil(rows.length / recordsPerPage);
-  const pageNumbers = Array.from({ length: totalPages }, (_, index) => index + 1);
   const startIndex = (pageNumber - 1) * recordsPerPage;
   const endIndex = Math.min(pageNumber * recordsPerPage, rows.length);
 
   const handleSelectAll = () => {
-    const allFields = Object.keys(showColumns).filter(key => key !== '_id');
+    const allFields = Object.keys(showColumns).filter(key => key !== 'key');
     setSelectedFields(allFields);
   };
 
@@ -116,8 +83,8 @@ const Grid = ({ endpoint }) => {
 
   const handleDeleteRow = async (row) => {
     try {
-      await axios.delete(`${config.apiUrl}${endpoint}/${row._id}`);
-      setRows(rows.filter(r => r._id !== row._id));
+      await axios.delete(`${config.apiUrl}${endpoint}/${row.key}`);
+      setRows(rows.filter(r => r.key !== row.key));
       setPopupVisible(false);
     } catch (error) {
       console.error('Error deleting user data:', error);
@@ -149,14 +116,12 @@ const Grid = ({ endpoint }) => {
   };
 
   const handleEditClick = () => {
-    setFormState(selectedRow);
-    setRowToEdit(rows.findIndex(r => r._id === selectedRow._id));
-    setModalOpen(true);
+    navigate(`/edit/${selectedRow.key}`);
     setPopupVisible(false);
   };
 
   const handleDetailsClick = () => {
-    navigate(`/details/${selectedRow._id}`);
+    navigate(`/details/${selectedRow.key}`);
     setPopupVisible(false);
   };
 
@@ -188,162 +153,154 @@ const Grid = ({ endpoint }) => {
         ))}
       </Box>
       {showCheckboxes && (
-          <div style={{ width:'95%', display:'flex', justifyContent:'center' }}>
-            <div style={{position:'absolute', top:'10%', background: 'white', borderRadius: '10px', boxShadow: '0px 0px 11px black', zIndex:10, width:'40rem' }}>
-              <div style={{ borderBottom:'2px solid #808080', fontSize:'20px', fontWeight:'bold', borderTopLeftRadius:'10px', borderTopRightRadius:'10px', padding:'3% 5%', display: 'flex', justifyContent: 'space-between' }}>
-                <span>Configure Columns - Calls</span>
-                <button onClick={toggleCheckboxes} style={{ background: 'none', border: 'none', cursor: 'pointer' }}>
-                  <CloseIcon />
-                </button>
-              </div>
-              <div style={{ display: 'flex' }}>
-                <div style={{ height: 'auto', width: '55%', position: 'relative', display: 'flex', flexDirection: 'column', padding: '15px 25px' }}>
-                  <div style={{ fontWeight: 'bold', padding: '10px', marginBottom: '10px', color:'#21252980' }}>
-                    Select Fields
-                  </div>
-                  <div className="scroll-bar" style={{ display: 'flex', flexDirection: 'column', height: '250px', overflow: 'auto' }}>
-                    {Object.entries(showColumns).map(([key, value]) => (
-                      key !== '_id' && value && (
-                        <label style={{ background:'#00AEF8', padding:'5px 10px', fontWeight:'500', marginBottom:'2px', marginRight:'5%', color: 'white', position: 'relative' }} id="selected_checkbox" key={key}>
-                          <input
-                            style={{ display:'none' }}
-                            type="checkbox"
-                            checked={value}
-                            onChange={() => handleCheckboxChange(key)}
-                          />
-                          {key.replace(/_/g, ' ')}
-                            <CloseRoundedIcon
-                              style={{
-                                position: 'absolute',
-                                top: '50%',
-                                right: '5px',
-                                transform: 'translateY(-50%)',
-                              }}
-                            />
-                        </label>
-                      )
-                    ))}
-                  </div>
+        <div style={{ width: '95%', display: 'flex', justifyContent: 'center' }}>
+          <div style={{ position: 'absolute', top: '10%', background: 'white', borderRadius: '10px', boxShadow: '0px 0px 11px black', zIndex: 10, width: '40rem' }}>
+            <div style={{ borderBottom: '2px solid #808080', fontSize: '20px', fontWeight: 'bold', borderTopLeftRadius: '10px', borderTopRightRadius: '10px', padding: '3% 5%', display: 'flex', justifyContent: 'space-between' }}>
+              <span>Configure Columns - Calls</span>
+              <button onClick={toggleCheckboxes} style={{ background: 'none', border: 'none', cursor: 'pointer' }}>
+                <CloseIcon />
+              </button>
+            </div>
+            <div style={{ display: 'flex' }}>
+              <div style={{ height: 'auto', width: '55%', position: 'relative', display: 'flex', flexDirection: 'column', padding: '15px 25px' }}>
+                <div style={{ fontWeight: 'bold', padding: '10px', marginBottom: '10px', color: '#21252980' }}>
+                  Select Fields
                 </div>
-                <div style={{ height: 'auto', width: '45%', position: 'relative', display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: '15px 25px' }}>
-                  <div style={{ fontWeight: 'bold', padding: '10px', marginBottom: '10px', color:'#21252980' }}>
-                    Available Fields
-                  </div>
-                  <input
-                    type="text"
-                    placeholder="Search..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    style={{ marginBottom: '10px', height:'30px' }}
-                  />
-                  <div className="scroll-bar" style={{ display: 'flex', flexDirection: 'column', height: '250px', overflow: 'auto' }}>
-                    {Object.entries(showColumns).filter(([key]) => key.toLowerCase().includes(searchQuery.toLowerCase())).map(([key, value]) => (
-                      key !== '_id' && !value && (
-                        <label style={{marginBottom:'1px', marginRight:'5%', color:selectedFields.includes(key) ?'white' :'#21252980', padding: selectedFields.includes(key) ?'7px' : '3px', fontWeight:'500', backgroundColor: selectedFields.includes(key) ? '#12E5E5' : 'white', position: 'relative' }} id="available_checkbox" key={key}>
-                          <input
-                            style={{ display:'none' }}
-                            type="checkbox"
-                            checked={selectedFields.includes(key)}
-                            onChange={() => {
-                              const updatedSelectedFields = [...selectedFields];
-                              const fieldIndex = updatedSelectedFields.indexOf(key);
-                              if (fieldIndex === -1) {
-                                updatedSelectedFields.push(key);
-                              } else {
-                                updatedSelectedFields.splice(fieldIndex, 1);
-                              }
-                              setSelectedFields(updatedSelectedFields);
-                            }}
-                          />
-                          {key.replace(/_/g, ' ')}
-                          {selectedFields.includes(key) && (
-                            <AddTaskRoundedIcon
-                              style={{
-                                position: 'absolute',
-                                top: '50%',
-                                right: '15px',
-                                transform: 'translateY(-50%)',
-                                color:'white'
-                              }}
-                            />
-                          )}
-                        </label>
-                      )
-                    ))}
-                  </div>
+                <div className="scroll-bar" style={{ display: 'flex', flexDirection: 'column', height: '250px', overflow: 'auto' }}>
+                  {Object.entries(showColumns).map(([key, value]) => (
+                    key !== 'key' && value && (
+                      <label style={{ background: '#00AEF8', padding: '5px 10px', fontWeight: '500', marginBottom: '2px', marginRight: '5%', color: 'white', position: 'relative' }} id="selected_checkbox" key={key}>
+                        <input
+                          style={{ display: 'none' }}
+                          type="checkbox"
+                          checked={value}
+                          onChange={() => handleCheckboxChange(key)}
+                        />
+                        {key.replace(/_/g, ' ')}
+                        <CloseRoundedIcon
+                          style={{
+                            position: 'absolute',
+                            top: '50%',
+                            right: '5px',
+                            transform: 'translateY(-50%)',
+                          }}
+                        />
+                      </label>
+                    )
+                  ))}
                 </div>
               </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', padding: '0 25px', borderTop: '2px solid #808080', marginTop: '10px' }}>
-                <div>
-                  <button style={{ margin:'10px', color:'white', background:'#3E3E42', borderRadius:'5px', padding:'5px 15px', border:'none', boxShadow:'0px 0px 5px gray'  }} onClick={handleSelectAll}>Select All</button>
-                  <button style={{ margin:'10px', color:'black', background:'#FFFFF', borderRadius:'5px', padding:'5px 15px', border:'none', boxShadow:'0px 0px 5px gray' }} onClick={handleDeselectAll}>Deselect All</button>
+              <div style={{ height: 'auto', width: '45%', position: 'relative', display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: '15px 25px' }}>
+                <div style={{ fontWeight: 'bold', padding: '10px', marginBottom: '10px', color: '#21252980' }}>
+                  Available Fields
                 </div>
-                <div>
-                  <button style={{ margin:'10px', color:'white', background:'#12E5E5', borderRadius:'100px', padding:'5px 15px', border:'none', boxShadow:'0px 0px 5px gray', display:'flex', alignItems:'center' }} onClick={handleApply}>Save  <DownloadDoneRoundedIcon style={{height:'20px', width:'auto', marginLeft:'10px'}} /></button>
+                <input
+                  type="text"
+                  placeholder="Search..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  style={{ marginBottom: '10px', height: '30px' }}
+                />
+                <div className="scroll-bar" style={{ display: 'flex', flexDirection: 'column', height: '250px', overflow: 'auto' }}>
+                  {Object.entries(showColumns).map(([key, value]) => (
+                    key !== 'key' && !value && key.toLowerCase().includes(searchQuery.toLowerCase()) && (
+                      <label style={{ background: '#ddd', padding: '5px 10px', fontWeight: '500', marginBottom: '2px', marginRight: '5%' }} key={key}>
+                        <input
+                          style={{ marginRight: '10px' }}
+                          type="checkbox"
+                          checked={selectedFields.includes(key)}
+                          onChange={(e) => {
+                            if (e.target.checked) {
+                              setSelectedFields([...selectedFields, key]);
+                            } else {
+                              setSelectedFields(selectedFields.filter(field => field !== key));
+                            }
+                          }}
+                        />
+                        {key.replace(/_/g, ' ')}
+                      </label>
+                    )
+                  ))}
                 </div>
               </div>
             </div>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', padding: '3%', margin: '10px 0', borderTop: '1px solid #ddd' }}>
+              <button
+                style={{ color: '#888', marginRight: '10px', background: 'none', border: 'none', cursor: 'pointer' }}
+                onClick={() => {
+                  handleDeselectAll();
+                  setSelectedFields([]);
+                }}
+              >
+                Clear
+              </button>
+              <button
+                style={{ color: '#00AEF8', marginRight: '10px', background: 'none', border: 'none', cursor: 'pointer' }}
+                onClick={handleSelectAll}
+              >
+                Select All
+              </button>
+              <button
+                style={{ color: '#fff', background: '#00AEF8', padding: '5px 10px', borderRadius: '5px', cursor: 'pointer', border: 'none' }}
+                onClick={handleApply}
+              >
+                Apply
+              </button>
+            </div>
           </div>
-        )}
-      <TableContainer component={Paper}>
-        <Table stickyHeader aria-label="sticky table">
+        </div>
+      )}
+      <TableContainer component={Paper} style={{ height: '400px', overflow: 'auto' }}>
+        <Table stickyHeader>
           <TableHead>
             <TableRow>
+              <TableCell padding="checkbox" />
+              {Object.entries(showColumns).map(
+                ([key, value]) =>
+                  key !== 'key' &&
+                  value && <TableCell key={key}>{key.replace(/_/g, ' ')}</TableCell>
+              )}
               <TableCell>Actions</TableCell>
-              {Object.entries(showColumns).map(([key, value]) => (
-                value && (
-                  <TableCell key={key}>
-                    {key.replace(/_/g, ' ')}
-                  </TableCell>
-                )
-              ))}
             </TableRow>
           </TableHead>
           <TableBody>
-            {rows.slice(startIndex, endIndex).map((row, idx) => (
-              <TableRow key={idx}>
+            {rows.slice(startIndex, endIndex).map((row) => (
+              <TableRow key={row.key}>
+                <TableCell padding="checkbox" />
+                {Object.entries(showColumns).map(
+                  ([key, value]) =>
+                    key !== 'key' &&
+                    value && <TableCell key={key}>{row[key]}</TableCell>
+                )}
                 <TableCell>
-                  <IconButton onClick={(e) => handleIconClick(e, row)}>
+                  <IconButton onClick={(event) => handleIconClick(event, row)}>
                     <MoreVertIcon />
                   </IconButton>
                 </TableCell>
-                {Object.entries(showColumns).map(([key, value]) => (
-                  value && (
-                    <TableCell key={key}>
-                      {row[key]}
-                    </TableCell>
-                  )
-                ))}
               </TableRow>
             ))}
           </TableBody>
         </Table>
       </TableContainer>
       {popupVisible && (
-        <Paper
+        <div
           ref={popupRef}
-          sx={{
+          style={{
             position: 'absolute',
             top: popupPosition.top,
             left: popupPosition.left,
-            p: 2,
-            zIndex: 1,
-            boxShadow: 3,
-            borderRadius: 2
+            backgroundColor: 'white',
+            boxShadow: '0px 0px 10px rgba(0,0,0,0.1)',
+            padding: '10px',
+            zIndex: 1000,
+            borderRadius: '8px',
           }}
         >
-          <MenuItem onClick={handleDetailsClick}>Details</MenuItem>
-          <MenuItem onClick={handleEditClick}>Edit</MenuItem>
-          <MenuItem onClick={() => handleDeleteRow(selectedRow)}>Delete</MenuItem>
-        </Paper>
+          <Button onClick={handleEditClick}>Edit</Button>
+          <Button onClick={handleDetailsClick}>View Details</Button>
+          <Button onClick={() => handleDeleteRow(selectedRow)}>Delete</Button>
+        </div>
       )}
-      {/* <EditModal
-        open={modalOpen}
-        onClose={() => setModalOpen(false)}
-        row={formState}
-        handleSave={handleSave}
-        handleChange={handleChange}
-      /> */}
     </div>
   );
 };
