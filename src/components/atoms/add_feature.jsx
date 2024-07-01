@@ -13,6 +13,10 @@ const AddFeature = ({ onSaveSelectedText, storedSelectedTexts }) => {
     fetchMenuData();
   }, []);
 
+  useEffect(() => {
+    setSelectedOptions(storedSelectedTexts);
+  }, [storedSelectedTexts]);
+
   const fetchMenuData = async () => {
     try {
       const response = await axios.get(`${config.apiUrl}/menus`)
@@ -51,6 +55,7 @@ const AddFeature = ({ onSaveSelectedText, storedSelectedTexts }) => {
 
   const handleSave = () => {
     onSaveSelectedText(selectedOptions);
+    localStorage.setItem('selectedTexts', JSON.stringify(selectedOptions));
     handleCloseDialog();
   };
 
@@ -69,7 +74,7 @@ const AddFeature = ({ onSaveSelectedText, storedSelectedTexts }) => {
       </IconButton>
       <Dialog open={dialogOpen} onClose={handleCloseDialog}>
         <DialogTitle>Select Features</DialogTitle>
-        <DialogContent>
+        <DialogContent sx={{columnCount:{sx:'2', md:'3'}}}>
           {options.map((option, index) => (
             <FormControlLabel
               key={index}
