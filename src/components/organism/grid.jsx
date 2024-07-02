@@ -1,29 +1,46 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
-import { Box, Button, Container,TextField, IconButton, Menu, MenuItem, Modal, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Toolbar, Typography, Paper } from '@mui/material';
+import {
+  Box,
+  Button,
+  Container,
+  TextField,
+  IconButton,
+  Menu,
+  MenuItem,
+  Modal,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Toolbar,
+  Typography,
+  Paper
+} from '@mui/material';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import WidgetsOutlinedIcon from '@mui/icons-material/WidgetsOutlined';
 import CloseIcon from '@mui/icons-material/Close';
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
+import DownloadDoneRoundedIcon from '@mui/icons-material/DownloadDoneRounded';
+import AddTaskRoundedIcon from '@mui/icons-material/AddTaskRounded';
 import Dropdown from '../atoms/dropdown';
 import ActionButton from '../atoms/actionbutton';
 import Pagination from '../atoms/pagination';
-import Callfilter from "../atoms/callfilter";
+import Callfilter from '../atoms/callfilter';
 import config from '../../config/config';
 import { useNavigate } from 'react-router-dom';
-import DownloadDoneRoundedIcon from '@mui/icons-material/DownloadDoneRounded';
-import AddTaskRoundedIcon from '@mui/icons-material/AddTaskRounded';
-import "../../assets/styles/callsgrid.css";
+import '../../assets/styles/callsgrid.css';
 
 const Grid = ({ endpoint }) => {
   const navigate = useNavigate();
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState('');
   const [modalOpen, setModalOpen] = useState(false);
   const [rows, setRows] = useState([]);
   const [showColumns, setShowColumns] = useState({});
-  const [rowToEdit, setRowToEdit] = useState(null);
   const [formState, setFormState] = useState({});
-  const [errors, setErrors] = useState("");
+  const [errors, setErrors] = useState('');
   const [showCheckboxes, setShowCheckboxes] = useState(false);
   const [pageNumber, setPageNumber] = useState(1);
   const [recordsPerPage, setRecordsPerPage] = useState(20);
@@ -36,27 +53,36 @@ const Grid = ({ endpoint }) => {
   const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await axios.get(`${config.apiUrl}${endpoint}`);
-
+  const fetchData = async () => {
+    try {
+      const response = await axios.get(`${config.apiUrl}${endpoint}`);
+      if (response.data && response.data.data && Array.isArray(response.data.data)) {  // Check if response.data.data is an array
         const initialShowColumnsState = {};
         response.data.data.forEach(row => {
           Object.keys(row).forEach(key => {
-            if (!initialShowColumnsState.hasOwnProperty(key) && key !== "_id") {
+            if (!initialShowColumnsState.hasOwnProperty(key) && key !== '_id') {
               initialShowColumnsState[key] = true;
             }
           });
         });
         setShowColumns(initialShowColumnsState);
-        setRows(response.data.data);
-        console.log("users", response.data.data);
-      } catch (error) {
-        console.error('Error fetching user data:', error);
+        setRows(response.data.data); // Set rows to response.data.data
+        console.log('Fetched data:', response.data.data); // Log fetched data
+      } else {
+        console.error('Invalid data format received:', response.data);
       }
-    };
-    fetchData();
-  }, [endpoint]);
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    }
+  };
+  fetchData();
+}, [endpoint]);
+
+  
+
+  useEffect(() => {
+    console.log('Rows state:', rows); // Log rows state
+  }, [rows]);
 
   const toggleCheckboxes = () => {
     setShowCheckboxes(!showCheckboxes);
@@ -73,20 +99,13 @@ const Grid = ({ endpoint }) => {
   const handleSave = async e => {
     e.preventDefault();
     try {
-      if (rowToEdit === null) {
-        const response = await axios.post(`${config.apiUrl}${endpoint}`, formState);
-        setRows([...rows, response.data.userData]);
-      } else {
-        const updatedRow = { ...formState };
-        await axios.put(`${config.apiUrl}${endpoint}/${updatedRow._id}`, updatedRow);
-        setRows(rows.map((currRow, idx) => {
-          if (idx !== rowToEdit) return currRow;
-          return updatedRow;
-        }));
-      }
+      const updatedRow = { ...formState };
+      await axios.put(`${config.apiUrl}${endpoint}/${updatedRow._id}`, updatedRow);
+      setRows(rows.map(row => (row._id === updatedRow._id ? updatedRow : row)));
       setModalOpen(false);
     } catch (error) {
-      console.error('Error saving user data:', error);
+      console.error('Error saving data:', error);
+      setErrors('Error saving data');
     }
   };
 
@@ -114,17 +133,17 @@ const Grid = ({ endpoint }) => {
     toggleCheckboxes();
   };
 
-  const handleDeleteRow = async (row) => {
+  const handleDeleteRow = async row => {
     try {
       await axios.delete(`${config.apiUrl}${endpoint}/${row._id}`);
       setRows(rows.filter(r => r._id !== row._id));
       setPopupVisible(false);
     } catch (error) {
-      console.error('Error deleting user data:', error);
+      console.error('Error deleting data:', error);
     }
   };
 
-  const handleClickOutside = (event) => {
+  const handleClickOutside = event => {
     if (popupRef.current && !popupRef.current.contains(event.target)) {
       setPopupVisible(false);
     }
@@ -159,7 +178,7 @@ const Grid = ({ endpoint }) => {
   };
 
   return (
-    <div className="CallsGrid" style={{ margin: '-160px 0px 10px 0px' }}>
+    <div className="CallsGrid">
       <Toolbar />
       <Box className="Appbar" sx={{ display: 'flex', justifyContent: 'space-around' }}>
         <ActionButton />
@@ -174,7 +193,7 @@ const Grid = ({ endpoint }) => {
         {alphabet.map(letter => (
           <Typography
             key={letter}
-            className={`letter ${selectedLetter === letter ? "selectedLetter" : ""}`}
+            className={`letter ${selectedLetter === letter ? 'selectedLetter' : ''}`}
             sx={{
               padding: '5px',
               cursor: 'pointer',
@@ -188,199 +207,133 @@ const Grid = ({ endpoint }) => {
         ))}
       </Box>
       {showCheckboxes && (
-          <div style={{ width:'95%', display:'flex', justifyContent:'center' }}>
-            <div style={{position:'absolute', top:'10%', background: 'white', borderRadius: '10px', boxShadow: '0px 0px 11px black', zIndex:10, width:'40rem' }}>
-              <div style={{ borderBottom:'2px solid #808080', fontSize:'20px', fontWeight:'bold', borderTopLeftRadius:'10px', borderTopRightRadius:'10px', padding:'3% 5%', display: 'flex', justifyContent: 'space-between' }}>
-                <span>Configure Columns - Calls</span>
-                <button onClick={toggleCheckboxes} style={{ background: 'none', border: 'none', cursor: 'pointer' }}>
-                  <CloseIcon />
-                </button>
-              </div>
-              <div style={{ display: 'flex' }}>
-                <div style={{ height: 'auto', width: '55%', position: 'relative', display: 'flex', flexDirection: 'column', padding: '15px 25px' }}>
-                  <div style={{ fontWeight: 'bold', padding: '10px', marginBottom: '10px', color:'#21252980' }}>
-                    Select Fields
-                  </div>
-                  <div className="scroll-bar" style={{ display: 'flex', flexDirection: 'column', height: '250px', overflow: 'auto' }}>
-                    {Object.entries(showColumns).map(([key, value]) => (
-                      key !== '_id' && value && (
-                        <label style={{ background:'#00AEF8', padding:'5px 10px', fontWeight:'500', marginBottom:'2px', marginRight:'5%', color: 'white', position: 'relative' }} id="selected_checkbox" key={key}>
-                          <input
-                            style={{ display:'none' }}
-                            type="checkbox"
-                            checked={value}
-                            onChange={() => handleCheckboxChange(key)}
-                          />
-                          {key.replace(/_/g, ' ')}
-                            <CloseRoundedIcon
-                              style={{
-                                position: 'absolute',
-                                top: '50%',
-                                right: '5px',
-                                transform: 'translateY(-50%)',
-                              }}
-                            />
-                        </label>
-                      )
-                    ))}
-                  </div>
+        <div className="checkboxes">
+          <div className="configure-columns">
+            <span className="configure-columns-title">Configure Columns - Calls</span>
+            <button className="close-btn" onClick={toggleCheckboxes}>
+              <CloseIcon />
+            </button>
+            <div className="columns-wrapper">
+              <div className="select-fields">
+                <div className="select-fields-title">Select Fields</div>
+                <div className="fields-list">
+                  {Object.entries(showColumns).map(([key, value]) => (
+                    key !== '_id' && !value && (
+                      <label key={key}>
+                        <input
+                          type="checkbox"
+                          checked={value}
+                          onChange={() => handleCheckboxChange(key)}
+                        />
+                        {key}
+                      </label>
+                    )
+                  ))}
                 </div>
-                <div style={{ height: 'auto', width: '45%', position: 'relative', display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: '15px 25px' }}>
-                  <div style={{ fontWeight: 'bold', padding: '10px', marginBottom: '10px', color:'#21252980' }}>
-                    Available Fields
-                  </div>
-                  <input
-                    type="text"
-                    placeholder="Search..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    style={{ marginBottom: '10px', height:'30px' }}
-                  />
-                  <div className="scroll-bar" style={{ display: 'flex', flexDirection: 'column', height: '250px', overflow: 'auto' }}>
-                    {Object.entries(showColumns).filter(([key]) => key.toLowerCase().includes(searchQuery.toLowerCase())).map(([key, value]) => (
-                      key !== '_id' && !value && (
-                        <label style={{marginBottom:'1px', marginRight:'5%', color:selectedFields.includes(key) ?'white' :'#21252980', padding: selectedFields.includes(key) ?'7px' : '3px', fontWeight:'500', backgroundColor: selectedFields.includes(key) ? '#12E5E5' : 'white', position: 'relative' }} id="available_checkbox" key={key}>
-                          <input
-                            style={{ display:'none' }}
-                            type="checkbox"
-                            checked={selectedFields.includes(key)}
-                            onChange={() => {
-                              const updatedSelectedFields = [...selectedFields];
-                              const fieldIndex = updatedSelectedFields.indexOf(key);
-                              if (fieldIndex === -1) {
-                                updatedSelectedFields.push(key);
-                              } else {
-                                updatedSelectedFields.splice(fieldIndex, 1);
-                              }
-                              setSelectedFields(updatedSelectedFields);
-                            }}
-                          />
-                          {key.replace(/_/g, ' ')}
-                          {selectedFields.includes(key) && (
-                            <AddTaskRoundedIcon
-                              style={{
-                                position: 'absolute',
-                                top: '50%',
-                                right: '15px',
-                                transform: 'translateY(-50%)',
-                                color:'white'
-                              }}
-                            />
-                          )}
-                        </label>
-                      )
-                    ))}
-                  </div>
+                <div className="select-buttons">
+                  <button onClick={handleSelectAll}>Select All</button>
+                  <button onClick={handleDeselectAll}>Deselect All</button>
                 </div>
               </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', padding: '0 25px', borderTop: '2px solid #808080', marginTop: '10px' }}>
-                <div>
-                  <button style={{ margin:'10px', color:'white', background:'#3E3E42', borderRadius:'5px', padding:'5px 15px', border:'none', boxShadow:'0px 0px 5px gray'  }} onClick={handleSelectAll}>Select All</button>
-                  <button style={{ margin:'10px', color:'black', background:'#FFFFF', borderRadius:'5px', padding:'5px 15px', border:'none', boxShadow:'0px 0px 5px gray' }} onClick={handleDeselectAll}>Deselect All</button>
-                </div>
-                <div>
-                  <button style={{ margin:'10px', color:'white', background:'#12E5E5', borderRadius:'100px', padding:'5px 15px', border:'none', boxShadow:'0px 0px 5px gray', display:'flex', alignItems:'center' }} onClick={handleApply}>Save  <DownloadDoneRoundedIcon style={{height:'20px', width:'auto', marginLeft:'10px'}} /></button>
+              <div className="selected-fields">
+                <div className="selected-fields-title">Selected Fields</div>
+                <div className="fields-list">
+                  {Object.entries(showColumns).map(([key, value]) => (
+                    key !== '_id' && value && (
+                      <label key={key}>
+                        <input
+                          type="checkbox"
+                          checked={value}
+                          onChange={() => handleCheckboxChange(key)}
+                        />
+                        {key}
+                      </label>
+                    )
+                  ))}
                 </div>
               </div>
             </div>
+            <div className="buttons">
+              <button onClick={toggleCheckboxes}>Cancel</button>
+              <button onClick={handleApply}>Apply</button>
+            </div>
           </div>
-        )}
-      <TableContainer component={Paper} sx={{ marginTop: '16px', borderRadius: '16px' }}>
-        <Table>
-          <TableHead>
-            <TableRow>
-            <TableCell>Actions</TableCell>
-              <TableCell>#</TableCell>
-              {Object.keys(showColumns).map(columnName => showColumns[columnName] && <TableCell key={columnName}>{columnName.replace(/_/g, ' ')}</TableCell>)}
-              
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {rows.slice(startIndex, endIndex).map((row, index) => (
-              <TableRow key={row._id}>
-                <TableCell>
-                  <IconButton onClick={(event) => handleIconClick(event, row)}>
-                    <MoreVertIcon />
-                  </IconButton>
-                </TableCell>
-                <TableCell>{index + 1}</TableCell>
-                {Object.keys(showColumns).map(columnName => showColumns[columnName] && <TableCell key={columnName}>{row[columnName]}</TableCell>)}
-                
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
-      <Modal open={modalOpen} onClose={() => setModalOpen(false)}>
-        <Box sx={{ p: 3 }}>
-          <Typography variant="h4" gutterBottom>
-            {rowToEdit !== null ? "Edit User" : "Add User"}
-          </Typography>
-          <form onSubmit={handleSave}>
-            {Object.entries(formState).map(([key, value]) => (
-              key !== "_id" && (
+        </div>
+      )}
+      <Container style={{ marginTop: '50px' }}>
+        <Modal open={modalOpen} onClose={() => setModalOpen(false)}>
+          <Box component="form" onSubmit={handleSave} sx={{ margin: '50px auto', padding: '20px', backgroundColor: 'white', maxWidth: '500px' }}>
+            {errors && <Typography color="error">{errors}</Typography>}
+            {Object.keys(showColumns).map(columnName => (
+              showColumns[columnName] && (
                 <TextField
-                  key={key}
-                  name={key}
-                  label={key.replace(/_/g, ' ')}
-                  value={value}
+                  key={columnName}
+                  label={columnName}
+                  name={columnName}
+                  value={formState[columnName] || ''}
                   onChange={handleChange}
                   fullWidth
                   margin="normal"
                 />
               )
             ))}
-            {errors && <Typography color="error">{errors}</Typography>}
             <Button type="submit" variant="contained" color="primary">
               Save
             </Button>
-          </form>
-        </Box>
-      </Modal>
-      {popupVisible && (
-        <div
-          ref={popupRef}
-          style={{
-            position: "absolute",
-            top: popupPosition.top,
-            left: popupPosition.left,
-            zIndex: 10,
-            backgroundColor: "white",
-            border: "1px solid #ccc",
-            borderRadius: "8px",
-            boxShadow: "0px 2px 10px rgba(0, 0, 0, 0.2)",
-          }}
-        >
-          <div style={{ display: "flex", justifyContent: "flex-end" }}>
-            <IconButton onClick={() => setPopupVisible(false)}>
-              <CloseRoundedIcon />
-            </IconButton>
+          </Box>
+        </Modal>
+        <TableContainer component={Paper} style={{ borderRadius: '10px', border: '1px solid #808080', height: 'max-content' }}>
+          <Table>
+            <TableHead style={{ background: '#00000070', color: 'white' }}>
+              <TableRow>
+                {Object.keys(showColumns).map(columnName => (
+                  showColumns[columnName] && <TableCell key={columnName}>{columnName}</TableCell>
+                ))}
+                <TableCell>Actions</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {rows.slice(startIndex, endIndex).map(row => (
+                <TableRow key={row._id}>
+                  {Object.keys(showColumns).map(columnName => (
+                    showColumns[columnName] && <TableCell key={columnName}>{row[columnName]}</TableCell>
+                  ))}
+                  <TableCell>
+                    <IconButton onClick={(event) => handleIconClick(event, row)}>
+                      <MoreVertIcon />
+                    </IconButton>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+        {popupVisible && (
+          <div ref={popupRef} style={{ position: 'absolute', top: popupPosition.top, left: popupPosition.left, background: 'white', padding: '10px', border: '1px solid black', borderRadius: '5px' }}>
+            <MenuItem onClick={handleEditClick}>
+              <AddTaskRoundedIcon /> Edit
+            </MenuItem>
+            <MenuItem onClick={handleDetailsClick}>
+              <DownloadDoneRoundedIcon /> Details
+            </MenuItem>
+            <MenuItem onClick={() => handleDeleteRow(selectedRow)}>
+              <CloseRoundedIcon /> Delete
+            </MenuItem>
           </div>
-          <Button onClick={handleEditClick} sx={{ width: "100%", justifyContent: "flex-start", textTransform: "none" }}>
-            <DownloadDoneRoundedIcon sx={{ mr: 1 }} />
-            Edit
-          </Button>
-          <Button onClick={handleDetailsClick} sx={{ width: "100%", justifyContent: "flex-start", textTransform: "none" }}>
-            <AddTaskRoundedIcon sx={{ mr: 1 }} />
-            Details
-          </Button>
-          <Button onClick={() => handleDeleteRow(selectedRow)} sx={{ width: "100%", justifyContent: "flex-start", textTransform: "none", color: "red" }}>
-            <CloseRoundedIcon sx={{ mr: 1 }} />
-            Delete
-          </Button>
-        </div>
-      )}
-      <Box sx={{ display: "flex", justifyContent: "center", marginTop: 2 }}>
-        {pageNumbers.map(number => (
-          <Button
-            key={number}
-            onClick={() => setPageNumber(number)}
-            variant={pageNumber === number ? "contained" : "outlined"}
-            sx={{ mx: 1 }}
-          >
-            {number}
-          </Button>
+        )}
+      </Container>
+      <Box style={{ display: 'flex', justifyContent: 'space-evenly', padding: '2%', margin: '20px 0', marginTop: '20px' }}>
+        <button onClick={() => setPageNumber(pageNumber - 1)} disabled={pageNumber === 1} className="page-btn">
+          &lt;
+        </button>
+        {pageNumbers.map(pageNum => (
+          <button key={pageNum} onClick={() => setPageNumber(pageNum)} className={`page-btn ${pageNumber === pageNum ? 'active' : ''}`}>
+            {pageNum}
+          </button>
         ))}
+        <button onClick={() => setPageNumber(pageNumber + 1)} disabled={pageNumber === totalPages} className="page-btn">
+          &gt;
+        </button>
       </Box>
     </div>
   );
