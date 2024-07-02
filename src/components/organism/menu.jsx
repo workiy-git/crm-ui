@@ -6,7 +6,6 @@ import SlideButton from '../atoms/slide_button';
 import '../../assets/styles/MenuComponent.css'; 
 
 const localStorageKey = 'selectedTexts';
-
 const MenuComponent = ({ backgroundColor, onSaveSelectedText }) => {
   const [selectedTexts, setSelectedTexts] = useState([]);
   const [scrollIndex, setScrollIndex] = useState(0);
@@ -29,10 +28,11 @@ const MenuComponent = ({ backgroundColor, onSaveSelectedText }) => {
   };
 
   const handleScrollRight = () => {
-    setScrollIndex(Math.min(selectedTexts.length - 9, scrollIndex + 1));
+    setScrollIndex(Math.min(selectedTexts.length - 6, scrollIndex + 1));
   };
 
   return (
+
     <AppBar position="static" className="menu-appBar"style={{ background: 'linear-gradient(90deg, rgba(12,45,78,1) 0%, rgba(28,104,180,1) 100%)' }}>
       <Toolbar className="menu-toolbar">
         <Box className="menu-selectedTextContainer">
@@ -45,6 +45,7 @@ const MenuComponent = ({ backgroundColor, onSaveSelectedText }) => {
         </Box>
         {selectedTexts.length > 9 && (
           <Box className="menu-buttonGroup">
+
             <SlideButton onScrollLeft={handleScrollLeft} direction="left" />
             <SlideButton onScrollRight={handleScrollRight} direction="right" />
           </Box>

@@ -74,6 +74,7 @@ const AddFeature = ({ onSaveSelectedText, storedSelectedTexts }) => {
       </IconButton>
       <Dialog open={dialogOpen} onClose={handleCloseDialog}>
         <DialogTitle>Select Features</DialogTitle>
+
         <DialogContent className="add-feature-dialog-content">
           {options.map((option, index) => (
             <FormControlLabel
