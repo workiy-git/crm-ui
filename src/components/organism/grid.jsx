@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import axios from 'axios';
-import { Box, Button, Container, IconButton, Menu, MenuItem, Modal, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Toolbar, Typography, Paper } from '@mui/material';
+import { Box, Button, Container,TextField, IconButton, Menu, MenuItem, Modal, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Toolbar, Typography, Paper } from '@mui/material';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import WidgetsOutlinedIcon from '@mui/icons-material/WidgetsOutlined';
 import CloseIcon from '@mui/icons-material/Close';
@@ -11,7 +11,6 @@ import Pagination from '../atoms/pagination';
 import Callfilter from "../atoms/callfilter";
 import config from '../../config/config';
 import { useNavigate } from 'react-router-dom';
-import EditModal from '../molecules/edit';
 import DownloadDoneRoundedIcon from '@mui/icons-material/DownloadDoneRounded';
 import AddTaskRoundedIcon from '@mui/icons-material/AddTaskRounded';
 import "../../assets/styles/callsgrid.css";
@@ -51,7 +50,7 @@ const Grid = ({ endpoint }) => {
         });
         setShowColumns(initialShowColumnsState);
         setRows(response.data.data);
-        console.log("users",response.data.data);
+        console.log("users", response.data.data);
       } catch (error) {
         console.error('Error fetching user data:', error);
       }
@@ -79,7 +78,7 @@ const Grid = ({ endpoint }) => {
         setRows([...rows, response.data.userData]);
       } else {
         const updatedRow = { ...formState };
-        await axios.put(`${config.apiUrl}${endpoint}${updatedRow._id}`, updatedRow);
+        await axios.put(`${config.apiUrl}${endpoint}/${updatedRow._id}`, updatedRow);
         setRows(rows.map((currRow, idx) => {
           if (idx !== rowToEdit) return currRow;
           return updatedRow;
@@ -150,9 +149,7 @@ const Grid = ({ endpoint }) => {
   };
 
   const handleEditClick = () => {
-    setFormState(selectedRow);
-    setRowToEdit(rows.findIndex(r => r._id === selectedRow._id));
-    setModalOpen(true);
+    navigate(`/edit/${selectedRow._id}`, { state: { rowData: selectedRow } });
     setPopupVisible(false);
   };
 
@@ -288,65 +285,103 @@ const Grid = ({ endpoint }) => {
             </div>
           </div>
         )}
-      <TableContainer className="table-wrapper" component={Paper}>
-        <Table className="table" stickyHeader aria-label="sticky table">
+      <TableContainer component={Paper} sx={{ marginTop: '16px', borderRadius: '16px' }}>
+        <Table>
           <TableHead>
             <TableRow>
-              <TableCell>Actions</TableCell>
-              {Object.entries(showColumns).map(([key, value]) => (
-                value && (
-                  <TableCell key={key}>
-                    {key.replace(/_/g, ' ')}
-                  </TableCell>
-                )
-              ))}
+            <TableCell>Actions</TableCell>
+              <TableCell>#</TableCell>
+              {Object.keys(showColumns).map(columnName => showColumns[columnName] && <TableCell key={columnName}>{columnName.replace(/_/g, ' ')}</TableCell>)}
+              
             </TableRow>
           </TableHead>
           <TableBody>
-            {rows.slice(startIndex, endIndex).map((row, idx) => (
-              <TableRow key={idx}>
+            {rows.slice(startIndex, endIndex).map((row, index) => (
+              <TableRow key={row._id}>
                 <TableCell>
-                  <IconButton onClick={(e) => handleIconClick(e, row)}>
+                  <IconButton onClick={(event) => handleIconClick(event, row)}>
                     <MoreVertIcon />
                   </IconButton>
                 </TableCell>
-                {Object.entries(showColumns).map(([key, value]) => (
-                  value && (
-                    <TableCell key={key}>
-                      {row[key]}
-                    </TableCell>
-                  )
-                ))}
+                <TableCell>{index + 1}</TableCell>
+                {Object.keys(showColumns).map(columnName => showColumns[columnName] && <TableCell key={columnName}>{row[columnName]}</TableCell>)}
+                
               </TableRow>
             ))}
           </TableBody>
         </Table>
       </TableContainer>
+      <Modal open={modalOpen} onClose={() => setModalOpen(false)}>
+        <Box sx={{ p: 3 }}>
+          <Typography variant="h4" gutterBottom>
+            {rowToEdit !== null ? "Edit User" : "Add User"}
+          </Typography>
+          <form onSubmit={handleSave}>
+            {Object.entries(formState).map(([key, value]) => (
+              key !== "_id" && (
+                <TextField
+                  key={key}
+                  name={key}
+                  label={key.replace(/_/g, ' ')}
+                  value={value}
+                  onChange={handleChange}
+                  fullWidth
+                  margin="normal"
+                />
+              )
+            ))}
+            {errors && <Typography color="error">{errors}</Typography>}
+            <Button type="submit" variant="contained" color="primary">
+              Save
+            </Button>
+          </form>
+        </Box>
+      </Modal>
       {popupVisible && (
-        <Paper
+        <div
           ref={popupRef}
-          sx={{
-            position: 'absolute',
+          style={{
+            position: "absolute",
             top: popupPosition.top,
             left: popupPosition.left,
-            p: 2,
-            zIndex: 1,
-            boxShadow: 3,
-            borderRadius: 2
+            zIndex: 10,
+            backgroundColor: "white",
+            border: "1px solid #ccc",
+            borderRadius: "8px",
+            boxShadow: "0px 2px 10px rgba(0, 0, 0, 0.2)",
           }}
         >
-          <MenuItem onClick={handleDetailsClick}>Details</MenuItem>
-          <MenuItem onClick={handleEditClick}>Edit</MenuItem>
-          <MenuItem onClick={() => handleDeleteRow(selectedRow)}>Delete</MenuItem>
-        </Paper>
+          <div style={{ display: "flex", justifyContent: "flex-end" }}>
+            <IconButton onClick={() => setPopupVisible(false)}>
+              <CloseRoundedIcon />
+            </IconButton>
+          </div>
+          <Button onClick={handleEditClick} sx={{ width: "100%", justifyContent: "flex-start", textTransform: "none" }}>
+            <DownloadDoneRoundedIcon sx={{ mr: 1 }} />
+            Edit
+          </Button>
+          <Button onClick={handleDetailsClick} sx={{ width: "100%", justifyContent: "flex-start", textTransform: "none" }}>
+            <AddTaskRoundedIcon sx={{ mr: 1 }} />
+            Details
+          </Button>
+          <Button onClick={() => handleDeleteRow(selectedRow)} sx={{ width: "100%", justifyContent: "flex-start", textTransform: "none", color: "red" }}>
+            <CloseRoundedIcon sx={{ mr: 1 }} />
+            Delete
+          </Button>
+        </div>
       )}
-      {/* <EditModal
-        open={modalOpen}
-        onClose={() => setModalOpen(false)}
-        row={formState}
-        handleSave={handleSave}
-        handleChange={handleChange}
-      /> */}
+      <Box sx={{ display: "flex", justifyContent: "center", marginTop: 2 }}>
+        {pageNumbers.map(number => (
+          <Button
+            key={number}
+            onClick={() => setPageNumber(number)}
+            variant={pageNumber === number ? "contained" : "outlined"}
+            sx={{ mx: 1 }}
+          >
+            {number}
+          </Button>
+        ))}
+      </Box>
     </div>
   );
 };
