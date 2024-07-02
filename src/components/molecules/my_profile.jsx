@@ -56,11 +56,11 @@ export default function Myprofile({ backgroundColor }) {
   const buttonFunctions = [
     () => {
       console.log('Function for the first button');
-      window.location.href = 'https://example.com/first';
+      window.location.href = '/myprofile';
     },
     () => {
       console.log('Function for the second button');
-      window.location.href = 'https://example.com/second';
+      window.location.href = 'calls';
     },
     // Add more functions for each ListItemButton as needed
   ];
