@@ -52,24 +52,28 @@ function Loginpage() {
   return (
     <div>
       {companylogoData && companylogoData.background ? (
-        <div className="login-container">
-          <img
-            src={companylogoData.background.BG}
-            alt="background"
-            className="login-background-image"
-          />
+        <div className="login-container" style={{ backgroundImage: `url(${companylogoData.background.BG})` }}>
+          <div className="login-main">
 
           <div className="login-left-section">
-            <div></div>
+              <img
+              src={companylogoData.background.bot}
+              alt="background"
+              className="login-background-image"
+            />
           </div>
-
           <div className="login-right-section">
+          <div className="login-right-section-main">
+            <div className="login-title-block">
+            <img src={companylogoData.login?.icon} alt="" />
             <Typography variant="h6" className="login-title">
               {companylogoData.login?.title}
             </Typography>
-            <Typography className="login-sub-title" variant="h6">
+            
+            </div>
+            {/* <Typography className="login-sub-title" variant="h6">
               {companylogoData.welcome?.title}
-            </Typography>
+            </Typography> */}
             <Grid>
               <Grid item xs={12} sm={6} className="login-form-group">
                 <div className="login-align-items">
@@ -184,6 +188,8 @@ function Loginpage() {
                 </Button>
               )}
             </div>
+          </div>
+          </div>
           </div>
         </div>
       ) : (
