@@ -1,20 +1,20 @@
 .add-feature-dialog-content {
-    column-count: 3;
+  column-count: 3;
+}
+
+.add-feature-label {
+  display: flex;
+  align-items: center;
+}
+
+.add-feature-icon {
+  width: 20px;
+  height: auto;
+  margin-right: 8px;
+}
+
+@media (max-width: 767px) {
+  .add-feature-dialog-content {
+    column-count: 1 !important;
   }
-  
-  .add-feature-label {
-    display: flex;
-    align-items: center;
-  }
-  
-  .add-feature-icon {
-    width: 20px;
-    height: auto;
-    margin-right: 8px;
-  }
-  
-@media (max-width:767px){
-    .add-feature-dialog-content {
-        column-count: 1 !important;
-      }
 }

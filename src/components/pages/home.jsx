@@ -4,10 +4,8 @@ import Header from '../organism/header';
 import MenuComponent from "../organism/menu";
 import SideMenu from "../organism/sidemenu";
 import Submenu from '../organism/submenu';
-import BackgroundColorChanger from '../atoms/BackgroundColorChanger';
 import Footer from '../atoms/Footer';
 import config from '../../config/config';
-import Widgets from '../atoms/widgets';
 
 function Home() {
   const [backgroundColor, setBackgroundColor] = useState(() => {
@@ -81,10 +79,7 @@ function Home() {
           <div>
             <Submenu backgroundColor={backgroundColor} />
           </div>
-          <div>
-            <Widgets backgroundColor={backgroundColor} />
           </div>
-        </div>
       </div>
       <Footer />
     </div>

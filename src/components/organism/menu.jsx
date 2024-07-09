@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import AddFeature from "../atoms/add_feature";
 import Refresh from '../atoms/refresh';
 import SlideButton from '../atoms/slide_button';
-import CreateWidget from '../atoms/create_widget';
+import CreateWidget from '../atoms/widgets';
 import { AppBar, Toolbar, IconButton, Button, Box } from '@material-ui/core';
 import '../../assets/styles/MenuComponent.css';
 
@@ -25,12 +25,6 @@ const MenuComponent = ({ backgroundColor, onSaveSelectedText }) => {
     localStorage.setItem(localStorageKey, JSON.stringify(texts));
     setScrollIndex(0);
     onSaveSelectedText(texts);
-    fetchWidgets(texts); // Fetch widgets when text is saved
-  };
-
-  const fetchWidgets = (texts) => {
-    const widgets = texts.flatMap(text => text.widgets);
-    setWidgets(widgets);
   };
 
   const handleScrollLeft = () => {
@@ -43,6 +37,9 @@ const MenuComponent = ({ backgroundColor, onSaveSelectedText }) => {
 
   const handleButtonClick = (index) => {
     setSelectedButtonIndex(index); // Set the index of the selected button
+    const featureWidgets = selectedTexts[index]?.widgets || [];
+    console.log("Selected feature widgets:", featureWidgets); // Debugging log
+    setWidgets(Array.isArray(featureWidgets) ? featureWidgets : []); // Ensure widgets is an array
   };
 
   return (
@@ -80,7 +77,11 @@ const MenuComponent = ({ backgroundColor, onSaveSelectedText }) => {
           </Box>
         </Toolbar>
       </AppBar>
-      <CreateWidget backgroundColor={backgroundColor} widgets={widgets} /> {/* Render CreateWidget */}
+      {selectedButtonIndex !== null && (
+        <div>
+          <CreateWidget backgroundColor={backgroundColor} widgets={widgets} /> {/* Render CreateWidget conditionally */}
+        </div>
+      )}
     </>
   );
 };

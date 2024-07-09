@@ -174,7 +174,7 @@ export default function Hamburger() {
                         return (
                           <div key={index}>
                             <ListItemButton
-                              sx={{ py: 0, minHeight: 40, color: 'rgba(255,255,255,.8)', display: 'flex', flexDirection: 'column' }}
+                              sx={{ padding: "0px 16px !important", minHeight: 40, color: 'rgba(255,255,255,.8)', display: 'flex', flexDirection: 'column', width:'100%' }}
                             >
                               <ul
                                 style={{

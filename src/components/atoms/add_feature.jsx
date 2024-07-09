@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import config from '../../config/config';
 import { Button, Dialog, DialogTitle, DialogContent, DialogActions, Checkbox, FormControlLabel, IconButton } from '@mui/material';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import axios from 'axios';
+import config from '../../config/config';
 import '../../assets/styles/AddFeature.css'; // Import the CSS file
 
 const AddFeature = ({ onSaveSelectedText, storedSelectedTexts }) => {
@@ -28,10 +28,11 @@ const AddFeature = ({ onSaveSelectedText, storedSelectedTexts }) => {
 
       const flattenedOptions = Object.keys(addFeaturesValues).map(key => ({
         title: key,
-        icon: addFeaturesValues[key],
+        icon: addFeaturesValues[key], // Ensure this is correct
         widgets: addFeaturesValues[key].widgets || [] // Include widgets
       }));
 
+      console.log("Flattened options:", flattenedOptions); // Debugging log
       setOptions(flattenedOptions);
     } catch (error) {
       console.error('Error fetching menu data:', error);
