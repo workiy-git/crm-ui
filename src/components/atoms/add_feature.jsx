@@ -3,6 +3,7 @@ import config from '../../config/config';
 import { Button, Dialog, DialogTitle, DialogContent, DialogActions, Checkbox, FormControlLabel, IconButton } from '@mui/material';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import axios from 'axios';
+import '../../assets/styles/AddFeature.css'; // Import the CSS file
 
 const AddFeature = ({ onSaveSelectedText, storedSelectedTexts }) => {
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -13,18 +14,22 @@ const AddFeature = ({ onSaveSelectedText, storedSelectedTexts }) => {
     fetchMenuData();
   }, []);
 
+  useEffect(() => {
+    setSelectedOptions(storedSelectedTexts);
+  }, [storedSelectedTexts]);
+
   const fetchMenuData = async () => {
     try {
-      const response = await axios.get(`${config.apiUrl}/menus`)
+      const response = await axios.get(`${config.apiUrl}/menus`);
       const menus = response.data.data;
 
-      // Extracting the add_features_values from the menu_bar
       const menuBar = menus.find(menu => menu.menu === 'menu_bar');
       const addFeaturesValues = menuBar?.add_features_values || {};
 
       const flattenedOptions = Object.keys(addFeaturesValues).map(key => ({
         title: key,
         icon: addFeaturesValues[key],
+        widgets: addFeaturesValues[key].widgets || [] // Include widgets
       }));
 
       setOptions(flattenedOptions);
@@ -51,6 +56,7 @@ const AddFeature = ({ onSaveSelectedText, storedSelectedTexts }) => {
 
   const handleSave = () => {
     onSaveSelectedText(selectedOptions);
+    localStorage.setItem('selectedTexts', JSON.stringify(selectedOptions));
     handleCloseDialog();
   };
 
@@ -69,7 +75,7 @@ const AddFeature = ({ onSaveSelectedText, storedSelectedTexts }) => {
       </IconButton>
       <Dialog open={dialogOpen} onClose={handleCloseDialog}>
         <DialogTitle>Select Features</DialogTitle>
-        <DialogContent>
+        <DialogContent className="add-feature-dialog-content">
           {options.map((option, index) => (
             <FormControlLabel
               key={index}
@@ -80,8 +86,8 @@ const AddFeature = ({ onSaveSelectedText, storedSelectedTexts }) => {
                 />
               }
               label={
-                <div>
-                  <img src={option.icon} alt={option.title} style={{ width: '20px', height: 'auto', marginRight: '8px' }} />
+                <div className="add-feature-label">
+                  <img src={option.icon} alt={option.title} className="add-feature-icon" />
                   {option.title}
                 </div>
               }

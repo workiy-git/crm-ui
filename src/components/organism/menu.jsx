@@ -1,84 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { makeStyles } from '@material-ui/core/styles';
 import AddFeature from "../atoms/add_feature";
-import { AppBar, Toolbar, IconButton, Typography, Box } from '@material-ui/core';
 import Refresh from '../atoms/refresh';
 import SlideButton from '../atoms/slide_button';
+import CreateWidget from '../atoms/create_widget';
+import { AppBar, Toolbar, IconButton, Button, Box } from '@material-ui/core';
+import '../../assets/styles/MenuComponent.css';
 
 const localStorageKey = 'selectedTexts';
 
-const useStyles = makeStyles((theme) => ({
-  grow: {
-    flexGrow: 1,
-  
-  },
-  appBar: {
-    backgroundColor: '#D9D9D9',
-    boxShadow: 'none',
-  
-  },
-  iconButton: {
-    color: 'white',
-    '&:hover': {
-      backgroundColor: 'transparent',
-    },
-  },
-  badge: {
-    top: '2px',
-    right: '18px',
-  },
-  selectedTextItem: {
-    display: 'flex',
-    alignItems: 'center',
-    margin:'10px',
-    padding:'5px',
-    borderRadius:'10px',
-    boxShadow:'0px 0px 3px 1px gray'
-
-  },
-  selectedTextIcon: {
-    width: '30px',
-    height: 'auto',
-    marginRight: '5px',
-  },
-  selectedTextContainer: {
-    display: 'flex',
-    flexDirection: 'row',
-    alignItems: 'center',
-    overflowX: 'hidden',
-    width: '80%',
-    marginLeft:'40px'
-  },
-  slideButton: {
-    width: '40px',
-    height: '40px',
-  },
-  productivityBox: {
-    boxShadow: '1px 1px 5px 0px #808080',
-    background: 'white',
-    color: 'black',
-    height: '100%',
-    display: 'flex',
-    alignItems: 'center',
-    padding: '0 3rem',
-    borderTopRightRadius: '0px',
-    borderBottomRightRadius: '10px',
-    marginRight: '1rem',
-  },
-  toolbar: {
-    padding: 0,
-    justifyContent: 'space-between',
-  },
-  buttonGroup: {
-    display: 'flex',
-    alignItems: 'center',
-  },
-}));
-
 const MenuComponent = ({ backgroundColor, onSaveSelectedText }) => {
-  const classes = useStyles();
   const [selectedTexts, setSelectedTexts] = useState([]);
   const [scrollIndex, setScrollIndex] = useState(0);
+  const [selectedButtonIndex, setSelectedButtonIndex] = useState(null);
+  const [widgets, setWidgets] = useState([]); // State for storing widgets
 
   useEffect(() => {
     const storedSelectedTexts = JSON.parse(localStorage.getItem(localStorageKey)) || [];
@@ -91,6 +25,12 @@ const MenuComponent = ({ backgroundColor, onSaveSelectedText }) => {
     localStorage.setItem(localStorageKey, JSON.stringify(texts));
     setScrollIndex(0);
     onSaveSelectedText(texts);
+    fetchWidgets(texts); // Fetch widgets when text is saved
+  };
+
+  const fetchWidgets = (texts) => {
+    const widgets = texts.flatMap(text => text.widgets);
+    setWidgets(widgets);
   };
 
   const handleScrollLeft = () => {
@@ -98,37 +38,50 @@ const MenuComponent = ({ backgroundColor, onSaveSelectedText }) => {
   };
 
   const handleScrollRight = () => {
-    setScrollIndex(Math.min(selectedTexts.length - 9, scrollIndex + 1));
+    setScrollIndex(Math.min(selectedTexts.length - 6, scrollIndex + 1));
+  };
+
+  const handleButtonClick = (index) => {
+    setSelectedButtonIndex(index); // Set the index of the selected button
   };
 
   return (
-    <AppBar position="static" className={classes.appBar} style={{ background: backgroundColor }}>
-      <Toolbar className={classes.toolbar}>
-        <Box className={classes.selectedTextContainer}>
-          {selectedTexts.slice(scrollIndex, scrollIndex + 9).map((text, index) => (
-            <Box key={index} className={classes.selectedTextItem}>
-              <img src={text.icon} alt={text.title} className={classes.selectedTextIcon} />
-              <Typography style={{ width: 'max-content' }} variant="body2">{text.title}</Typography>
-            </Box>
-          ))}
-        </Box>
-        {selectedTexts.length > 9 && (
-          <Box className={classes.buttonGroup}>
-            <SlideButton onScrollLeft={handleScrollLeft} direction="left" />
-            <SlideButton onScrollRight={handleScrollRight} direction="right" />
+    <>
+      <AppBar position="static" className="menu-appBar" style={{ background: 'linear-gradient(90deg, rgba(12,45,78,1) 0%, rgba(28,104,180,1) 100%)' }}>
+        <Toolbar className="menu-toolbar">
+          <Box className="menu-selectedTextContainer">
+            {selectedTexts.slice(scrollIndex, scrollIndex + 9).map((text, index) => (
+              <Box key={index} className="menu-selectedTextItem">
+                <Button
+                  variant="contained"
+                  color={selectedButtonIndex === index ? "secondary" : "primary"} // Change color based on selectedButtonIndex state
+                  className="menu-featureButton"
+                  onClick={() => handleButtonClick(index)} // Handle button click to set selected index
+                  style={{ backgroundColor: selectedButtonIndex === index ? 'rgb(255, 63, 20)' : 'white', color: selectedButtonIndex === index ? 'white' : '#264653' }}
+                >
+                  {text.title}
+                </Button>
+              </Box>
+            ))}
           </Box>
-        )}
-        <Box className={classes.buttonGroup}>
-          <IconButton className={classes.iconButton}>
-            <AddFeature onSaveSelectedText={handleSaveSelectedText} storedSelectedTexts={selectedTexts} />
-          </IconButton>
-          
-          <IconButton className={classes.iconButton} onClick={() => console.log('Refresh clicked')}>
-            <Refresh />
-          </IconButton>
-        </Box>
-      </Toolbar>
-    </AppBar>
+          {selectedTexts.length > 9 && (
+            <Box className="menu-buttonGroup">
+              <SlideButton onScrollLeft={handleScrollLeft} direction="left" />
+              <SlideButton onScrollRight={handleScrollRight} direction="right" />
+            </Box>
+          )}
+          <Box className="menu-buttonGroup">
+            <IconButton className="menu-iconButton">
+              <AddFeature onSaveSelectedText={handleSaveSelectedText} storedSelectedTexts={selectedTexts} />
+            </IconButton>
+            <IconButton className="menu-iconButton" onClick={() => console.log('Refresh clicked')}>
+              <Refresh />
+            </IconButton>
+          </Box>
+        </Toolbar>
+      </AppBar>
+      <CreateWidget backgroundColor={backgroundColor} widgets={widgets} /> {/* Render CreateWidget */}
+    </>
   );
 };
 

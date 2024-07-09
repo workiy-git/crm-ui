@@ -7,6 +7,7 @@ import Submenu from '../organism/submenu';
 import BackgroundColorChanger from '../atoms/BackgroundColorChanger';
 import Footer from '../atoms/Footer';
 import config from '../../config/config';
+import Widgets from '../atoms/widgets';
 
 function Home() {
   const [backgroundColor, setBackgroundColor] = useState(() => {
@@ -73,7 +74,6 @@ function Home() {
         <div style={{ width: '100%', marginRight: "-10px", backgroundColor: backgroundColor, overflow: 'hidden' }}>
           <div>
             <Header backgroundColor={backgroundColor} />
-            <BackgroundColorChanger colors={randomGradientColors} onColorChange={handleColorChange} />
           </div>
           <div>
             <MenuComponent onSaveSelectedText={handleSaveSelectedText} backgroundColor={backgroundColor} />
@@ -81,10 +81,8 @@ function Home() {
           <div>
             <Submenu backgroundColor={backgroundColor} />
           </div>
-          <div style={{ padding: '20px' }}>
-            <h1>{homeData.title}</h1>
-            <p>{homeData.description}</p>
-            <div>{homeData.content}</div>
+          <div>
+            <Widgets backgroundColor={backgroundColor} />
           </div>
         </div>
       </div>
