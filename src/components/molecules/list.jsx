@@ -28,8 +28,8 @@ export default function Hamburger() {
   const menuRef = useRef(null);
 
   const handleMenuItemClick = (menuItem) => {
-    console.log('Clicked on:', menuItem.title);
-    const url = `/${menuItem.title.toLowerCase().replace(/\s+/g, '')}`;
+    console.log('Clicked on:', menuItem.path);
+    const url = `${menuItem.path}`;
     window.location.href = url;
   };
 

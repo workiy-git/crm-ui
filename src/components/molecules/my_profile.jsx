@@ -52,8 +52,8 @@ export default function Myprofile({ backgroundColor }) {
     setOpen(!open);
   };
 
-  const handleMenuItemClick = (title) => {
-    const url = `/${title.toLowerCase().replace(/\s+/g, '')}`;
+  const handleMenuItemClick = (path) => {
+    const url = `${path}`;
     window.location.href = url;
   };
 
@@ -97,7 +97,7 @@ export default function Myprofile({ backgroundColor }) {
                       <ListItemButton
                         key={index}
                         sx={{ py: 0, minHeight: 32, color: 'rgba(255,255,255,.8)' }}
-                        onClick={() => handleMenuItemClick(myprofileData[key].title)}
+                        onClick={() => handleMenuItemClick(myprofileData[key].path)}
                         style={index === 0 ? { borderBottom: '1px dashed black', paddingBottom: '10px' } : {}}
                       >
                         <ListItemIcon sx={{ color: 'inherit', minWidth: 'fit-content', marginRight: '15px' }} style={index === 0 ? { height: '40px', padding: '0px' } : {}}>

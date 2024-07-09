@@ -25,7 +25,7 @@ const SideMenu = () => {
               title: value.title,
               icon: value.icon,
               selectedIcon: value.selected_icon,
-              path: `/${key}`
+              path: value.path,
             }));
           console.log('Mapped menu items:', mappedMenuItems);
           setMenuItems(mappedMenuItems);
