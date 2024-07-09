@@ -6,6 +6,9 @@ import Home from "./components/pages/home";
 import Loginpage from "./components/pages/login"; // Ensure this path is correct
 import Edit from "./components/pages/edit"; // Ensure this path is correct
 import Grid from "./components/organism/grid";
+import DetailsPage from "./components/pages/details";
+import Users from "./components/pages/users";
+import UserForm from "./components/organism/usersForm";
 
 const App = () => {
   return (
@@ -17,6 +20,9 @@ const App = () => {
         <Route path="/calls" element={<Calls />} />
         <Route path="/grid" element={<Grid endpoint="/users" />} />
         <Route path="/edit/:id" element={<Edit endpoint="/users" />} />
+        <Route path="/details/:id" element={<DetailsPage endpoint="/users" />} />
+        <Route path="/users" element={<Users />} />
+        <Route path="/adduser" element={<UserForm />} />
       </Routes>
     </Router>
   );

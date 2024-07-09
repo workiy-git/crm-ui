@@ -6,7 +6,6 @@ import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import Avatar from '@mui/material/Avatar';
-import Paper from '@mui/material/Paper';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import config from '../../config/config'; // Import the configuration file
 
@@ -53,17 +52,10 @@ export default function Myprofile({ backgroundColor }) {
     setOpen(!open);
   };
 
-  const buttonFunctions = [
-    () => {
-      console.log('Function for the first button');
-      window.location.href = '/myprofile';
-    },
-    () => {
-      console.log('Function for the second button');
-      window.location.href = 'calls';
-    },
-    // Add more functions for each ListItemButton as needed
-  ];
+  const handleMenuItemClick = (title) => {
+    const url = `/${title.toLowerCase().replace(/\s+/g, '')}`;
+    window.location.href = url;
+  };
 
   return (
     <Box sx={{ display: 'flex', justifyContent: 'center' }}>
@@ -105,11 +97,11 @@ export default function Myprofile({ backgroundColor }) {
                       <ListItemButton
                         key={index}
                         sx={{ py: 0, minHeight: 32, color: 'rgba(255,255,255,.8)' }}
-                        onClick={buttonFunctions[index]} // Set appropriate click handlers
+                        onClick={() => handleMenuItemClick(myprofileData[key].title)}
                         style={index === 0 ? { borderBottom: '1px dashed black', paddingBottom: '10px' } : {}}
                       >
                         <ListItemIcon sx={{ color: 'inherit', minWidth: 'fit-content', marginRight: '15px' }} style={index === 0 ? { height: '40px', padding: '0px' } : {}}>
-                          <img src={myprofileData[key].icon} alt="" />
+                          <img src={myprofileData[key].icon} alt={myprofileData[key].title} />
                         </ListItemIcon>
                         <ListItemText
                           primary={myprofileData[key].title}

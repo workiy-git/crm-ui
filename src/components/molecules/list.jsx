@@ -8,8 +8,7 @@ import Collapse from '@mui/material/Collapse';
 import config from '../../config/config'; // Import the configuration file
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useTheme } from '@mui/material/styles';
-import MoreVertIcon from '@mui/icons-material/MoreVert';
-import "../../assets/styles/header.css"
+import "../../assets/styles/header.css";
 
 const FireNav = styled(List)({
   '& .MuiListItemIcon-root': {
@@ -28,23 +27,10 @@ export default function Hamburger() {
   const [hamburgerData, setHamburgerData] = useState([]);
   const menuRef = useRef(null);
 
-  const handleMenuItemClick = (menuItem, menuIndex, menuItemIndex) => {
-    console.log('Clicked on:', menuItem.title, 'from menu', menuIndex, 'item index', menuItemIndex);
-    // Perform actions based on the clicked menu item
-    switch (menuItem.title) {
-      case 'Chats':
-        window.location.href = '/chats';
-        break;
-      case 'Enquiry':
-        window.location.href = '/enquiry';
-        break;
-      case 'Calls':
-        window.location.href = '/calls';
-        break;
-      // Add more cases for other menu items if needed
-      default:
-        // Default action
-    }
+  const handleMenuItemClick = (menuItem) => {
+    console.log('Clicked on:', menuItem.title);
+    const url = `/${menuItem.title.toLowerCase().replace(/\s+/g, '')}`;
+    window.location.href = url;
   };
 
   useEffect(() => {
@@ -87,7 +73,7 @@ export default function Hamburger() {
             <li
             className='hamburger_list'
               onClick={() =>
-                handleMenuItemClick(menuItem[subKey], 0, subIndex)
+                handleMenuItemClick(menuItem[subKey])
               }
               style={{
                 cursor: 'pointer',
