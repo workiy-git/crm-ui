@@ -2,8 +2,11 @@ import React, { useEffect, useState } from 'react';
 import Header from '../organism/header';
 import SideMenu from "../organism/sidemenu";
 import { Typography } from '@mui/material';
-import Grid from '../organism/grid';
+
+import CallsGrid from '../molecules/call_app_bar';
+
 function Enquiry() {
+  const endpoint = '/appdata';
   const [backgroundColor] = useState(() => {
     // Check if there's a color stored in local storage, otherwise use default
     return localStorage.getItem('backgroundColor') || '#d9d9d9';
@@ -33,7 +36,7 @@ function Enquiry() {
           <Typography style={{ height:'10rem', color:'white', padding:'10px', fontSize:'30px',backgroundColor:{backgroundColor}  }}>
           enquiry
         </Typography>
-        <Grid endpoint="/appdata" />
+       <CallsGrid endpoint={endpoint} />
           
         </div>
       </div>

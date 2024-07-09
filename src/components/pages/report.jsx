@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import Header from '../organism/header';
 import SideMenu from "../organism/sidemenu";
+import CallsGrid from '../molecules/call_app_bar';
 import { Typography } from '@mui/material';
-import Grid from '../organism/grid';
+
 
 function Report() {
   const [backgroundColor] = useState(() => {
@@ -34,7 +35,7 @@ function Report() {
           <Typography style={{ height:'10rem', color:'white', padding:'10px', fontSize:'30px',backgroundColor:{backgroundColor}  }}>
           report
         </Typography>
-        <Grid endpoint="/appdata" />
+       <CallsGrid />
           
         </div>
       </div>

@@ -5,6 +5,7 @@ import SideMenu from "../organism/sidemenu";
 import Grid from '../organism/grid';
 
 function Calls() {
+  const endpoint = '/appdata';
   const [backgroundColor] = useState(() => {
     return localStorage.getItem('backgroundColor') || '#d9d9d9';
   });
@@ -37,12 +38,12 @@ function Calls() {
         <div style={{ width: '10vh', backgroundColor: "#0d2d4e" }}>
           <SideMenu backgroundColor={backgroundColor} />
         </div>
-        <div style={{ width: '100%', marginRight: "-10px", backgroundColor: backgroundColor, overflow: 'hidden' }}>
+        <div style={{ width: '100%', backgroundColor: backgroundColor, overflow: 'hidden' }}>
           <Header backgroundColor={backgroundColor} />
-          <Typography style={{ height: '10rem', color: 'white', padding: '10px', fontSize: '30px', background: 'linear-gradient(90deg, rgba(12,45,78,1) 0%, rgba(28,104,180,1) 100%)' }}>
+          <Typography style={{ height: '3rem', color: 'white', padding: '10px', fontSize: '30px', background: 'linear-gradient(90deg, rgba(12,45,78,1) 0%, rgba(28,104,180,1) 100%)' }}>
             Calls
           </Typography>
-          <Grid endpoint="/appdata" />
+          <Grid endpoint={endpoint} />
         </div>
       </div>
     </div>
