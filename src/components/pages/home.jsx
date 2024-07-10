@@ -65,7 +65,7 @@ function Home() {
   }
 
   return (
-    <div style={{ height: '100vh', display: "flex", flexDirection: "column", overflow: 'hidden', backgroundColor: "gray", paddingLeft: 0 }}>
+    <div style={{ height: '100vh', display: "flex", flexDirection: "column", overflow: 'hidden', backgroundColor: "#dde1e9", paddingLeft: 0 }}>
       <div style={{ display: 'flex', height: '-webkit-fill-available', overflow: 'hidden' }}>
         <div style={{ width: '10vh', backgroundColor: "#0d2d4e" }}>
           <SideMenu backgroundColor={backgroundColor} />
@@ -80,11 +80,7 @@ function Home() {
           <div>
             <Submenu backgroundColor={backgroundColor} />
           </div>
-          <div style={{ padding: '20px' }}>
-            <h1>{homeData.title}</h1>
-            <p>{homeData.description}</p>
-            <div>{homeData.content}</div>
-          </div>
+      
         </div>
       </div>
       <Footer />
