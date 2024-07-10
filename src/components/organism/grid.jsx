@@ -60,7 +60,6 @@ const Grid = ({ endpoint, pageName }) => {
         setRows(appdata);
         const schemaForPage = webform.find((page) => page.pageName === pageName);
         setWebformSchema(schemaForPage?.fields || []);
-
         const validated = appdata.map((data) => {
           const validatedData = {};
           schemaForPage?.fields.forEach((field) => {
@@ -84,7 +83,6 @@ const Grid = ({ endpoint, pageName }) => {
         setErrors('Error fetching data');
       }
     };
-
     fetchData();
   }, [endpoint, pageName]);
 
@@ -134,6 +132,12 @@ const Grid = ({ endpoint, pageName }) => {
       console.error('Error deleting data:', error);
       setErrors('Error deleting data');
     }
+    if (webformSchema.length === 0) {
+      console.error('Webform schema is not available');
+      return;
+    }
+    console.log('Navigating to edit page with ID:', selectedRow._id);
+    navigate(`/edit/${selectedRow._id}`, { state: { rowData: selectedRow, schema: webformSchema } });
   };
 
   const totalPages = Math.ceil(rows.length / recordsPerPage);
@@ -168,8 +172,6 @@ const Grid = ({ endpoint, pageName }) => {
   const deselectAllColumns = () => {
     setSelectedColumns([]);
   };
-
-  
 
   return (
     <div className="CallsGrid">
@@ -322,11 +324,19 @@ const Grid = ({ endpoint, pageName }) => {
                     <TableCell key={field.fieldName}>{field.label}</TableCell>
                   )
                 ))}
+                <TableCell>Actions</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {validatedData.slice(startIndex, endIndex).map((row) => (
                 <TableRow key={row._id}>
+                  {webformSchema.map((field) => (
+                    <TableCell key={`${row._id}-${field.fieldName}`}>
+                      {typeof row[field.fieldName] === 'object' && row[field.fieldName] !== null
+                        ? JSON.stringify(row[field.fieldName])
+                        : row[field.fieldName]}
+                    </TableCell>
+                  ))}
                   <TableCell>
                     <IconButton onClick={(event) => handleMenuOpen(event, row)}>
                       <MoreVertIcon />

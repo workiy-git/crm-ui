@@ -1,93 +1,58 @@
-import React, { useState, useEffect } from "react";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
+import React, { useState } from 'react';
 import axios from 'axios';
-import config from '../../config/config';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { Box, Button, TextField, Typography } from '@mui/material';
-import Header from "../organism/header";
-import SideMenu from "../organism/sidemenu";
-import Footer from "../atoms/Footer";
+import config from '../../config/config';
 
-const EditPage = ({ endpoint }) => {
+const Edit = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { id } = useParams();
-  const [formState, setFormState] = useState(location.state?.rowData || {});
-  const [errors, setErrors] = useState("");
-
-  useEffect(() => {
-    if (!location.state?.rowData) {
-      // Fetch data if it's not passed via state
-      const fetchData = async () => {
-        try {
-          const response = await axios.get(`${config.apiUrl}${endpoint}/${id}`);
-          setFormState(response.data);
-        } catch (error) {
-          console.error('Error fetching user data:', error);
-        }
-      };
-      fetchData();
-    }
-  }, [id, location.state, endpoint]);
+  const { rowData, schema } = location.state;
+  const [formData, setFormData] = useState(rowData);
+  const [errors, setErrors] = useState('');
 
   const handleChange = (e) => {
-    setFormState({ ...formState, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
   };
 
-  const handleSave = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    const apiUrl = `${config.apiUrl.replace(/\/$/, '')}/appdata/${formData._id}`;
+    console.log('API URL:', apiUrl);
+    console.log('Form Data:', formData);
+  
     try {
-      await axios.put(`${config.apiUrl}${endpoint}/${id}`, formState);
-      navigate('/'); // Navigate back to the grid page after saving
+      const response = await axios.put(apiUrl, formData);
+      console.log('Response:', response);
+      alert('Data updated successfully');
+      navigate('/');
     } catch (error) {
-      console.error('Error saving user data:', error);
-      setErrors("Error saving user data");
+      console.error('Error updating data:', error);
+      setErrors('Error updating data');
     }
   };
+  
 
   return (
-    <div>
-    <div style={{ height: '100vh', display: "flex", flexDirection: "column", overflow: 'hidden', backgroundColor: "gray", paddingLeft: 0 }}>
-      <div style={{ display: 'flex', height: '-webkit-fill-available', overflow: 'hidden' }}>
-        <div style={{ width: '10vh', backgroundColor: "#0d2d4e" }}>
-          <SideMenu />
-        </div>
-        <div style={{ width: '100%', marginRight: "-10px", overflow: 'hidden' }}>
-          <div>
-            <Header />
-          </div>
-          <div>
-          <Box sx={{ p: 3 }}>
-      <Typography variant="h4" gutterBottom>
-        Edit User
-      </Typography>
-      <form onSubmit={handleSave}>
-        {Object.entries(formState).map(([key, value]) => (
-          key !== "_id" && (
-            <TextField
-              key={key}
-              name={key}
-              label={key.replace(/_/g, ' ')}
-              value={value}
-              onChange={handleChange}
-              fullWidth
-              margin="normal"
-            />
-          )
-        ))}
-        {errors && <Typography color="error">{errors}</Typography>}
-        <Button type="submit" variant="contained" color="primary">
-          Save
-        </Button>
-      </form>
+    <Box component="form" onSubmit={handleSubmit} sx={{ padding: '20px', maxWidth: '500px', margin: '50px auto', backgroundColor: 'white' }}>
+      {errors && <Typography color="error">{errors}</Typography>}
+      {schema.map((field) => (
+        <TextField
+          key={field.fieldName}
+          name={field.fieldName}
+          label={field.label}
+          value={formData[field.fieldName] || ''}
+          onChange={handleChange}
+          fullWidth
+          margin="normal"
+        />
+      ))}
+      <Button type="submit" variant="contained" color="primary">
+        Save
+      </Button>
     </Box>
-          </div>
-        </div>
-      </div>
-      <Footer />
-    </div>
-    
-    </div>
   );
 };
 
-export default EditPage;
+export default Edit;
