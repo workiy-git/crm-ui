@@ -4,7 +4,7 @@ import Header from '../organism/header';
 import SideMenu from "../organism/sidemenu";
 import Grid from '../organism/grid';
 
-function Calls() {
+function Reports() {
   const endpoint = '/appdata';
   const [backgroundColor] = useState(() => {
     return localStorage.getItem('backgroundColor') || '#d9d9d9';
@@ -33,13 +33,13 @@ function Calls() {
         <div style={{ width: '100%', backgroundColor: backgroundColor, overflow: 'hidden' }}>
           <Header backgroundColor={backgroundColor} />
           <Typography style={{ height: '3rem', color: 'white', padding: '10px', fontSize: '30px', background: 'linear-gradient(90deg, rgba(12,45,78,1) 0%, rgba(28,104,180,1) 100%)' }}>
-            Calls
+            Reports
           </Typography>
-          <Grid endpoint={endpoint} pageName="calls" />
+          <Grid endpoint={endpoint} pageName="reports" />
         </div>
       </div>
     </div>
   );
 }
 
-export default Calls;
+export default Reports;
