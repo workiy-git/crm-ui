@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import AddFeature from "../atoms/add_feature";
 import Refresh from '../atoms/refresh';
 import SlideButton from '../atoms/slide_button';
 import CreateWidget from '../atoms/widgets';
 import { AppBar, Toolbar, IconButton, Button, Box } from '@material-ui/core';
 import '../../assets/styles/MenuComponent.css';
+import config from '../../config/config';  // Ensure the correct path to config file
 
 const localStorageKey = 'selectedTexts';
 
@@ -12,12 +14,25 @@ const MenuComponent = ({ backgroundColor, onSaveSelectedText }) => {
   const [selectedTexts, setSelectedTexts] = useState([]);
   const [scrollIndex, setScrollIndex] = useState(0);
   const [selectedButtonIndex, setSelectedButtonIndex] = useState(null);
-  const [widgets, setWidgets] = useState([]); // State for storing widgets
+  const [widgets, setWidgets] = useState([]);
+  const [count, setCount] = useState(0);
+  const [notificationCount, setNotificationCount] = useState(0);
+  const [notificationData, setNotificationData] = useState([]);
 
   useEffect(() => {
     const storedSelectedTexts = JSON.parse(localStorage.getItem(localStorageKey)) || [];
     setSelectedTexts(storedSelectedTexts);
     setScrollIndex(0);
+
+    axios.get(`${config.apiUrl}/appdata`)
+      .then((response) => {
+        console.log('Notification data received:', response.data);
+        const { data } = response.data;
+        setNotificationData(data);  // Store the fetched data
+      })
+      .catch((error) => {
+        console.error('Error fetching notification data:', error);
+      });
   }, []);
 
   const handleSaveSelectedText = (texts) => {
@@ -36,10 +51,21 @@ const MenuComponent = ({ backgroundColor, onSaveSelectedText }) => {
   };
 
   const handleButtonClick = (index) => {
-    setSelectedButtonIndex(index); // Set the index of the selected button
-    const featureWidgets = selectedTexts[index]?.widgets || [];
-    console.log("Selected feature widgets:", featureWidgets); // Debugging log
-    setWidgets(Array.isArray(featureWidgets) ? featureWidgets : []); // Ensure widgets is an array
+    setSelectedButtonIndex(index);
+    const selectedTextTitle = selectedTexts[index].title;
+
+    // Filter notification data based on the selected text title
+    const filteredData = notificationData.filter(item => item.pageName === selectedTextTitle);
+    console.log(`Filtered data for ${selectedTextTitle}:`, filteredData);
+
+    const newWidgets = Array.from({ length: filteredData.length }, (_, i) => ({
+      icon: '+',
+      title: `Widget ${i + 1}`,
+    }));
+
+    setWidgets(newWidgets);
+    setCount(filteredData.length);
+    setNotificationCount(filteredData.length);
   };
 
   return (
@@ -51,10 +77,10 @@ const MenuComponent = ({ backgroundColor, onSaveSelectedText }) => {
               <Box key={index} className="menu-selectedTextItem">
                 <Button
                   variant="contained"
-                  color={selectedButtonIndex === index ? "secondary" : "primary"} // Change color based on selectedButtonIndex state
+                  color={selectedButtonIndex === index ? "secondary" : "primary"}
                   className="menu-featureButton"
-                  onClick={() => handleButtonClick(index)} // Handle button click to set selected index
-                  style={{ backgroundColor: selectedButtonIndex === index ? 'rgb(255, 63, 20)' : 'white', color: selectedButtonIndex === index ? 'white' : '#264653' }}
+                  onClick={() => handleButtonClick(index)}
+                  style={{ backgroundColor: selectedButtonIndex === index ? 'rgb(255, 63, 20)' : 'white', color: selectedButtonIndex === index ? 'white' : '#264653', textTransform: 'none'  }}
                 >
                   {text.title}
                 </Button>
@@ -79,7 +105,7 @@ const MenuComponent = ({ backgroundColor, onSaveSelectedText }) => {
       </AppBar>
       {selectedButtonIndex !== null && (
         <div>
-          <CreateWidget backgroundColor={backgroundColor} widgets={widgets} /> {/* Render CreateWidget conditionally */}
+          <CreateWidget backgroundColor={backgroundColor} widgets={widgets} />
         </div>
       )}
     </>
