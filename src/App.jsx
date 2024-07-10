@@ -12,6 +12,9 @@ import Grid from "./components/organism/grid";
 import DetailsPage from "./components/pages/details";
 import Users from "./components/pages/users";
 import UserForm from "./components/organism/usersForm";
+import Enquiry from "./components/pages/enquiry";
+import Leads from "./components/pages/leads";
+import Report from "./components/pages/reports";
 
 const App = () => {
   return (
@@ -23,7 +26,7 @@ const App = () => {
         <Route path="/calls" element={<Calls />} />
         <Route path="/enquiry" element={<Enquiry />} />
         <Route path="/leads" element={<Leads />} />
-        <Route path="/reports" element={<Reports />} />
+        <Route path="/reports" element={<Report />} />
         <Route path="/grid" element={<Grid endpoint="/users" />} />
         <Route path="/edit/:id" element={<Edit endpoint="/users" />} />
         <Route path="/details/:id" element={<DetailsPage endpoint="/users" />} />

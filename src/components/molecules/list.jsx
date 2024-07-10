@@ -28,8 +28,8 @@ export default function Hamburger() {
   const menuRef = useRef(null);
 
   const handleMenuItemClick = (menuItem) => {
-    console.log('Clicked on:', menuItem.title);
-    const url = `/${menuItem.title.toLowerCase().replace(/\s+/g, '')}`;
+    console.log('Clicked on:', menuItem.path);
+    const url = `${menuItem.path}`;
     window.location.href = url;
   };
 
@@ -58,40 +58,19 @@ export default function Hamburger() {
 
   const renderNestedItems = (menuItem) => {
     return (
-      <ul
-        style={{
-          listStyle: 'none',
-          padding: '0px 10px',
-          margin: '5px 0',
-          width: '100%',
-          lineHeight: '2',
-        }}
-      >
+      <ul className="hamburger-list-container">
         {Object.keys(menuItem)
           .filter((subKey) => subKey !== 'title' && subKey !== 'icon')
           .map((subKey, subIndex) => (
             <li
-            className='hamburger_list'
-              onClick={() =>
-                handleMenuItemClick(menuItem[subKey])
-              }
-              style={{
-                cursor: 'pointer',
-                display: 'flex',
-                width: 'max-content',
-                lineHeight: 2.5,
-                padding:'0 15px',
-                margin:'0 10px'
-              }}
+              className="hamburger-list-item"
+              onClick={() => handleMenuItemClick(menuItem[subKey])}
               key={subIndex}
             >
               <img
                 alt={menuItem[subKey].title} // Provide meaningful alt text
                 src={menuItem[subKey].icon}
-                style={{
-                  margin: 'auto 15px auto 0',
-                  width: '20px',
-                }}
+                className="hamburger-img"
               />
               {menuItem[subKey].title}
               {menuItem[subKey].children && (
@@ -119,69 +98,40 @@ export default function Hamburger() {
           palette: {},
         })}
       >
-        <div elevation={0} sx={{ maxWidth: 256, backgroundColor: 'transparent' }}>
-          <FireNav component="nav" disablePadding className="FireNav" ref={menuRef}>
+        <div className="hamburger-menu-container" ref={menuRef}>
+          <FireNav component="nav" disablePadding className="hamburger-nav">
             <ListItemButton
               alignItems="flex-start"
               onClick={() => setOpen(!open)}
-              sx={{
-                padding: 0,
-                margin: '15px',
-                '&:hover, &:focus': { '& svg': { opacity: open ? 1 : 0 }, background: 'none' },
-                height: { xs: '30px', md: '20px' }
-              }}
+              className={`hamburger-list-item-button ${isMdUp ? '' : 'hamburger-list-item-button-md'}`}
             >
               <img
                 alt={hamburgerData.hamburger_image} // Provide meaningful alt text
                 src={isMdUp ? hamburgerData.hamburger_image : hamburgerData.hamburger_md_image}
-                style={{ height: "100%", padding: '', }}
+                className="hamburger-menu-img"
               />
             </ListItemButton>
             <Box>
               <Box
-                sx={{
-                  bgcolor: open ? 'white' : null,
-                  borderRadius: '10px',
-                  pb: open ? 2 : 0,
-                  pt: open ? 2 : 0,
-                  position: open ? 'absolute' : 'static',
-                  boxShadow: '2px 2px 19px 0px black',
-                  zIndex: '10',
-                  marginLeft: '20px',
-                }}
+                className={`hamburger-nav ${open ? 'hamburger-nav-open' : 'hamburger-nav-close'}`}
               >
                 {open && (
                   <Box sx={{ display: "flex" }}>
                     {Object.keys(hamburgerData)
-                      .filter((key) => key !== 'hamburger_image')
-                      .filter((key) => key !== 'hamburger_md_image')
+                      .filter((key) => key !== 'hamburger_image' && key !== 'hamburger_md_image')
                       .map((key, index) => {
                         const menuItem = hamburgerData[key];
                         return (
                           <div key={index}>
                             <ListItemButton
-                              sx={{ padding: "0px 16px !important", minHeight: 40, color: 'rgba(255,255,255,.8)', display: 'flex', flexDirection: 'column', width:'100%' }}
+                              sx={{ padding: "0px 16px !important", minHeight: 40, color: 'rgba(255,255,255,.8)', display: 'flex', flexDirection: 'column', width: '100%' }}
                             >
-                              <ul
-                                style={{
-                                  listStyle: 'none',
-                                  color: 'black',
-                                  padding: '0px 10px',
-                                  margin: 0,
-                                  width: '100%',
-                                  display: 'flex',
-                                  
-                                  
-                                }}
-                              >
-                                <li
-                                  style={{ display: 'flex', width: '100%', background:'#0c2d4e', color:'white', padding:'15px', borderRadius:'10px' }}
-                                >
+                              <ul className="hamburger-nested-item">
+                                <li className="hamburger-nested-list-item">
                                   <img
                                     alt={menuItem.title} // Provide meaningful alt text
                                     src={menuItem.icon}
-                                    style={{ marginRight: '15px', width: '20px', 
-                                      filter: 'brightness(0) invert(1)' }}
+                                    className="hamburger-nested-list-img"
                                   />
                                   {menuItem.title}
                                 </li>

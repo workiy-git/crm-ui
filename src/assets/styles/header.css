@@ -8,3 +8,144 @@ background-color: blue;
     background-color: rgb(173, 206, 235);
     border-radius: 10px;
 }
+
+.header-container {
+    background: white;
+    color: black;
+    box-shadow: 0px 0px 15px gray;
+    padding: 0px 5px;
+  }
+  
+  .header-toolbar {
+    flex-grow: 1;
+    height: 10vh;
+  }
+  
+  .hamburger-box,
+  .fullscreen-box,
+  .search-box {
+    display: none;
+  }
+  
+  @media (min-width: 600px) {
+    .fullscreen-box,
+    .search-box {
+      display: block;
+    }
+  }
+  
+  .flex-grow {
+    flex-grow: 1;
+  }
+  
+  .header-right-box {
+    display: flex;
+  }
+  
+  .dayin-box {
+    margin: auto;
+    display: none;
+  }
+  
+  @media (min-width: 600px) {
+    .dayin-box {
+      display: block;
+    }
+  }
+  
+  .notification-box {
+    margin: auto 20px auto auto;
+  }
+  
+
+  .hamburger-list-container {
+    list-style: none;
+    padding: 0px 10px;
+    margin: 5px 0;
+    width: 100%;
+    line-height: 2;
+  }
+  
+  .hamburger-list-item {
+    cursor: pointer;
+    display: flex;
+    width: max-content;
+    line-height: 2.5;
+    padding: 0 15px;
+    margin: 0 10px;
+  }
+  .hamburger-list-item:hover {
+    background-color: #a1cbeb;
+    /* color: white; */
+    border-radius: 10px;
+    /* filter: brightness(0) invert(1); */
+  }
+  
+  .hamburger-img {
+    margin: auto 15px auto 0;
+    width: 20px;
+  }
+  
+  .hamburger-menu-container {
+    background-color: transparent;
+    max-width: 256px;
+  }
+  
+  .hamburger-nav {
+    position: relative;
+    z-index: 10;
+    margin-left: 20px;
+  }
+  
+  .hamburger-nav-open {
+    background-color: white;
+    border-radius: 10px;
+    padding-bottom: 16px;
+    padding-top: 16px;
+    position: absolute;
+    box-shadow: 2px 2px 19px 0px black;
+  }
+  
+  .hamburger-nav-close {
+    display: none;
+  }
+  
+  .hamburger-list-item-button {
+    padding: 0 !important;
+    margin: 15px !important;
+    height: 18px;
+}
+  
+  .hamburger-list-item-button-md {
+    height: 20px;
+  }
+  
+  .hamburger-menu-img {
+    height: 100%;
+  }
+  
+  .hamburger-nested-item {
+    list-style: none;
+    color: black;
+    padding: 0px 10px;
+    margin: 0;
+    width: 100%;
+    display: flex;
+  }
+  
+  .hamburger-nested-list-item {
+    display: flex;
+    width: 100%;
+    background: #0c2d4e;
+    color: white;
+    padding: 15px;
+    border-radius: 10px;
+  }
+  
+  .hamburger-nested-list-img {
+    margin-right: 15px;
+    width: 20px;
+    filter: brightness(0) invert(1);
+  }
+  
+  

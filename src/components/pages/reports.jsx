@@ -4,7 +4,7 @@ import Header from '../organism/header';
 import SideMenu from "../organism/sidemenu";
 import Grid from '../organism/grid';
 
-function Reports() {
+function Report() {
   const endpoint = '/appdata';
   const [backgroundColor] = useState(() => {
     return localStorage.getItem('backgroundColor') || '#d9d9d9';

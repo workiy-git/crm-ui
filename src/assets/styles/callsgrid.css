@@ -2,10 +2,9 @@
   font-family: Arial, Helvetica, sans-serif;
   display: flex;
   flex-direction: column;
-  height: 95%; /* Full viewport height */
+  height: 80%;
   /* padding: 10px; */
   color: #333;
-  width: 99%;
  /* margin-top: -7rem; */
 
 }
@@ -279,4 +278,47 @@
   margin-left: 70%;
   margin-top: -5%;
 
+}
+/* pagination.css */
+
+.pagination-container {
+  display: flex;
+  justify-content: space-evenly;
+  margin: 20px 0;
+  margin-top: 20px;
+}
+
+.page-btn {
+  color: white;
+  padding: 5px 9px;
+  border: none;
+  border-radius: 100px;
+  cursor: pointer;
+  outline: none;
+  margin: 2px;
+  font-size: 16px;
+  transition: background-color 0.3s ease;
+}
+.page-btn-arrow{
+  border: none;
+  border-radius: 100px;
+  cursor: pointer;
+  outline: none;
+  margin: 2px;
+  font-size: 16px;
+  background-color: transparent;
+
+}
+
+.page-btn:hover {
+  background-color: gray;
+}
+
+.page-btn.active {
+  background-color: #1976d2;
+}
+
+.page-btn:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
 }

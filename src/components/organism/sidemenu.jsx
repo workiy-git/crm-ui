@@ -25,7 +25,7 @@ const SideMenu = () => {
               title: value.title,
               icon: value.icon,
               selectedIcon: value.selected_icon,
-              path: `/${key}`
+              path: value.path,
             }));
           console.log('Mapped menu items:', mappedMenuItems);
           setMenuItems(mappedMenuItems);
@@ -47,40 +47,30 @@ const SideMenu = () => {
   };
 
   return (
-    <div className="scrollable-container" style={{ backgroundColor: "#0d2d4e" , }}>
+    <div className="sidemenu-scrollable-container">
       <MyProfile />
-      <div style={{ width: 'fit-content', textAlign: 'center', margin: 'auto', overflowY:'auto', maxHeight:'70vh' ,overflowX:'hidden'}}>
+      <div className="sidemenu-profile-container">
         {menuItems.map((menuItem, index) => {
           const isSelected = selectedOptionIndex === index || (location.pathname === "/" && index === 0);
           return (
             <div
               key={menuItem.title}
-              style={{
-                display: 'block',
-                textAlign: 'center',
-                zIndex: '3',
-                gap: '50px',
-                marginTop: '20px',
-                position: 'relative',
-                transition: 'transform 0.3s ease',
-                transform: isSelected ? 'scale(1.1)' : 'scale(1)',
-                padding: '2px',
-                backgroundColor: isSelected ? '#ff3f14' : '',
-                borderRadius: '5px'
-              }}
+              className={`sidemenu-menu-item ${isSelected ? 'sidemenu-menu-item-selected' : ''}`}
               onClick={() => handleOptionClick(menuItem.path, index)}
               onMouseEnter={(e) => {
-                e.currentTarget.style.transform = 'scale(1.1)';
-                e.currentTarget.style.fontSize = '10px';
+                e.currentTarget.classList.add('sidemenu-menu-item-hover');
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.transform = isSelected ? 'scale(1.1)' : 'scale(1)';
-                e.currentTarget.style.fontSize = '13px';
+                e.currentTarget.classList.remove('sidemenu-menu-item-hover');
+                if (isSelected) {
+                  e.currentTarget.classList.add('sidemenu-menu-item-selected');
+                }
               }}
             >
               <Avatar
                 src={menuItem.icon}
                 alt={menuItem.title}
+                // className="sidemenu-avatar"
                 sx={{
                   width: 20,
                   height: 20,
@@ -91,11 +81,7 @@ const SideMenu = () => {
               />
               <Typography
                 variant="body2"
-                sx={{
-                  fontSize: '10px !important',
-                  color: 'white',
-                  transition: 'color 0.3s ease',
-                }}
+                className="sidemenu-typography"
               >
                 {menuItem.title}
               </Typography>
