@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Typography } from '@mui/material';
 import Header from '../organism/header';
 import SideMenu from "../organism/sidemenu";
@@ -9,14 +9,6 @@ function Calls() {
   const [backgroundColor] = useState(() => {
     return localStorage.getItem('backgroundColor') || '#d9d9d9';
   });
-
-  useEffect(() => {
-    document.title = 'Home';
-
-    return () => {
-      document.title = 'Default Title';
-    };
-  }, []);
 
   const randomGradientColors = [];
   function generateRandomLightColor() {
@@ -34,7 +26,7 @@ function Calls() {
 
   return (
     <div style={{ height: '100vh', display: "flex", flexDirection: "column", overflow: 'hidden' }}>
-      <div  style={{ display: 'flex', height: '-webkit-fill-available', overflow: 'hidden' }}>
+      <div style={{ display: 'flex', height: '-webkit-fill-available', overflow: 'hidden' }}>
         <div style={{ width: '10vh', backgroundColor: "#0d2d4e" }}>
           <SideMenu backgroundColor={backgroundColor} />
         </div>
@@ -43,7 +35,7 @@ function Calls() {
           <Typography style={{ height: '3rem', color: 'white', padding: '10px', fontSize: '30px', background: 'linear-gradient(90deg, rgba(12,45,78,1) 0%, rgba(28,104,180,1) 100%)' }}>
             Calls
           </Typography>
-          <Grid endpoint={endpoint} />
+          <Grid endpoint={endpoint} pageName="calls" />
         </div>
       </div>
     </div>

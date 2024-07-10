@@ -9,8 +9,9 @@ import Companylogo from '../atoms/company_logo';
 import Search from '../atoms/search';
 import Notification from '../atoms/notification';
 import Dayin from '../atoms/dayin';
-import WindowControls from '../atoms/minimize';
 import config from '../../config/config';
+import '../../assets/styles/header.css'
+
 
 const Header = () => {
   const [isMinimized, setIsMinimized] = useState(false);
@@ -46,29 +47,21 @@ const Header = () => {
 
   return (
     <Box sx={{ flexGrow: 1 }}>
-      <div position="static" style={{ background: "white", color: 'black', boxShadow: '0px 0px 15px gray', padding: '0px 5px' }}>
-        <Toolbar sx={{ flexGrow: 1, height: '10vh' }}>
-          <Hamburger />
-          <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
-            <FullScreen sx={{ display: { xs: 'none', sm: 'block' } }} />
+      <div className="header-container">
+        <Toolbar className="header-toolbar">
+          <Hamburger className="hamburger-box" />
+          <Box className="fullscreen-box">
+            <FullScreen />
           </Box>
-          <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
+          <Box className="search-box">
             <Search />
           </Box>
-          {/* <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
-            <WindowControls
-              onMinimize={handleMinimizeClick}
-              onMaximize={handleMaximizeClick}
-              onClose={handleCloseClick}
-            />
-          </Box> */}
-          <Box sx={{ flexGrow: 1 }} />
-          <Box sx={{ display: 'flex'  }}>
-            <Box sx={{ margin: 'auto', display:{xs : 'none'} }}>
+          <Box className="flex-grow" />
+          <Box className="header-right-box">
+            <Box className="dayin-box">
               <Dayin />
             </Box>
-            <Box sx={{ margin: 'auto 20px auto auto' }}>
-              {/* <Badge badgeContent={7} color="error"> */}
+            <Box className="notification-box">
               <Badge>
                 <Notification />
               </Badge>
