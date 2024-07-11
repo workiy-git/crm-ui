@@ -286,8 +286,8 @@ input {
 }
 
 .login-title {
-  color: #ffffff;
-  font-family:"Arial Rounded MT Bold", Arial, Helvetica, sans-serif !important;
+  color: #ffba08;
+  font-style: sans-serif !important;
   /* margin-top: 50px !important; */
   font-size: 40px !important;
   font-weight: bolder !important;
@@ -362,11 +362,11 @@ input {
 }
 
 #login-button {
-  background: #8C79FB !important;
-  color: #fff;
+  background: #4084ff !important;
+  color: #000;
   /* border:2px solid #fc921b; */
-  font-weight: 500;
-  padding: 5px 50px;
+  font-weight: 600;
+  padding: 10px 50px;
   margin-top: 10px;
    border-radius: 100px;
 }
@@ -386,7 +386,7 @@ input {
 }
 
 .login-forgot-password {
-  color: #000;
+  color: #fff;
   margin-top: 30px;
   text-align: center;
   padding: 10px;
@@ -431,8 +431,7 @@ input {
   }
 
   .login-title {
-    color: #fc921b;
-    margin-top: 0px !important;
+    
     font-size: 32px !important;
     font-weight: bolder !important;
   }
