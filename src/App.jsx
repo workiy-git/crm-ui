@@ -12,6 +12,7 @@ import UserForm from "./components/organism/usersForm";
 import Enquiry from "./components/pages/enquiry";
 import Leads from "./components/pages/leads";
 import Reports from "./components/pages/reports";
+import Underconstruction from "./components/pages/underconstruction"; // Ensure this path is correct
 
 const App = () => {
   return (
@@ -29,6 +30,7 @@ const App = () => {
         <Route path="/details/:id" element={<DetailsPage endpoint="/users" />} />
         <Route path="/users" element={<Users />} />
         <Route path="/adduser" element={<UserForm />} />
+        <Route path="/underconstruction" element={<Underconstruction />} />
       </Routes>
     </Router>
   );

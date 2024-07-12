@@ -116,8 +116,17 @@ const Grid = ({ endpoint, pageName }) => {
 
   const handleDetails = () => {
     handleMenuClose();
-    console.log('Viewing details for row:', selectedRow);
-    // Add your code for handling details here
+    console.log('Details row:', selectedRow);
+    if (!selectedRow || !selectedRow._id) {
+      console.error('Selected row or _id is not defined');
+      return;
+    }
+    if (webformSchema.length === 0) {
+      console.error('Webform schema is not available');
+      return;
+    }
+    console.log('Navigating to Details page with ID:', selectedRow._id);
+    navigate(`/details/${selectedRow._id}`, { state: { rowData: selectedRow, schema: webformSchema } });
   };
 
   const handleDelete = async () => {
@@ -169,6 +178,67 @@ const Grid = ({ endpoint, pageName }) => {
     setSelectedColumns([]);
   };
 
+  const renderPageNumbers = () => {
+    const pages = [];
+    if (totalPages <= 5) {
+      for (let i = 1; i <= totalPages; i++) {
+        pages.push(
+          <button
+            key={i}
+            onClick={() => setPageNumber(i)}
+            className={`page-btn ${pageNumber === i ? 'active' : ''}`}
+          >
+            {i}
+          </button>
+        );
+      }
+    } else {
+      pages.push(
+        <button
+          key={1}
+          onClick={() => setPageNumber(1)}
+          className={`page-btn ${pageNumber === 1 ? 'active' : ''}`}
+        >
+          1
+        </button>
+      );
+
+      if (pageNumber > 3) {
+        pages.push(<span key="ellipsis1" className="ellipsis">...</span>);
+      }
+
+      const startPage = Math.max(2, pageNumber - 1);
+      const endPage = Math.min(totalPages - 1, pageNumber + 1);
+
+      for (let i = startPage; i <= endPage; i++) {
+        pages.push(
+          <button
+            key={i}
+            onClick={() => setPageNumber(i)}
+            className={`page-btn ${pageNumber === i ? 'active' : ''}`}
+          >
+            {i}
+          </button>
+        );
+      }
+
+      if (pageNumber < totalPages - 2) {
+        pages.push(<span key="ellipsis2" className="ellipsis">...</span>);
+      }
+
+      pages.push(
+        <button
+          key={totalPages}
+          onClick={() => setPageNumber(totalPages)}
+          className={`page-btn ${pageNumber === totalPages ? 'active' : ''}`}
+        >
+          {totalPages}
+        </button>
+      );
+    }
+    return pages;
+  };
+
   
 
   return (
@@ -187,32 +257,29 @@ const Grid = ({ endpoint, pageName }) => {
         {/* <Callfilter /> */}
         {/* <Pagination />*/}
         <div className="pagination-container">
-      <Box className="pagination-box">
-        <button
-          onClick={() => setPageNumber(pageNumber - 1)}
-          disabled={pageNumber === 1}
-          className="page-btn-arrow"
-        >
-          &lt;
-        </button>
-        {Array.from({ length: totalPages }, (_, index) => index + 1).map((pageNum) => (
-          <button
-            key={pageNum}
-            onClick={() => setPageNumber(pageNum)}
-            className={`page-btn ${pageNumber === pageNum ? 'active' : ''}`}
-          >
-            {pageNum}
-          </button>
-        ))}
-        <button
-          onClick={() => setPageNumber(pageNumber + 1)}
-          disabled={pageNumber === totalPages}
-          className="page-btn-arrow"
-        >
-          &gt;
-        </button>
-      </Box>
-    </div>
+          <Box className="pagination-box">
+            <button
+              onClick={() => setPageNumber(pageNumber - 1)}
+              disabled={pageNumber === 1}
+              className="page-btn-arrow"
+            >
+              &lt;&lt; Previous
+            </button>
+            {renderPageNumbers()}
+            <button
+              onClick={() => setPageNumber(pageNumber + 1)}
+              disabled={pageNumber === totalPages}
+              className="page-btn-arrow"
+            >
+              Next &gt;&gt;
+            </button>
+            
+          </Box>
+          {/* <div className='tatoal-pageination-div'>
+            <span>{`Total Pages: ${totalPages}`}</span>
+            <span>{`Total Records: ${rows.length}`}</span>
+        </div> */}
+        </div>
       </Box>
       <Box sx={{height: 'inherit', overflowY:'auto', overflowX:'hidden'}}>
         <Box>
@@ -310,48 +377,82 @@ const Grid = ({ endpoint, pageName }) => {
           </Modal>
         </Box>
         <TableContainer
-          component={Paper}
-          style={{ borderRadius: '10px', border: '1px solid #808080', height: 'max-content' }}
+  component={Paper}
+  style={{ borderRadius: '10px', border: '1px solid #808080', height: 'max-content' }}
+>
+  <Table>
+    <TableHead className='table-head' style={{ background: '#D9D9D9', color: 'white' }}>
+      <TableRow className='table-head-row'>
+        <TableCell
+          sx={{
+            whiteSpace: 'nowrap',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            textAlign: 'center'
+          }}
         >
-          <Table>
-            <TableHead style={{ background: '#00000070', color: 'white' }}>
-              <TableRow>
-                <TableCell>Actions</TableCell>
-                {webformSchema.map((field) => (
-                  visibleColumns.includes(field.fieldName) && (
-                    <TableCell key={field.fieldName}>{field.label}</TableCell>
-                  )
-                ))}
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {validatedData.slice(startIndex, endIndex).map((row) => (
-                <TableRow key={row._id}>
-                  <TableCell>
-                    <IconButton onClick={(event) => handleMenuOpen(event, row)}>
-                      <MoreVertIcon />
-                    </IconButton>
-                    <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose}>
-                      <MenuItem onClick={handleEdit}>Edit</MenuItem>
-                      <MenuItem onClick={handleDetails}>Details</MenuItem>
-                      <MenuItem onClick={handleDelete}>Delete</MenuItem>
-                    </Menu>
-                  </TableCell>
-                  {webformSchema.map(
-                    (field) =>
-                      visibleColumns.includes(field.fieldName) && (
-                        <TableCell sx={{p:0}} key={`${row._id}-${field.fieldName}`}>
-                          {typeof row[field.fieldName] === 'object' && row[field.fieldName] !== null
-                            ? JSON.stringify(row[field.fieldName])
-                            : row[field.fieldName]}
-                        </TableCell>
-                      )
-                  )}
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
+          Actions
+        </TableCell>
+        {webformSchema.map((field) => (
+          visibleColumns.includes(field.fieldName) && (
+            <TableCell
+              sx={{
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                textAlign: 'center'
+              }}
+              key={field.fieldName}
+            >
+              {field.label}
+            </TableCell>
+          )
+        ))}
+      </TableRow>
+    </TableHead>
+    <TableBody className='table-body'>
+      {validatedData.slice(startIndex, endIndex).map((row) => (
+        <TableRow className='table-body-row' key={row._id}>
+          <TableCell
+            sx={{
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              textAlign: 'center'
+            }}
+          >
+            <IconButton onClick={(event) => handleMenuOpen(event, row)}>
+              <MoreVertIcon />
+            </IconButton>
+            <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose}>
+              <MenuItem onClick={handleEdit}>Edit</MenuItem>
+              <MenuItem onClick={handleDetails}>Details</MenuItem>
+              <MenuItem onClick={handleDelete}>Delete</MenuItem>
+            </Menu>
+          </TableCell>
+          {webformSchema.map(
+            (field) =>
+              visibleColumns.includes(field.fieldName) && (
+                <TableCell
+                  sx={{
+                    whiteSpace: 'nowrap',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    textAlign: 'center'
+                  }}
+                  key={`${row._id}-${field.fieldName}`}
+                >
+                  {typeof row[field.fieldName] === 'object' && row[field.fieldName] !== null
+                    ? JSON.stringify(row[field.fieldName])
+                    : row[field.fieldName]}
+                </TableCell>
+              )
+          )}
+        </TableRow>
+      ))}
+    </TableBody>
+  </Table>
+</TableContainer>
       </Box>
     </div>
   );
