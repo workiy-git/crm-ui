@@ -67,7 +67,7 @@ function Loginpage() {
             <div className="login-title-block">
             <img src={companylogoData.login?.icon} alt="" />
             <Typography variant="h6" className="login-title">
-              {companylogoData.login.title}
+              {companylogoData.login?.title}
             </Typography>
             
             </div>
@@ -179,7 +179,7 @@ function Loginpage() {
               ) : (
                 <Button
                   variant="contained"
-         
+                  color="primary"
                   className="login-button-disabled"
                   id="login-button"
                   onClick={handleLogin}
