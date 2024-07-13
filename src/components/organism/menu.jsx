@@ -15,9 +15,7 @@ const MenuComponent = ({ backgroundColor, onSaveSelectedText }) => {
   const [scrollIndex, setScrollIndex] = useState(0);
   const [selectedButtonIndex, setSelectedButtonIndex] = useState(null);
   const [widgets, setWidgets] = useState([]);
-  const [count, setCount] = useState(0);
-  const [notificationCount, setNotificationCount] = useState(0);
-  const [notificationData, setNotificationData] = useState([]);
+  const [dashboardName, setDashboardName] = useState(null);
 
   useEffect(() => {
     const storedSelectedTexts = JSON.parse(localStorage.getItem(localStorageKey)) || [];
@@ -28,7 +26,6 @@ const MenuComponent = ({ backgroundColor, onSaveSelectedText }) => {
       .then((response) => {
         console.log('Notification data received:', response.data);
         const { data } = response.data;
-        setNotificationData(data);  // Store the fetched data
       })
       .catch((error) => {
         console.error('Error fetching notification data:', error);
@@ -50,22 +47,58 @@ const MenuComponent = ({ backgroundColor, onSaveSelectedText }) => {
     setScrollIndex(Math.min(selectedTexts.length - 6, scrollIndex + 1));
   };
 
-  const handleButtonClick = (index) => {
+  const handleButtonClick = async (index) => {
     setSelectedButtonIndex(index);
-    const selectedTextTitle = selectedTexts[index].title;
-
-    // Filter notification data based on the selected text title
-    const filteredData = notificationData.filter(item => item.pageName === selectedTextTitle);
-    console.log(`Filtered data for ${selectedTextTitle}:`, filteredData);
-
-    const newWidgets = Array.from({ length: filteredData.length }, (_, i) => ({
-      icon: '+',
-      title: `Widget ${i + 1}`,
-    }));
-
-    setWidgets(newWidgets);
-    setCount(filteredData.length);
-    setNotificationCount(filteredData.length);
+  
+    if (selectedTexts.length > index && index >= 0) {
+      const selectedMenuKey = selectedTexts[index].title.toLowerCase(); // Convert title to lowercase
+      console.log('Selected Menu Key:', selectedMenuKey);
+  
+      try {
+        const response = await axios.post(
+          `${config.apiUrl}/dashboards/retrieve`,
+          [
+            {
+              "$match": {
+                "dashboardName": selectedMenuKey
+              }
+            },
+            {
+              "$sort": { "createdAt": -1 }
+            }
+          ],
+          {
+            headers: {
+              'Content-Type': 'application/json',
+            }
+          }
+        );
+  
+        console.log('Response Data:', response.data); // Log entire response data for inspection
+  
+        if (response.status === 200 && response.data && response.data.data) {
+          const fetchedWidgets = response.data.data;
+          console.log('Fetched Widgets:', fetchedWidgets); // Log fetched widgets for inspection
+  
+          // Filter widgets based on selectedMenuKey
+          const matchedWidgets = fetchedWidgets.filter(widget => widget.dashboardName === selectedMenuKey);
+          console.log('Matched Widgets:', matchedWidgets); // Log matched widgets for inspection
+  
+          setWidgets(matchedWidgets); // Set state with filtered widgets
+          setDashboardName(selectedMenuKey); // Set dashboardName state
+        } else {
+          console.log('No widget data found or incorrect structure');
+          setWidgets([]);
+          setDashboardName(null);
+        }
+      } catch (error) {
+        console.error('Error retrieving widgets data:', error);
+        setWidgets([]);
+        setDashboardName(null);
+      }
+    } else {
+      console.error('Invalid index or selectedTexts array');
+    }
   };
 
   return (
@@ -103,10 +136,8 @@ const MenuComponent = ({ backgroundColor, onSaveSelectedText }) => {
           </Box>
         </Toolbar>
       </AppBar>
-      {selectedButtonIndex !== null && (
-        <div>
-          <CreateWidget backgroundColor={backgroundColor} widgets={widgets} />
-        </div>
+      {dashboardName && (
+        <CreateWidget backgroundColor={backgroundColor} dashboardName={dashboardName} />
       )}
     </>
   );
