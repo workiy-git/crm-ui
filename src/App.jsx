@@ -23,6 +23,7 @@ const App = () => {
         <Route path="/details/:id" element={<DetailsPage />} />
         <Route path="/users" element={<Users />} />
         <Route path="/adduser" element={<UserForm />} />
+        <Route path="/underconstruction" element={<Underconstruction />} />
       </Routes>
     </Router>
   );
