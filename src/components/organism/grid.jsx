@@ -6,11 +6,11 @@ import MoreVertIcon from '@mui/icons-material/MoreVert';
 import '../../assets/styles/callsgrid.css';
 import ActionButton from '../atoms/actionbutton';
 import Pagination from '../atoms/pagination';
+import Dropdown from '../atoms/dropdown';
 import axios from 'axios';
 import config from '../../config/config';
-import Dropdown from '../atoms/dropdown';
 
-const Grid = ({ rows, webformSchema, onFilterChange }) => {
+const Grid = ({ rows, webformSchema, onFilterChange, pageName }) => {
   const [modalOpen, setModalOpen] = useState(false);
   const [pageNumber, setPageNumber] = useState(1);
   const [recordsPerPage, setRecordsPerPage] = useState(15);
@@ -20,7 +20,6 @@ const Grid = ({ rows, webformSchema, onFilterChange }) => {
   const [showColumnModal, setShowColumnModal] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
   const [currentRow, setCurrentRow] = useState(null);
-  const [selectedFilter, setSelectedFilter] = useState({});
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -82,7 +81,6 @@ const Grid = ({ rows, webformSchema, onFilterChange }) => {
   };
 
   const handleFilterChange = (filterCondition) => {
-    setSelectedFilter(filterCondition);
     onFilterChange(filterCondition);
   };
 
@@ -97,7 +95,7 @@ const Grid = ({ rows, webformSchema, onFilterChange }) => {
           </Box>
         </Box>
         <ActionButton />
-        <Dropdown controlName="call_Filter" onOptionSelected={handleFilterChange} /> {/* Use Dropdown component */}
+        <Dropdown controlName={calls_Filter} pageName={pageName} onOptionSelected={handleFilterChange} /> {/* Use Dropdown component */}
         <div className="pagination-container">
           <Box className="pagination-box">
             <button
@@ -153,53 +151,42 @@ const Grid = ({ rows, webformSchema, onFilterChange }) => {
               </Typography>
               <Box sx={{ display: 'flex', flexDirection: 'column' }}>
                 {availableColumns.map((column) => (
-                  <Box key={column.fieldName} sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                  <Box key={column.fieldName} sx={{ display: 'flex', alignItems: 'center', marginBottom: '8px' }}>
                     <input
                       type="checkbox"
-                      checked={visibleColumns.includes(column)}
-                      onChange={() => {
-                        setVisibleColumns((prevColumns) =>
-                          prevColumns.includes(column)
-                            ? prevColumns.filter((col) => col !== column)
-                            : [...prevColumns, column]
-                        );
+                      checked={visibleColumns.some((vc) => vc.fieldName === column.fieldName)}
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          setVisibleColumns([...visibleColumns, column]);
+                        } else {
+                          setVisibleColumns(visibleColumns.filter((vc) => vc.fieldName !== column.fieldName));
+                        }
                       }}
                     />
-                    <Typography variant="body1" sx={{ ml: 1 }}>
-                      {column.label}
-                    </Typography>
+                    <Typography sx={{ marginLeft: '8px' }}>{column.label}</Typography>
                   </Box>
                 ))}
               </Box>
-              <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                <Button variant="contained" onClick={() => setShowColumnModal(false)}>
-                  Close
-                </Button>
-                <Button variant="contained" onClick={() => setShowColumnModal(false)}>
-                  Apply
-                </Button>
-              </Box>
+              <Button onClick={() => setShowColumnModal(false)}>Close</Button>
             </Box>
           </Modal>
-        </Box>
-        <Box sx={{ height: 'inherit', overflowY: 'auto', overflowX: 'hidden' }}>
-          <table style={{ width: '100%' }}>
-            <thead>
-              <tr>
+          <table className="Grid-Table">
+            <thead className="Grid-TableHead">
+              <tr className="Grid-TableHeadRow">
                 {visibleColumns.map((column) => (
                   <th key={column.fieldName}>{column.label}</th>
                 ))}
-                <th>Action</th>
+                <th className="actionColumn">Actions</th>
               </tr>
             </thead>
             <tbody>
-              {paginatedData.map((data) => (
-                <tr key={data._id}>
+              {paginatedData.map((row, index) => (
+                <tr key={row._id} className={`Grid-TableRow ${index % 2 === 0 ? 'even' : 'odd'}`}>
                   {visibleColumns.map((column) => (
-                    <td key={column.fieldName}>{data[column.fieldName]}</td>
+                    <td key={column.fieldName}>{row[column.fieldName]}</td>
                   ))}
                   <td>
-                    <IconButton onClick={(event) => handleMenuOpen(event, data)}>
+                    <IconButton onClick={(event) => handleMenuOpen(event, row)}>
                       <MoreVertIcon />
                     </IconButton>
                     <Menu

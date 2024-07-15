@@ -9,7 +9,7 @@ import config from '../../config/config';
 
 const Container = () => {
   const { pageName } = useParams();
-  const endpoint = '/appdata';
+  const endpoint = '/appdata/retrieve';
   const [backgroundColor] = useState(() => {
     return localStorage.getItem('backgroundColor') || '#d9d9d9';
   });
@@ -20,12 +20,22 @@ const Container = () => {
 
   const fetchData = async (filter = {}) => {
     try {
-      const appdataResponse = await axios.get(`${config.apiUrl.replace(/\/$/, '')}${endpoint}`, {
-        params: { ...filter, pageName }
+      const postData = [
+        {
+          "$match": {
+            "pageName": pageName,
+            ...filter
+          }
+        }
+      ];
+
+      const appdataResponse = await axios.post(`${config.apiUrl.replace(/\/$/, '')}${endpoint}`, postData, {
+        headers: { 'Content-Type': 'application/json' }
       });
+
       const webformResponse = await axios.get(`${config.apiUrl.replace(/\/$/, '')}/webforms`);
 
-      const appdata = appdataResponse.data.data.filter(data => data.pageName === pageName);
+      const appdata = appdataResponse.data.data;
       const webform = webformResponse.data.data;
 
       console.log('Fetched appdata:', appdata);
