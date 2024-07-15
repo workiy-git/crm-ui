@@ -85,6 +85,7 @@ const Grid = ({ rows, webformSchema, onFilterChange }) => {
     setSelectedFilter(filterCondition);
     onFilterChange(filterCondition);
   };
+
   return (
     <div className="CallsGrid">
       <Box className="Appbar" sx={{ display: 'flex', justifyContent: 'space-around' }}>
