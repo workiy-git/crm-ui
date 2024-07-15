@@ -59,7 +59,8 @@ const Notification = () => {
               <img
                 src={menuData.notifications_icon.icon}
                 alt='icon'
-                style={{ width: '30px', height: 'auto', cursor: 'pointer' }}
+                style={{ width: '30px', height: 'auto', cursor: 'pointer',
+                  filter: "brightness(0) invert(1)" }}
                 onClick={handleNotificationClick}
               />
             </Badge>

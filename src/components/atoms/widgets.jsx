@@ -10,25 +10,28 @@ import config from '../../config/config';
 const CreateWidgetItem = styled(Paper)(({ theme }) => ({
   backgroundColor: '#ffffff',
   ...theme.typography.body2,
-  padding: theme.spacing(2),
   textAlign: 'center',
   color: theme.palette.text.secondary,
-  width: '75%',
+  width: '100%',
   height: 100,
-  borderRadius: 5,
+  borderRadius: '10px !important',
   display: 'flex',
-  flexDirection: 'column',
-  justifyContent: 'center',
   alignItems: 'center',
   cursor: 'pointer',
   marginTop: '15%',
   marginLeft: '5%',
+  padding: '0',
+  justifyContent: 'space-between',
 }));
 
 const Icon = styled('div')({
-  width: '30px',
-  height: '30px',
-  marginBottom: '8px',
+  height: '100%',
+  display: 'flex',
+  alignItems: 'center',
+  background: '#212529',
+  color:'white',
+  width: '40%',
+  borderRadius:'10px'
 });
 
 const Title = styled('div')({
@@ -142,17 +145,17 @@ const CreateWidget = ({ backgroundColor, dashboardName }) => {
             <Grid item xs={1} sm={1} md={1} key={index} sx={{ marginBottom: '10px' }}>
               <CreateWidgetItem style={{ background: `linear-gradient(${backgroundColor})` }}>
                 <Icon>
-                  <img src={widget.icon_url || 'default_icon_url'} alt={widget.title} />
+                  <img style={{ height:'30px', width:'auto', margin:'auto'}} src={widget.icon_url || 'default_icon_url'} alt={widget.title} />
                 </Icon>
-                <Button
+                <div
                   variant="contained"
                   color="primary"
                   onClick={() => navigate(widget.apiRedirectEndpoint)}
+                  style={{ width: '60%', height: '100%', display: 'flex', flexDirection:'column', justifyContent: 'center' }}
                 >
-                  {widget.title}
-                </Button>
                 <Title>{widget.title}</Title>
                 <Count>{counts[widget.name] !== undefined ? counts[widget.name] : 'Loading...'}</Count>
+                </div>
               </CreateWidgetItem>
             </Grid>
           )) : <div>Loading...</div>}
