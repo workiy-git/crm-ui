@@ -6,7 +6,7 @@ import Select from '@mui/material/Select';
 import config from '../../config/config';
 import axios from 'axios';
 
-function Dropdown({ controlName, onOptionSelected }) {
+function Dropdown({ controlName, onOptionSelected, pageName }) {
   const theme = useTheme();
   const [selectedOption, setSelectedOption] = useState('');
   const [options, setOptions] = useState([]);
@@ -18,10 +18,21 @@ function Dropdown({ controlName, onOptionSelected }) {
         const controlsData = response.data.data;
         console.log('Fetched controls:', controlsData);
 
-        const control = controlsData.find(control => control.control_name === controlName);
+        // Adjusted controlName to dynamically match the pageName filter
+        const adjustedControlName = `${pageName}_Filter`;
+        console.log('Adjusted control name:', adjustedControlName);
+
+        const control = controlsData.find(
+          control => control.control_name === adjustedControlName
+        );
+        console.log('Matched control:', control);
+
         if (control && control.value) {
           setOptions(control.value);
           console.log('Options set:', control.value);
+        } else {
+          console.log('No control matched or control has no value');
+          setOptions([]);
         }
       } catch (error) {
         console.error('Failed to fetch controls data:', error);
@@ -29,26 +40,28 @@ function Dropdown({ controlName, onOptionSelected }) {
     };
 
     fetchControls();
-  }, [controlName]);
+  }, [pageName]);
 
   const handleChange = (event) => {
     setSelectedOption(event.target.value);
     const selectedOption = options.find(option => option.name === event.target.value);
-    if (selectedOption && onOptionSelected) {
-      onOptionSelected(selectedOption.filter); // Pass the filter of the selected option
-      console.log('Selected filter:', selectedOption.filter);
+    if (selectedOption) {
+      onOptionSelected(selectedOption.filter);
     }
   };
 
   return (
-    <FormControl fullWidth>
+    <FormControl sx={{ m: 1, minWidth: 120 }}>
       <Select
         value={selectedOption}
         onChange={handleChange}
         displayEmpty
         inputProps={{ 'aria-label': 'Without label' }}
       >
-        {options.map((option) => (
+        <MenuItem value="">
+          <em>None</em>
+        </MenuItem>
+        {options.map(option => (
           <MenuItem key={option.name} value={option.name}>
             {option.name}
           </MenuItem>

@@ -9,6 +9,7 @@ import '../../assets/styles/MenuComponent.css';
 import config from '../../config/config';  // Ensure the correct path to config file
 
 const localStorageKey = 'selectedTexts';
+const selectedButtonIndexKey = 'selectedButtonIndex';
 
 const MenuComponent = ({ backgroundColor, onSaveSelectedText }) => {
   const [selectedTexts, setSelectedTexts] = useState([]);
@@ -19,6 +20,7 @@ const MenuComponent = ({ backgroundColor, onSaveSelectedText }) => {
 
   useEffect(() => {
     const storedSelectedTexts = JSON.parse(localStorage.getItem(localStorageKey)) || [];
+    const storedSelectedButtonIndex = JSON.parse(localStorage.getItem(selectedButtonIndexKey));
     setSelectedTexts(storedSelectedTexts);
     setScrollIndex(0);
 
@@ -30,6 +32,12 @@ const MenuComponent = ({ backgroundColor, onSaveSelectedText }) => {
       .catch((error) => {
         console.error('Error fetching notification data:', error);
       });
+
+    if (storedSelectedTexts.length > 0) {
+      const initialIndex = storedSelectedButtonIndex !== null ? storedSelectedButtonIndex : 0;
+      setSelectedButtonIndex(initialIndex);
+      handleButtonClick(initialIndex, storedSelectedTexts);
+    }
   }, []);
 
   const handleSaveSelectedText = (texts) => {
@@ -37,6 +45,10 @@ const MenuComponent = ({ backgroundColor, onSaveSelectedText }) => {
     localStorage.setItem(localStorageKey, JSON.stringify(texts));
     setScrollIndex(0);
     onSaveSelectedText(texts);
+    if (texts.length > 0) {
+      setSelectedButtonIndex(0);
+      handleButtonClick(0, texts);
+    }
   };
 
   const handleScrollLeft = () => {
@@ -47,13 +59,14 @@ const MenuComponent = ({ backgroundColor, onSaveSelectedText }) => {
     setScrollIndex(Math.min(selectedTexts.length - 6, scrollIndex + 1));
   };
 
-  const handleButtonClick = async (index) => {
+  const handleButtonClick = async (index, texts = selectedTexts) => {
     setSelectedButtonIndex(index);
-  
-    if (selectedTexts.length > index && index >= 0) {
-      const selectedMenuKey = selectedTexts[index].title.toLowerCase(); // Convert title to lowercase
+    localStorage.setItem(selectedButtonIndexKey, index);
+
+    if (texts.length > index && index >= 0) {
+      const selectedMenuKey = texts[index].title.toLowerCase(); // Convert title to lowercase
       console.log('Selected Menu Key:', selectedMenuKey);
-  
+
       try {
         const response = await axios.post(
           `${config.apiUrl}/dashboards/retrieve`,
@@ -73,17 +86,17 @@ const MenuComponent = ({ backgroundColor, onSaveSelectedText }) => {
             }
           }
         );
-  
+
         console.log('Response Data:', response.data); // Log entire response data for inspection
-  
+
         if (response.status === 200 && response.data && response.data.data) {
           const fetchedWidgets = response.data.data;
           console.log('Fetched Widgets:', fetchedWidgets); // Log fetched widgets for inspection
-  
+
           // Filter widgets based on selectedMenuKey
           const matchedWidgets = fetchedWidgets.filter(widget => widget.dashboardName === selectedMenuKey);
           console.log('Matched Widgets:', matchedWidgets); // Log matched widgets for inspection
-  
+
           setWidgets(matchedWidgets); // Set state with filtered widgets
           setDashboardName(selectedMenuKey); // Set dashboardName state
         } else {
