@@ -103,8 +103,8 @@ const MenuComponent = ({ backgroundColor, onSaveSelectedText }) => {
 
   return (
     <>
-      <AppBar position="static" className="menu-appBar" style={{ background: 'linear-gradient(90deg, rgba(12,45,78,1) 0%, rgba(28,104,180,1) 100%)' }}>
-        <Toolbar className="menu-toolbar">
+      <AppBar position="static" className="menu-appBar" style={{ background: '#E5E5E5' }}>
+        <Toolbar style={{minHeight:'50px'}} className="menu-toolbar">
           <Box className="menu-selectedTextContainer">
             {selectedTexts.slice(scrollIndex, scrollIndex + 9).map((text, index) => (
               <Box key={index} className="menu-selectedTextItem">
@@ -113,7 +113,8 @@ const MenuComponent = ({ backgroundColor, onSaveSelectedText }) => {
                   color={selectedButtonIndex === index ? "secondary" : "primary"}
                   className="menu-featureButton"
                   onClick={() => handleButtonClick(index)}
-                  style={{ backgroundColor: selectedButtonIndex === index ? 'rgb(255, 63, 20)' : 'white', color: selectedButtonIndex === index ? 'white' : '#264653', textTransform: 'none'  }}
+                  style={{ backgroundColor: selectedButtonIndex === index ? '#80808080 ' : 'transparent', color: selectedButtonIndex === index ? '#212529' : '#212529', textTransform: 'none', boxShadow: 'none', borderBottom: selectedButtonIndex === index ?  '5px solid #FFC03D' : 'none', width:'max-content'
+                    }}
                 >
                   {text.title}
                 </Button>

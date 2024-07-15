@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Container, Grid, Dialog, DialogContent, Button, Typography } from '@mui/material';
 import config from '../../config/config'; // Import the configuration file
+import '../../assets/styles/header.css';
 
 const Dayin = () => {
   const [menuData, setMenuData] = useState(null); // Initialize as null to handle loading state
@@ -44,18 +45,23 @@ const Dayin = () => {
         <Grid container spacing={2}>
           <Grid item>
             {menuData?.title && ( // Use optional chaining to safely access menuData.title
+            <div className='dayin-main'>
+              <div>
+              <img src={menuData.icon} alt={menuData.title} style={{ height: 20, margin:0 }} />
               <h5
                 style={{
-                  backgroundColor: 'green',
-                  padding: '5px',
-                  borderRadius: "5px",
+                  color:'black',
+                  borderRadius: "15px",
                   width: "50px",
                   fontSize: '12px',
+                  margin:'0',
                   textAlign: "center",
                 }}
               >
                 {menuData.title}
               </h5>
+              </div>
+              </div>
             )}
           </Grid>
         </Grid>

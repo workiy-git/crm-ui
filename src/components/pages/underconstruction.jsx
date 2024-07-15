@@ -65,7 +65,7 @@ function Underconstruction() {
   return (
     <div style={{ height: '100vh', display: "flex", flexDirection: "column", overflow: 'hidden', backgroundColor: "#dde1e9", paddingLeft: 0 }}>
       <div style={{ display: 'flex', height: '-webkit-fill-available', overflow: 'hidden' }}>
-        <div style={{ width: '10vh', backgroundColor: "#0d2d4e" }}>
+        <div style={{ backgroundColor: "#121A2C" }}>
           <SideMenu backgroundColor={backgroundColor} />
         </div>
         <div style={{ width: '100%', marginRight: "-10px", backgroundColor: backgroundColor, overflow: 'hidden' }}>

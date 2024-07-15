@@ -10,15 +10,16 @@ background-color: blue;
 }
 
 .header-container {
-    background: white;
-    color: black;
+    background: #2C2C2C;
+    color: white;
     box-shadow: 0px 0px 15px gray;
     padding: 0px 5px;
   }
   
   .header-toolbar {
     flex-grow: 1;
-    height: 10vh;
+    height: auto !important;
+    padding: 0 !important;
   }
   
   .hamburger-box,
@@ -73,6 +74,8 @@ background-color: blue;
     line-height: 2.5;
     padding: 0 15px;
     margin: 0 10px;
+    color: black;
+
   }
   .hamburger-list-item:hover {
     background-color: #a1cbeb;
@@ -113,7 +116,6 @@ background-color: blue;
   .hamburger-list-item-button {
     padding: 0 !important;
     margin: 15px !important;
-    height: 18px;
 }
   
   .hamburger-list-item-button-md {
@@ -121,7 +123,8 @@ background-color: blue;
   }
   
   .hamburger-menu-img {
-    height: 100%;
+    height: 30px;
+    filter: brightness(0) invert(1);
   }
   
   .hamburger-nested-item {
@@ -147,5 +150,27 @@ background-color: blue;
     width: 20px;
     filter: brightness(0) invert(1);
   }
-  
-  
+  .myprofile-username-main{
+    margin-left: 10px;
+  }
+  .myprofile-username-role{
+    font-size: 10px !important;
+  }
+  .myprofile-username {
+    width: max-content;
+    margin: auto !important;
+    color: white !important;
+}
+.dayin-main div{
+  display: flex;
+  background: #D9D9D9;
+  border-radius: 100px;
+  padding: 5px 10px;
+}
+.dayin-main img{
+  filter: brightness(0) saturate(100%) invert(50%) sepia(100%) saturate(500%) hue-rotate(190deg);
+
+}
+.username-hide{
+  display: none;
+}

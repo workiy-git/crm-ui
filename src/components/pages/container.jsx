@@ -55,7 +55,7 @@ const Container = () => {
   return (
     <div style={{ height: '100vh', display: "flex", flexDirection: "column", overflow: 'hidden' }}>
       <div style={{ display: 'flex', height: '-webkit-fill-available', overflow: 'hidden' }}>
-        <div style={{ width: '10vh', backgroundColor: "#0d2d4e" }}>
+        <div style={{ backgroundColor: "#121A2C" }}>
           <SideMenu backgroundColor={backgroundColor} />
         </div>
         <div style={{ width: '100%', backgroundColor: backgroundColor, overflow: 'hidden' }}>

@@ -2,12 +2,14 @@ import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import Box from '@mui/material/Box';
 import List from '@mui/material/List';
+import Text from '@mui/material/Typography';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import Avatar from '@mui/material/Avatar';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import config from '../../config/config'; // Import the configuration file
+import '../../assets/styles/header.css';
 
 const theme = createTheme({
   components: {
@@ -20,7 +22,7 @@ const theme = createTheme({
   palette: {},
 });
 
-export default function Myprofile({ backgroundColor }) {
+export default function Myprofile({ backgroundColor, value }) {
   const [open, setOpen] = useState(false);
   const menuRef = useRef(null);
   const [myprofileData, setMyprofileData] = useState({});
@@ -70,12 +72,12 @@ export default function Myprofile({ backgroundColor }) {
     window.location.href = url;
   };
   const handleProfileClick = () => {
-    const url = `/profile`;
+    const url = `/underconstruction`;
     window.location.href  = url;  
   }
 
   return (
-    <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+    <Box sx={{ display: 'flex', justifyContent: 'left' }}>
       <ThemeProvider theme={theme}>
         <div elevation={0} sx={{ maxWidth: 256, backgroundColor: 'transparent' }}>
           <List component="nav" disablePadding ref={menuRef}>
@@ -92,6 +94,10 @@ export default function Myprofile({ backgroundColor }) {
                 src={userData.profile_img}
                 sx={{ width: 40, height: 40, outline: 'white 2px solid' }}
               />
+              <div className='myprofile-username-main'>
+              <Text className={`myprofile-username  ${value}`}>{userData.username}</Text>
+              <Text className={`myprofile-username myprofile-username-role ${value}`}>{userData.job_role}</Text>
+              </div>
             </ListItemButton>
             {open && (
               <Box

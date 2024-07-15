@@ -9,6 +9,7 @@ import Grid from "./components/organism/grid";
 import DetailsPage from "./components/pages/details";
 import Users from "./components/pages/users";
 import UserForm from "./components/organism/usersForm";
+import Underconstruction from "./components/pages/underconstruction";
 
 const App = () => {
   return (

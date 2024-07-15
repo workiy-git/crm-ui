@@ -72,7 +72,7 @@ const Users = () => {
     return (
         <div style={{ height: '100vh', display: "flex", flexDirection: "column", overflow: 'hidden', backgroundColor: "gray", paddingLeft: 0 }}>
             <div style={{ display: 'flex', height: '100%', overflow: 'hidden' }}>
-                <div style={{ width: '10vh', backgroundColor: "#0d2d4e" }}>
+                <div style={{ backgroundColor: "#121A2C" }}>
                     <SideMenu />
                 </div>
                 <div style={{ width: '100%', background:'#D9D9D9' }}>
