@@ -1,220 +1,123 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import {
-  Box,
-  Button,
-  Container,
-  IconButton,
-  Menu,
-  MenuItem,
-  Modal,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Toolbar,
-  Typography,
-  Paper,
-  Checkbox,
-} from '@mui/material';
-import MoreVertIcon from '@mui/icons-material/MoreVert';
-import config from '../../config/config';
 import { useNavigate } from 'react-router-dom';
-import '../../assets/styles/callsgrid.css';
+import { Box, Button, Modal, Typography, IconButton, Menu, MenuItem } from '@mui/material';
 import WidgetsOutlinedIcon from '@mui/icons-material/WidgetsOutlined';
-import Dropdown from '../atoms/dropdown';
+import MoreVertIcon from '@mui/icons-material/MoreVert';
+import '../../assets/styles/callsgrid.css';
 import ActionButton from '../atoms/actionbutton';
 import Pagination from '../atoms/pagination';
-import Callfilter from '../atoms/callfilter';
+import axios from 'axios';
+import config from '../../config/config';
+import Dropdown from '../atoms/dropdown';
 
-const Grid = ({ endpoint, pageName }) => {
-  const navigate = useNavigate();
+const Grid = ({ rows, webformSchema, onFilterChange }) => {
   const [modalOpen, setModalOpen] = useState(false);
-  const [rows, setRows] = useState([]);
-  const [errors, setErrors] = useState('');
   const [pageNumber, setPageNumber] = useState(1);
   const [recordsPerPage, setRecordsPerPage] = useState(15);
-  const [selectedRow, setSelectedRow] = useState(null);
-  const [anchorEl, setAnchorEl] = useState(null);
-  const [webformSchema, setWebformSchema] = useState([]);
   const [validatedData, setValidatedData] = useState([]);
   const [visibleColumns, setVisibleColumns] = useState([]);
   const [availableColumns, setAvailableColumns] = useState([]);
   const [showColumnModal, setShowColumnModal] = useState(false);
-  const [selectedColumns, setSelectedColumns] = useState([]);
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [currentRow, setCurrentRow] = useState(null);
+  const [selectedFilter, setSelectedFilter] = useState({});
+  const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const appdataResponse = await axios.get(`${config.apiUrl.replace(/\/$/, '')}${endpoint}`);
-        const webformResponse = await axios.get(`${config.apiUrl.replace(/\/$/, '')}/webforms`);
+    const validated = rows.map((data) => {
+      const validatedData = {};
+      webformSchema.forEach((field) => {
+        validatedData[field.fieldName] = data[field.fieldName] !== undefined ? data[field.fieldName] : ''; // Default value if field is missing
+      });
+      validatedData._id = data._id; // Ensure ObjectId is included for key
+      return validatedData;
+    });
 
-        const appdata = appdataResponse.data.data.filter(data => data.pageName === pageName);
-        const webform = webformResponse.data.data;
+    setValidatedData(validated);
 
-        console.log('Fetched appdata:', appdata);
-        console.log('Fetched webform:', webform);
+    const columns = webformSchema.map(field => ({ fieldName: field.fieldName, label: field.label })) || [];
+    setAvailableColumns(columns);
+    setVisibleColumns(columns);
+  }, [rows, webformSchema]);
 
-        setRows(appdata);
-        const schemaForPage = webform.find((page) => page.pageName === pageName);
-        setWebformSchema(schemaForPage?.fields || []);
-
-        const validated = appdata.map((data) => {
-          const validatedData = {};
-          schemaForPage?.fields.forEach((field) => {
-            if (data[field.fieldName] !== undefined) {
-              validatedData[field.fieldName] = data[field.fieldName];
-            } else {
-              validatedData[field.fieldName] = ''; // Default value if field is missing
-            }
-          });
-          return { ...data, ...validatedData }; // Merge original data with validatedData
-        });
-
-        setValidatedData(validated);
-
-        // Initialize available columns
-        const columns = schemaForPage?.fields.map(field => field.fieldName) || [];
-        setAvailableColumns(columns);
-        setVisibleColumns(columns);
-      } catch (error) {
-        console.error('Error fetching data:', error);
-        setErrors('Error fetching data');
-      }
-    };
-
-    fetchData();
-  }, [endpoint, pageName]);
+  const startIndex = (pageNumber - 1) * recordsPerPage;
+  const endIndex = startIndex + recordsPerPage;
+  const paginatedData = validatedData.slice(startIndex, endIndex);
 
   const handleMenuOpen = (event, row) => {
-    setSelectedRow(row);
     setAnchorEl(event.currentTarget);
-    console.log('Opened menu for row:', row);
+    setCurrentRow(row);
   };
 
   const handleMenuClose = () => {
     setAnchorEl(null);
-    console.log('Closed menu');
+    setCurrentRow(null);
   };
 
   const handleEdit = () => {
     handleMenuClose();
-    console.log('Editing row:', selectedRow);
-    if (!selectedRow || !selectedRow._id) {
-      console.error('Selected row or _id is not defined');
-      return;
-    }
-    if (webformSchema.length === 0) {
-      console.error('Webform schema is not available');
-      return;
-    }
-    console.log('Navigating to edit page with ID:', selectedRow._id);
-    navigate(`/edit/${selectedRow._id}`, { state: { rowData: selectedRow, schema: webformSchema } });
+    navigate(`/edit/${currentRow._id}`, { state: { rowData: currentRow, schema: webformSchema } });
   };
 
   const handleDetails = () => {
     handleMenuClose();
-    console.log('Viewing details for row:', selectedRow);
-    // Add your code for handling details here
+    navigate(`/details/${currentRow._id}`, { state: { rowData: currentRow } });
   };
 
   const handleDelete = async () => {
     handleMenuClose();
-    console.log('Deleting row:', selectedRow);
-    if (!selectedRow || !selectedRow._id) {
-      console.error('Selected row or _id is not defined');
-      return;
-    }
+    const apiUrl = `${config.apiUrl.replace(/\/$/, '')}/appdata/${currentRow._id}`;
     try {
-      await axios.delete(`${config.apiUrl.replace(/\/$/, '')}/appdata/${selectedRow._id}`);
-      setRows(rows.filter((row) => row._id !== selectedRow._id));
+      const response = await axios.delete(apiUrl);
+      if (response.status === 200) {
+        alert('Data deleted successfully');
+        setValidatedData(validatedData.filter(item => item._id !== currentRow._id));
+      } else {
+        alert('Error deleting data: ' + response.data.message);
+      }
     } catch (error) {
       console.error('Error deleting data:', error);
-      setErrors('Error deleting data');
+      alert('Error deleting data');
     }
   };
 
-  const totalPages = Math.ceil(rows.length / recordsPerPage);
-  const startIndex = (pageNumber - 1) * recordsPerPage;
-  const endIndex = Math.min(pageNumber * recordsPerPage, rows.length);
-
-  const handleColumnToggle = (field) => {
-    const updatedColumns = selectedColumns.includes(field)
-      ? selectedColumns.filter((col) => col !== field)
-      : [...selectedColumns, field];
-    setSelectedColumns(updatedColumns);
+  const handleFilterChange = (filterCondition) => {
+    setSelectedFilter(filterCondition);
+    onFilterChange(filterCondition);
   };
-
-  const openColumnModal = () => {
-    setSelectedColumns(visibleColumns);
-    setShowColumnModal(true);
-  };
-
-  const closeColumnModal = () => {
-    setShowColumnModal(false);
-  };
-
-  const applyColumnChanges = () => {
-    setVisibleColumns(selectedColumns);
-    setShowColumnModal(false);
-  };
-
-  const selectAllColumns = () => {
-    setSelectedColumns(availableColumns);
-  };
-
-  const deselectAllColumns = () => {
-    setSelectedColumns([]);
-  };
-
-  
 
   return (
     <div className="CallsGrid">
-      {/* <Toolbar /> */}
       <Box className="Appbar" sx={{ display: 'flex', justifyContent: 'space-around' }}>
         <Box className="Appbar" sx={{ display: 'flex', justifyContent: 'left' }}>
           <Box>
-            <Button onClick={openColumnModal}>
+            <Button onClick={() => setShowColumnModal(true)}>
               <WidgetsOutlinedIcon />
             </Button>
           </Box>
         </Box>
         <ActionButton />
-        <Dropdown />
-        {/* <Callfilter /> */}
-        {/* <Pagination />*/}
+        <Dropdown controlName="call_Filter" onOptionSelected={handleFilterChange} /> {/* Use Dropdown component */}
         <div className="pagination-container">
-      <Box className="pagination-box">
-        <button
-          onClick={() => setPageNumber(pageNumber - 1)}
-          disabled={pageNumber === 1}
-          className="page-btn-arrow"
-        >
-          &lt;
-        </button>
-        {Array.from({ length: totalPages }, (_, index) => index + 1).map((pageNum) => (
-          <button
-            key={pageNum}
-            onClick={() => setPageNumber(pageNum)}
-            className={`page-btn ${pageNumber === pageNum ? 'active' : ''}`}
-          >
-            {pageNum}
-          </button>
-        ))}
-        <button
-          onClick={() => setPageNumber(pageNumber + 1)}
-          disabled={pageNumber === totalPages}
-          className="page-btn-arrow"
-        >
-          &gt;
-        </button>
+          <Box className="pagination-box">
+            <button
+              onClick={() => setPageNumber(pageNumber - 1)}
+              disabled={pageNumber === 1}
+              className="page-btn-arrow"
+            >
+              &lt;&lt; Previous
+            </button>
+            <button
+              onClick={() => setPageNumber(pageNumber + 1)}
+              disabled={pageNumber === Math.ceil(validatedData.length / recordsPerPage)}
+              className="page-btn-arrow"
+            >
+              Next &gt;&gt;
+            </button>
+          </Box>
+        </div>
       </Box>
-    </div>
-      </Box>
-      <Box sx={{height: 'inherit', overflowY:'auto', overflowX:'hidden'}}>
+      <Box sx={{ height: 'inherit', overflowY: 'auto', overflowX: 'hidden' }}>
         <Box>
           <Modal open={modalOpen} onClose={() => setModalOpen(false)}>
             <Box
@@ -226,14 +129,12 @@ const Grid = ({ endpoint, pageName }) => {
                 maxWidth: '500px',
               }}
             >
-              {errors && <Typography color="error">{errors}</Typography>}
-              {/* Add fields for adding a new call */}
               <Button type="submit" variant="contained" color="primary">
                 Save
               </Button>
             </Box>
           </Modal>
-          <Modal open={showColumnModal} onClose={closeColumnModal}>
+          <Modal open={showColumnModal} onClose={() => setShowColumnModal(false)}>
             <Box
               sx={{
                 position: 'absolute',
@@ -250,108 +151,72 @@ const Grid = ({ endpoint, pageName }) => {
               <Typography variant="h6" gutterBottom>
                 Configure Columns - Calls
               </Typography>
+              <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+                {availableColumns.map((column) => (
+                  <Box key={column.fieldName} sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                    <input
+                      type="checkbox"
+                      checked={visibleColumns.includes(column)}
+                      onChange={() => {
+                        setVisibleColumns((prevColumns) =>
+                          prevColumns.includes(column)
+                            ? prevColumns.filter((col) => col !== column)
+                            : [...prevColumns, column]
+                        );
+                      }}
+                    />
+                    <Typography variant="body1" sx={{ ml: 1 }}>
+                      {column.label}
+                    </Typography>
+                  </Box>
+                ))}
+              </Box>
               <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                <Box>
-                  <Typography variant="subtitle1" sx={{ marginBottom: '5px' }}>
-                    Select Fields
-                  </Typography>
-                  <Box sx={{height:'20rem', overflow:'auto'}}>
-                  {selectedColumns.map((field) => (
-                    <Box key={field} sx={{ display: 'flex', alignItems: 'center', p:"0 20px", background:'skyblue', m:'10px' }}>
-                      <Checkbox
-                        checked={true}
-                        onChange={() => handleColumnToggle(field)}
-                        color="primary"
-                        inputProps={{ 'aria-label': field }}
-                      />
-                      <Typography variant="body2">{field}</Typography>
-                    </Box>
-                  ))}
-                </Box>
-                </Box>
-                <Box>
-                  <Typography variant="subtitle1" sx={{ marginBottom: '5px' }}>
-                    Available Fields
-                  </Typography>
-                  <Box   sx={{height:'20rem', overflow:'auto'}}>
-                  {availableColumns
-                    .filter((field) => !selectedColumns.includes(field))
-                    .map((field) => (
-                      <Box key={field} sx={{ display: 'flex', alignItems: 'center', p:"0 20px", background:'skyblue', m:'10px' }} >
-                        <Checkbox
-                          checked={false}
-                          onChange={() => handleColumnToggle(field)}
-                          color="primary"
-                          inputProps={{ 'aria-label': field }}
-                        />
-                        <Typography variant="body2">{field}</Typography>
-                      </Box>
-                    ))}
-                </Box>
-                </Box>
-              </Box>
-              <Box sx={{ display: 'flex', justifyContent: 'space-between', marginTop: '20px' }}>
-                <Button onClick={selectAllColumns} variant="outlined" color="primary">
-                  Select All
+                <Button variant="contained" onClick={() => setShowColumnModal(false)}>
+                  Close
                 </Button>
-                <Button onClick={deselectAllColumns} variant="outlined" color="primary">
-                  Deselect All
-                </Button>
-              </Box>
-              <Box sx={{ display: 'flex', justifyContent: 'space-between', marginTop: '20px' }}>
-                <Button onClick={applyColumnChanges} variant="contained" color="primary">
+                <Button variant="contained" onClick={() => setShowColumnModal(false)}>
                   Apply
-                </Button>
-                <Button onClick={closeColumnModal} variant="outlined" color="secondary">
-                  Cancel
                 </Button>
               </Box>
             </Box>
           </Modal>
         </Box>
-        <TableContainer
-          component={Paper}
-          style={{ borderRadius: '10px', border: '1px solid #808080', height: 'max-content' }}
-        >
-          <Table>
-            <TableHead style={{ background: '#00000070', color: 'white' }}>
-              <TableRow>
-                <TableCell>Actions</TableCell>
-                {webformSchema.map((field) => (
-                  visibleColumns.includes(field.fieldName) && (
-                    <TableCell key={field.fieldName}>{field.label}</TableCell>
-                  )
+        <Box sx={{ height: 'inherit', overflowY: 'auto', overflowX: 'hidden' }}>
+          <table style={{ width: '100%' }}>
+            <thead>
+              <tr>
+                {visibleColumns.map((column) => (
+                  <th key={column.fieldName}>{column.label}</th>
                 ))}
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {validatedData.slice(startIndex, endIndex).map((row) => (
-                <TableRow key={row._id}>
-                  <TableCell>
-                    <IconButton onClick={(event) => handleMenuOpen(event, row)}>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {paginatedData.map((data) => (
+                <tr key={data._id}>
+                  {visibleColumns.map((column) => (
+                    <td key={column.fieldName}>{data[column.fieldName]}</td>
+                  ))}
+                  <td>
+                    <IconButton onClick={(event) => handleMenuOpen(event, data)}>
                       <MoreVertIcon />
                     </IconButton>
-                    <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose}>
+                    <Menu
+                      anchorEl={anchorEl}
+                      open={Boolean(anchorEl)}
+                      onClose={handleMenuClose}
+                    >
                       <MenuItem onClick={handleEdit}>Edit</MenuItem>
                       <MenuItem onClick={handleDetails}>Details</MenuItem>
                       <MenuItem onClick={handleDelete}>Delete</MenuItem>
                     </Menu>
-                  </TableCell>
-                  {webformSchema.map(
-                    (field) =>
-                      visibleColumns.includes(field.fieldName) && (
-                        <TableCell sx={{p:0}} key={`${row._id}-${field.fieldName}`}>
-                          {typeof row[field.fieldName] === 'object' && row[field.fieldName] !== null
-                            ? JSON.stringify(row[field.fieldName])
-                            : row[field.fieldName]}
-                        </TableCell>
-                      )
-                  )}
-                </TableRow>
+                  </td>
+                </tr>
               ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
+            </tbody>
+          </table>
+        </Box>
       </Box>
     </div>
   );

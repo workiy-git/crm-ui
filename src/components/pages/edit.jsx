@@ -21,18 +21,22 @@ const Edit = () => {
     const apiUrl = `${config.apiUrl.replace(/\/$/, '')}/appdata/${formData._id}`;
     console.log('API URL:', apiUrl);
     console.log('Form Data:', formData);
-  
+
     try {
-      const response = await axios.put(apiUrl, formData);
+      const response = await axios.put(apiUrl, { appdata: formData });
       console.log('Response:', response);
-      alert('Data updated successfully');
-      navigate('/');
+
+      if (response.status === 200) {
+        alert('Data updated successfully');
+        navigate('/');
+      } else {
+        setErrors('Error updating data: ' + response.data.message);
+      }
     } catch (error) {
       console.error('Error updating data:', error);
       setErrors('Error updating data');
     }
   };
-  
 
   return (
     <Box component="form" onSubmit={handleSubmit} sx={{ padding: '20px', maxWidth: '500px', margin: '50px auto', backgroundColor: 'white' }}>
