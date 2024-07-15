@@ -16,7 +16,7 @@ const SideMenu = () => {
     axios.get(`${config.apiUrl}/menus`)
       .then(response => {
         console.log('Menu data received:', response.data);
-        const menuDataArray = response.data.data; // Accessing the data array
+        const menuDataArray = response.data.data;
         const menuData = menuDataArray.find(menu => menu.menu === 'sidemenu');
         if (menuData) {
           const mappedMenuItems = Object.entries(menuData)
@@ -43,7 +43,7 @@ const SideMenu = () => {
 
   const handleOptionClick = (path, index) => {
     setSelectedOptionIndex(index);
-    navigate(path);
+    navigate(`${path}`);
   };
 
   return (
@@ -70,7 +70,6 @@ const SideMenu = () => {
               <Avatar
                 src={menuItem.icon}
                 alt={menuItem.title}
-                // className="sidemenu-avatar"
                 sx={{
                   width: 20,
                   height: 20,
