@@ -6,7 +6,7 @@ import Select from '@mui/material/Select';
 import config from '../../config/config';
 import axios from 'axios';
 
-function Dropdown({ controlName, onOptionSelected, pageName }) {
+function Dropdown({ onOptionSelected, pageName }) {
   const theme = useTheme();
   const [selectedOption, setSelectedOption] = useState('');
   const [options, setOptions] = useState([]);
@@ -16,22 +16,14 @@ function Dropdown({ controlName, onOptionSelected, pageName }) {
       try {
         const response = await axios.get(`${config.apiUrl}/controls`);
         const controlsData = response.data.data;
-        console.log('Fetched controls:', controlsData);
-
-        // Adjusted controlName to dynamically match the pageName filter
-        const adjustedControlName = `${pageName}_Filter`;
-        console.log('Adjusted control name:', adjustedControlName);
 
         const control = controlsData.find(
-          control => control.control_name === adjustedControlName
+          control => control.pageName === pageName
         );
-        console.log('Matched control:', control);
 
         if (control && control.value) {
           setOptions(control.value);
-          console.log('Options set:', control.value);
         } else {
-          console.log('No control matched or control has no value');
           setOptions([]);
         }
       } catch (error) {

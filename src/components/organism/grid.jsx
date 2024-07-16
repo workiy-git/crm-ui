@@ -55,8 +55,9 @@ const Grid = ({ rows, webformSchema, onFilterChange, pageName }) => {
 
   const handleEdit = () => {
     handleMenuClose();
-    navigate(`/edit/${currentRow._id}`, { state: { rowData: currentRow, schema: webformSchema } });
+    navigate(`/edit/${currentRow._id}`, { state: { rowData: currentRow, schema: webformSchema, pageName } });
   };
+  
 
   const handleDetails = () => {
     handleMenuClose();
@@ -95,7 +96,7 @@ const Grid = ({ rows, webformSchema, onFilterChange, pageName }) => {
           </Box>
         </Box>
         <ActionButton />
-        <Dropdown controlName={calls_Filter} pageName={pageName} onOptionSelected={handleFilterChange} /> {/* Use Dropdown component */}
+        <Dropdown pageName={pageName} onOptionSelected={handleFilterChange} /> {/* Use Dropdown component */}
         <div className="pagination-container">
           <Box className="pagination-box">
             <button
@@ -170,20 +171,20 @@ const Grid = ({ rows, webformSchema, onFilterChange, pageName }) => {
               <Button onClick={() => setShowColumnModal(false)}>Close</Button>
             </Box>
           </Modal>
-          <table className="Grid-Table">
-            <thead className="Grid-TableHead">
-              <tr className="Grid-TableHeadRow">
-                {visibleColumns.map((column) => (
-                  <th key={column.fieldName}>{column.label}</th>
+          <table className="GridTable">
+            <thead>
+              <tr>
+                {visibleColumns.map((field) => (
+                  <th key={field.fieldName}>{field.label}</th>
                 ))}
-                <th className="actionColumn">Actions</th>
+                <th>Actions</th>
               </tr>
             </thead>
             <tbody>
-              {paginatedData.map((row, index) => (
-                <tr key={row._id} className={`Grid-TableRow ${index % 2 === 0 ? 'even' : 'odd'}`}>
-                  {visibleColumns.map((column) => (
-                    <td key={column.fieldName}>{row[column.fieldName]}</td>
+              {paginatedData.map((row) => (
+                <tr key={row._id}>
+                  {visibleColumns.map((field) => (
+                    <td key={field.fieldName}>{row[field.fieldName]}</td>
                   ))}
                   <td>
                     <IconButton onClick={(event) => handleMenuOpen(event, row)}>
@@ -194,8 +195,8 @@ const Grid = ({ rows, webformSchema, onFilterChange, pageName }) => {
                       open={Boolean(anchorEl)}
                       onClose={handleMenuClose}
                     >
-                      <MenuItem onClick={handleEdit}>Edit</MenuItem>
                       <MenuItem onClick={handleDetails}>Details</MenuItem>
+                      <MenuItem onClick={handleEdit}>Edit</MenuItem>
                       <MenuItem onClick={handleDelete}>Delete</MenuItem>
                     </Menu>
                   </td>
