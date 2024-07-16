@@ -237,6 +237,7 @@ input {
 }*/
 
 /* Loginpage.css */
+@import url('https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200..1000;1,200..1000&display=swap');
 
 .login-container {
   height: 100vh;
@@ -287,9 +288,11 @@ input {
 
 .login-title {
   color: #ffba08;
-  font-style: sans-serif !important;
-  /* margin-top: 50px !important; */
-  font-size: 40px !important;
+  padding: 6px 0 0 0;
+  font-family: 'Nunito' !important;
+  font-weight: 500;
+margin:auto 0px !important;
+  font-size: 35px !important;
   font-weight: bolder !important;
 }
 .login-title-block{
