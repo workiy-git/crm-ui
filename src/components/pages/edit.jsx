@@ -7,7 +7,7 @@ import config from '../../config/config';
 const Edit = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { rowData, schema } = location.state;
+  const { rowData, schema, pageName } = location.state;
   const [formData, setFormData] = useState(rowData);
   const [errors, setErrors] = useState('');
 
@@ -27,8 +27,7 @@ const Edit = () => {
       console.log('Response:', response);
 
       if (response.status === 200) {
-        alert('Data updated successfully');
-        navigate('/');
+        navigate('/', { state: { pageName } });
       } else {
         setErrors('Error updating data: ' + response.data.message);
       }
