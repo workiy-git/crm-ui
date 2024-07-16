@@ -66,8 +66,9 @@ const Grid = ({ rows, webformSchema, onFilterChange, pageName }) => {
 
   const handleEdit = () => {
     handleMenuClose();
-    navigate(`/edit/${currentRow._id}`, { state: { rowData: currentRow, schema: webformSchema } });
+    navigate(`/edit/${currentRow._id}`, { state: { rowData: currentRow, schema: webformSchema, pageName } });
   };
+  
 
   const handleDetails = () => {
     handleMenuClose();
