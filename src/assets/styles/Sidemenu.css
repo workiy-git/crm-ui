@@ -35,12 +35,12 @@
 }
 
 .sidemenu-profile-container {
-  width: fit-content;
   text-align: center;
   margin: auto;
   overflow-y: auto;
   max-height: 70vh;
   overflow-x: hidden;
+  padding: 3%;
 }
 
 .sidemenu-menu-item-horizontal {
