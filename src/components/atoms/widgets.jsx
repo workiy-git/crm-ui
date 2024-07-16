@@ -8,7 +8,7 @@ import { useNavigate } from 'react-router-dom';
 import config from '../../config/config';
 
 const CreateWidgetItem = styled(Paper)(({ theme }) => ({
-  backgroundColor: '#ffffff',
+  backgroundColor: '#FFCA82',
   ...theme.typography.body2,
   textAlign: 'center',
   color: theme.palette.text.secondary,
@@ -28,19 +28,22 @@ const Icon = styled('div')({
   height: '100%',
   display: 'flex',
   alignItems: 'center',
-  background: '#212529',
+  // background: '#212529',
   color:'white',
   width: '40%',
   borderRadius:'10px'
 });
 
 const Title = styled('div')({
-  marginTop: '8px',
+  color:'black',
+  fontSize: '16px',
 });
 
 const Count = styled('div')({
   marginTop: '8px',
   fontWeight: 'bold',
+  color: 'black',
+  fontSize: '22px',
 });
 
 const ScrollContainer = styled(Box)({
@@ -145,7 +148,9 @@ const CreateWidget = ({ backgroundColor, dashboardName }) => {
             <Grid item xs={1} sm={1} md={1} key={index} sx={{ marginBottom: '10px' }}>
               <CreateWidgetItem style={{ background: `linear-gradient(${backgroundColor})` }}>
                 <Icon>
-                  <img style={{ height:'30px', width:'auto', margin:'auto'}} src={widget.icon_url || 'default_icon_url'} alt={widget.title} />
+                  <div style={{background:'white', borderRadius:'100px', padding:'20px', margin:'auto',display:'flex'}}>
+                  <img style={{ height:'30px', width:'auto', margin:'auto',filter: 'brightness(0) saturate(100%) invert(50%) sepia(100%) saturate(500%) hue-rotate(190deg)' }} src={widget.icon_url || 'default_icon_url'} alt={widget.title} />
+                  </div>
                 </Icon>
                 <div
                   variant="contained"

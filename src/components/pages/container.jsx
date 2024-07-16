@@ -38,9 +38,6 @@ const Container = () => {
       const appdata = appdataResponse.data.data;
       const webform = webformResponse.data.data;
 
-      console.log('Fetched appdata:', appdata);
-      console.log('Fetched webform:', webform);
-
       setRows(appdata);
       const schemaForPage = webform.find((page) => page.pageName === pageName);
       setWebformSchema(schemaForPage?.fields || []);
@@ -70,10 +67,10 @@ const Container = () => {
         </div>
         <div style={{ width: '100%', backgroundColor: backgroundColor, overflow: 'hidden' }}>
           <Header backgroundColor={backgroundColor} />
-          <Typography style={{ height: '3rem', color: 'white', padding: '10px', fontSize: '30px', background: 'linear-gradient(90deg, rgba(12,45,78,1) 0%, rgba(28,104,180,1) 100%)' }}>
+          <Typography style={{ color: 'white', padding: '5px 10px', fontSize: '25px', background: 'linear-gradient(90deg, rgba(12,45,78,1) 0%, rgba(28,104,180,1) 100%)', fontWeight:'bold' }}>
             {pageName.charAt(0).toUpperCase() + pageName.slice(1)}
           </Typography>
-          <Grid rows={rows} webformSchema={webformSchema} onFilterChange={handleFilterChange} />
+          <Grid rows={rows} webformSchema={webformSchema} onFilterChange={handleFilterChange} pageName={pageName} />
         </div>
       </div>
     </div>
