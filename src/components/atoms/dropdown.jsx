@@ -1,68 +1,70 @@
-import * as React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTheme } from '@mui/material/styles';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
+import config from '../../config/config';
+import axios from 'axios';
+import '../../assets/styles/callsgrid.css';
 
-
-const names = [
-  'Todays Calls',
-  'Todays Answered Calls',
-  'Todays Missed Calls',
-  'Total Calls',
-  'Total Answered Calls',
-  'Total Missed Calls',
-  'Total incoming Calls',
-  'Todays incoming Calls',
-  'All',
-  
-];
-
-function getStyles(name, personName, theme) {
-  return {
-    fontWeight:
-      personName.indexOf(name) === -1
-        ? theme.typography.fontWeightRegular
-        : theme.typography.fontWeightMedium,
-  };
-}
-
-export default function MultipleSelectChip() {
+function Dropdown({ onOptionSelected, pageName }) {
   const theme = useTheme();
-  const [personName, setPersonName] = React.useState([]);
+  const [selectedOption, setSelectedOption] = useState('');
+  const [options, setOptions] = useState([]);
+
+  useEffect(() => {
+    const fetchControls = async () => {
+      try {
+        const response = await axios.get(`${config.apiUrl}/controls`);
+        const controlsData = response.data.data;
+
+        const control = controlsData.find(
+          control => control.pageName === pageName
+        );
+
+        if (control && control.value) {
+          setOptions(control.value);
+        } else {
+          setOptions([]);
+        }
+      } catch (error) {
+        console.error('Failed to fetch controls data:', error);
+      }
+    };
+
+    fetchControls();
+  }, [pageName]);
 
   const handleChange = (event) => {
-    const {
-      target: { value },
-    } = event;
-    setPersonName(
-      // On autofill we get a stringified value.
-      typeof value === 'string' ? value.split(',') : value,
-    );
+    setSelectedOption(event.target.value);
+    const selectedOption = options.find(option => option.name === event.target.value);
+    if (selectedOption) {
+      onOptionSelected(selectedOption.filter);
+    }
   };
 
+
   return (
-    <div>
-      <FormControl sx={{ m: 1, width: 300 }}>
-        <Select
-          labelId="demo-multiple-chip-label"
-          id="demo-multiple-chip"
-            label='Calls'
-          value={personName}
-          onChange={handleChange}
+    <FormControl className='dropdown' sx={{ m: 1, width:'300px' }}>
+      <Select
+        value={selectedOption}
+        onChange={handleChange}
+        displayEmpty
+        inputProps={{ 'aria-label': 'Without label' }}
+        sx={{color:'white', background:'#212529'}}
         
-        >
-          {names.map((name) => (
-            <MenuItem
-              key={name}
-              value={name}
-              style={getStyles(name, personName, theme)}
-            >
-              {name}
-            </MenuItem>
-          ))}
-        </Select>
-      </FormControl>
-    </div>
+      >
+        <MenuItem value="">
+          <em>None</em>
+        </MenuItem>
+        {options.map(option => (
+          <MenuItem key={option.name} value={option.name}>
+            {option.name}
+          </MenuItem>
+        ))}
+      </Select>
+    </FormControl>
   );
 }
+
+export default Dropdown;

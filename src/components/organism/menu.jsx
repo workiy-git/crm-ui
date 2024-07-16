@@ -9,18 +9,18 @@ import '../../assets/styles/MenuComponent.css';
 import config from '../../config/config';  // Ensure the correct path to config file
 
 const localStorageKey = 'selectedTexts';
+const selectedButtonIndexKey = 'selectedButtonIndex';
 
 const MenuComponent = ({ backgroundColor, onSaveSelectedText }) => {
   const [selectedTexts, setSelectedTexts] = useState([]);
   const [scrollIndex, setScrollIndex] = useState(0);
   const [selectedButtonIndex, setSelectedButtonIndex] = useState(null);
   const [widgets, setWidgets] = useState([]);
-  const [count, setCount] = useState(0);
-  const [notificationCount, setNotificationCount] = useState(0);
-  const [notificationData, setNotificationData] = useState([]);
+  const [dashboardName, setDashboardName] = useState(null);
 
   useEffect(() => {
     const storedSelectedTexts = JSON.parse(localStorage.getItem(localStorageKey)) || [];
+    const storedSelectedButtonIndex = JSON.parse(localStorage.getItem(selectedButtonIndexKey));
     setSelectedTexts(storedSelectedTexts);
     setScrollIndex(0);
 
@@ -28,11 +28,16 @@ const MenuComponent = ({ backgroundColor, onSaveSelectedText }) => {
       .then((response) => {
         console.log('Notification data received:', response.data);
         const { data } = response.data;
-        setNotificationData(data);  // Store the fetched data
       })
       .catch((error) => {
         console.error('Error fetching notification data:', error);
       });
+
+    if (storedSelectedTexts.length > 0) {
+      const initialIndex = storedSelectedButtonIndex !== null ? storedSelectedButtonIndex : 0;
+      setSelectedButtonIndex(initialIndex);
+      handleButtonClick(initialIndex, storedSelectedTexts);
+    }
   }, []);
 
   const handleSaveSelectedText = (texts) => {
@@ -40,6 +45,10 @@ const MenuComponent = ({ backgroundColor, onSaveSelectedText }) => {
     localStorage.setItem(localStorageKey, JSON.stringify(texts));
     setScrollIndex(0);
     onSaveSelectedText(texts);
+    if (texts.length > 0) {
+      setSelectedButtonIndex(0);
+      handleButtonClick(0, texts);
+    }
   };
 
   const handleScrollLeft = () => {
@@ -50,28 +59,65 @@ const MenuComponent = ({ backgroundColor, onSaveSelectedText }) => {
     setScrollIndex(Math.min(selectedTexts.length - 6, scrollIndex + 1));
   };
 
-  const handleButtonClick = (index) => {
+  const handleButtonClick = async (index, texts = selectedTexts) => {
     setSelectedButtonIndex(index);
-    const selectedTextTitle = selectedTexts[index].title;
+    localStorage.setItem(selectedButtonIndexKey, index);
 
-    // Filter notification data based on the selected text title
-    const filteredData = notificationData.filter(item => item.pageName === selectedTextTitle);
-    console.log(`Filtered data for ${selectedTextTitle}:`, filteredData);
+    if (texts.length > index && index >= 0) {
+      const selectedMenuKey = texts[index].title.toLowerCase(); // Convert title to lowercase
+      console.log('Selected Menu Key:', selectedMenuKey);
 
-    const newWidgets = Array.from({ length: filteredData.length }, (_, i) => ({
-      icon: '+',
-      title: `Widget ${i + 1}`,
-    }));
+      try {
+        const response = await axios.post(
+          `${config.apiUrl}/dashboards/retrieve`,
+          [
+            {
+              "$match": {
+                "dashboardName": selectedMenuKey
+              }
+            },
+            {
+              "$sort": { "createdAt": -1 }
+            }
+          ],
+          {
+            headers: {
+              'Content-Type': 'application/json',
+            }
+          }
+        );
 
-    setWidgets(newWidgets);
-    setCount(filteredData.length);
-    setNotificationCount(filteredData.length);
+        console.log('Response Data:', response.data); // Log entire response data for inspection
+
+        if (response.status === 200 && response.data && response.data.data) {
+          const fetchedWidgets = response.data.data;
+          console.log('Fetched Widgets:', fetchedWidgets); // Log fetched widgets for inspection
+
+          // Filter widgets based on selectedMenuKey
+          const matchedWidgets = fetchedWidgets.filter(widget => widget.dashboardName === selectedMenuKey);
+          console.log('Matched Widgets:', matchedWidgets); // Log matched widgets for inspection
+
+          setWidgets(matchedWidgets); // Set state with filtered widgets
+          setDashboardName(selectedMenuKey); // Set dashboardName state
+        } else {
+          console.log('No widget data found or incorrect structure');
+          setWidgets([]);
+          setDashboardName(null);
+        }
+      } catch (error) {
+        console.error('Error retrieving widgets data:', error);
+        setWidgets([]);
+        setDashboardName(null);
+      }
+    } else {
+      console.error('Invalid index or selectedTexts array');
+    }
   };
 
   return (
     <>
-      <AppBar position="static" className="menu-appBar" style={{ background: 'linear-gradient(90deg, rgba(12,45,78,1) 0%, rgba(28,104,180,1) 100%)' }}>
-        <Toolbar className="menu-toolbar">
+      <AppBar position="static" className="menu-appBar" style={{ background: '#E5E5E5' }}>
+        <Toolbar style={{minHeight:'50px'}} className="menu-toolbar">
           <Box className="menu-selectedTextContainer">
             {selectedTexts.slice(scrollIndex, scrollIndex + 9).map((text, index) => (
               <Box key={index} className="menu-selectedTextItem">
@@ -80,7 +126,8 @@ const MenuComponent = ({ backgroundColor, onSaveSelectedText }) => {
                   color={selectedButtonIndex === index ? "secondary" : "primary"}
                   className="menu-featureButton"
                   onClick={() => handleButtonClick(index)}
-                  style={{ backgroundColor: selectedButtonIndex === index ? 'rgb(255, 63, 20)' : 'white', color: selectedButtonIndex === index ? 'white' : '#264653', textTransform: 'none'  }}
+                  style={{ backgroundColor: selectedButtonIndex === index ? '#80808080 ' : 'transparent', color: selectedButtonIndex === index ? '#212529' : '#212529', textTransform: 'none', boxShadow: 'none', borderBottom: selectedButtonIndex === index ?  '5px solid #FFC03D' : 'none', width:'max-content'
+                    }}
                 >
                   {text.title}
                 </Button>
@@ -103,10 +150,8 @@ const MenuComponent = ({ backgroundColor, onSaveSelectedText }) => {
           </Box>
         </Toolbar>
       </AppBar>
-      {selectedButtonIndex !== null && (
-        <div>
-          <CreateWidget backgroundColor={backgroundColor} widgets={widgets} />
-        </div>
+      {dashboardName && (
+        <CreateWidget backgroundColor={backgroundColor} dashboardName={dashboardName} />
       )}
     </>
   );

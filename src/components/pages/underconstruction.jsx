@@ -1,14 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import Header from '../organism/header';
-import MenuComponent from "../organism/menu";
 import SideMenu from "../organism/sidemenu";
-import Submenu from '../organism/submenu';
-import BackgroundColorChanger from '../atoms/BackgroundColorChanger';
 import Footer from '../atoms/Footer';
 import config from '../../config/config';
+import Icon from '../../assets/underconstruction.png';
 
-function Home() {
+function Underconstruction() {
   const [backgroundColor, setBackgroundColor] = useState(() => {
     return localStorage.getItem('backgroundColor') || '#d9d9d9';
   });
@@ -74,11 +72,8 @@ function Home() {
           <div>
             <Header backgroundColor={backgroundColor} />
           </div>
-          <div>
-            <MenuComponent onSaveSelectedText={handleSaveSelectedText} backgroundColor={backgroundColor} />
-          </div>
-          <div>
-            <Submenu backgroundColor={backgroundColor} />
+          <div style={{textAlign:'center', position:'relative', top:'20%'}}>
+            <img src={Icon} alt="Under Construction"  />
           </div>
       
         </div>
@@ -88,4 +83,4 @@ function Home() {
   );
 }
 
-export default Home;
+export default Underconstruction;

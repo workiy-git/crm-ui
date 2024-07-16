@@ -2,12 +2,14 @@ import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import Box from '@mui/material/Box';
 import List from '@mui/material/List';
+import Text from '@mui/material/Typography';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import Avatar from '@mui/material/Avatar';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import config from '../../config/config'; // Import the configuration file
+import '../../assets/styles/header.css';
 
 const theme = createTheme({
   components: {
@@ -20,16 +22,29 @@ const theme = createTheme({
   palette: {},
 });
 
-export default function Myprofile({ backgroundColor }) {
+export default function Myprofile({ backgroundColor, value }) {
   const [open, setOpen] = useState(false);
   const menuRef = useRef(null);
   const [myprofileData, setMyprofileData] = useState({});
+  const [userData, setuserData] = useState({});
+
 
   useEffect(() => {
     axios.get(`${config.apiUrl}/menus/header`)
       .then((response) => {
         console.log('myprofile Data received:', response.data);
         setMyprofileData(response.data.data.myprofile);
+      })
+      .catch((error) => {
+        console.error('Error fetching data:', error);
+      });
+  }, []);
+
+  useEffect(() => {
+    axios.get(`${config.apiUrl}/users`)
+      .then((response) => {
+        console.log('Users Data received:', response.data.data[1]);
+        setuserData(response.data.data[1]);
       })
       .catch((error) => {
         console.error('Error fetching data:', error);
@@ -56,9 +71,13 @@ export default function Myprofile({ backgroundColor }) {
     const url = `${path}`;
     window.location.href = url;
   };
+  const handleProfileClick = () => {
+    const url = `/underconstruction`;
+    window.location.href  = url;  
+  }
 
   return (
-    <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+    <Box sx={{ display: 'flex', justifyContent: 'left' }}>
       <ThemeProvider theme={theme}>
         <div elevation={0} sx={{ maxWidth: 256, backgroundColor: 'transparent' }}>
           <List component="nav" disablePadding ref={menuRef}>
@@ -72,9 +91,13 @@ export default function Myprofile({ backgroundColor }) {
             >
               <Avatar
                 alt="Profile"
-                src={myprofileData.profile_image}
+                src={userData.profile_img}
                 sx={{ width: 40, height: 40, outline: 'white 2px solid' }}
               />
+              <div className='myprofile-username-main'>
+              <Text className={`myprofile-username  ${value}`}>{userData.username}</Text>
+              <Text className={`myprofile-username myprofile-username-role ${value}`}>{userData.job_role}</Text>
+              </div>
             </ListItemButton>
             {open && (
               <Box
@@ -91,16 +114,24 @@ export default function Myprofile({ backgroundColor }) {
                 }}
               >
                 <Box style={{ display: 'grid', padding: '15px' }}>
-                  {Object.keys(myprofileData)
+                      <ListItemButton onClick={() => handleProfileClick()} style={{ borderBottom: '1px dashed black', paddingBottom: '10px' }}>
+                        <ListItemIcon sx={{ color: 'inherit', minWidth: 'fit-content', marginRight: '15px' }} style={{ height: '40px', width:'40px', padding: '0px'}}>
+                          <img style={{width:'100%', borderRadius:'100px'}} src={userData.profile_img} alt={userData.profile_img} />
+                        </ListItemIcon>
+                        <ListItemText
+                          primary={userData.username}
+                          primaryTypographyProps={{ fontSize: 14, fontWeight: 'medium', color: 'black' }}
+                        /> 
+                      </ListItemButton>
+                  {Object.keys(myprofileData || userData)
                     .filter(key => key !== 'profile_image')
                     .map((key, index) => (
                       <ListItemButton
                         key={index}
                         sx={{ py: 0, minHeight: 32, color: 'rgba(255,255,255,.8)' }}
                         onClick={() => handleMenuItemClick(myprofileData[key].path)}
-                        style={index === 0 ? { borderBottom: '1px dashed black', paddingBottom: '10px' } : {}}
                       >
-                        <ListItemIcon sx={{ color: 'inherit', minWidth: 'fit-content', marginRight: '15px' }} style={index === 0 ? { height: '40px', padding: '0px' } : {}}>
+                        <ListItemIcon sx={{ color: 'inherit', minWidth: 'fit-content', marginRight: '15px' }} >
                           <img src={myprofileData[key].icon} alt={myprofileData[key].title} />
                         </ListItemIcon>
                         <ListItemText

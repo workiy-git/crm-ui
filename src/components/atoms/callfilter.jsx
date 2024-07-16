@@ -1,5 +1,7 @@
 import React, { useState} from 'react';
 import { Button, Popover, Typography, TextField, Select, MenuItem, FormControl, DialogActions , InputLabel } from '@mui/material';
+import FilterListIcon from '@mui/icons-material/FilterList';
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 // import config from '../../config/config';
 // import axios from 'axios';
 
@@ -72,10 +74,10 @@ function Callfilter() {
        {/* {companylogoData.map((item, index) => ( */}
             <div style={{ display: 'flex', width: '100%', justifyContent: 'center' }} >
                 <Button 
-                  style={{ color: '#212529', border: '2px solid #04aa6d' }} 
+                  style={{ color: '#ffff' }} 
                   onClick={handleClick}
                 >
-                  Filter    <div style={{fontWeight:'bolder', color:'#04aa6d'}}>  &nbsp; &nbsp; &gt;</div>
+                  <FilterListIcon />&nbsp; &nbsp;Filter <KeyboardArrowDownIcon />
 {/*               
                     <Avatar
                       src={item.menu.submenu.filter.icon}

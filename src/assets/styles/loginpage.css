@@ -326,6 +326,8 @@ margin:auto 0px !important;
   border: none;
   border-top-right-radius: 10px;
   border-bottom-right-radius: 10px;
+  border-top-left-radius: 0px;
+  border-bottom-left-radius: 0px;
 }
 .login-text-field:focus{
   outline: none;
@@ -365,11 +367,11 @@ margin:auto 0px !important;
 }
 
 #login-button {
-  background: #4084ff !important;
-  color: #000;
+  background: #8C79FB !important;
+  color: #fff;
   /* border:2px solid #fc921b; */
-  font-weight: 600;
-  padding: 10px 50px;
+  font-weight: 500;
+  padding: 5px 50px;
   margin-top: 10px;
    border-radius: 100px;
 }
@@ -389,7 +391,7 @@ margin:auto 0px !important;
 }
 
 .login-forgot-password {
-  color: #fff;
+  color: #000;
   margin-top: 30px;
   text-align: center;
   padding: 10px;
@@ -420,6 +422,15 @@ margin:auto 0px !important;
 
 
 @media (max-width: 768px) {
+
+.login-right-section-main{
+    padding:0;
+    right: 0;
+    width: 100%;
+}
+.login-main {
+    height: auto;
+}
   .login-right-section {
     right: 0px;
     width: 100%;
@@ -434,7 +445,8 @@ margin:auto 0px !important;
   }
 
   .login-title {
-    
+    color: #fc921b;
+    margin-top: 0px !important;
     font-size: 32px !important;
     font-weight: bolder !important;
   }

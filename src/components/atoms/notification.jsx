@@ -41,7 +41,7 @@ const Notification = () => {
     setNotificationCount(0);
 
     // Additional code to mark notifications as read in the backend could be added here
-    axios.post(`${config.apiUrl}/appdata/mark_as_read`)
+    axios.post(`${config.apiUrl}/appdata`)
       .then((response) => {
         console.log('Notifications marked as read:', response.data);
       })
@@ -55,11 +55,12 @@ const Notification = () => {
       <Grid container spacing={2}>
         <Grid item>
           {menuData && menuData.notifications_icon && (
-            <Badge badgeContent={count} color="error">
+            <Badge badgeContent={count} color="error" max={99999}>
               <img
                 src={menuData.notifications_icon.icon}
                 alt='icon'
-                style={{ width: '30px', height: 'auto', cursor: 'pointer' }}
+                style={{ width: '30px', height: 'auto', cursor: 'pointer',
+                  filter: "brightness(0) invert(1)" }}
                 onClick={handleNotificationClick}
               />
             </Badge>
