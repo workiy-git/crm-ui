@@ -37,9 +37,6 @@ const EditPage = () => {
     setFormData({ ...formData, [name]: value });
   };
   const [ishover, setIshover] = useState(false);
-
-
-
   const handleSave = async () => {
     const { _id, ...updateData } = formData; // Exclude _id from form data
     const apiUrl = `${config.apiUrl.replace(/\/$/, '')}/appdata/${id}`;
