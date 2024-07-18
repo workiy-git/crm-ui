@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { styled, alpha } from '@mui/material/styles';
 import InputBase from '@mui/material/InputBase';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Box, Button, Modal, Typography, IconButton, Menu, MenuItem } from '@mui/material';
@@ -108,44 +108,7 @@ const Grid = ({ rows, webformSchema, onFilterChange, pageName }) => {
   const handleDeselectAll = () => {
     setTempVisibleColumns([]);
   };
-  const Search = styled('div')(({ theme }) => ({
-    position: 'relative',
-    borderRadius: theme.shape.borderRadius,
-    backgroundColor: "white",
-    '&:hover': {
-      backgroundColor: alpha(theme.palette.common.white, 0.7),
-    },
-    marginLeft: 0,
-    width: '100%',
-    [theme.breakpoints.up('sm')]: {
-      marginLeft: theme.spacing(1),
-      width: 'auto',
-    },
-  }));
-  
-  const SearchIconWrapper = styled('div')(({ theme }) => ({
-    padding: theme.spacing(0, 2),
-    height: '100%',
-    position: 'absolute',
-    pointerEvents: 'none',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-  }));
-  
-  const StyledInputBase = styled(InputBase)(({ theme }) => ({
-    color: 'black',
-    width: '100%',
-    '& .MuiInputBase-input': {
-      padding: theme.spacing(1, 1, 1, 0),
-      // vertical padding + font size from searchIcon
-      paddingLeft: `calc(1em + ${theme.spacing(4)})`,
-      transition: theme.transitions.create('width'),
-      [theme.breakpoints.up('sm')]: {
-        width: '10ch',
-      },
-    },
-  }));
+
 
 
   const handleSearchChange = (columnName, value) => {
@@ -216,6 +179,29 @@ const Grid = ({ rows, webformSchema, onFilterChange, pageName }) => {
     return pages;
   };
 
+  const wrapper1Ref = useRef(null);
+  const wrapper2Ref = useRef(null);
+
+  useEffect(() => {
+    const handleScroll = (source, target) => {
+      target.scrollLeft = source.scrollLeft;
+    };
+
+    const wrapper1 = wrapper1Ref.current;
+    const wrapper2 = wrapper2Ref.current;
+
+    const handleWrapper1Scroll = () => handleScroll(wrapper1, wrapper2);
+    const handleWrapper2Scroll = () => handleScroll(wrapper2, wrapper1);
+
+    wrapper1.addEventListener('scroll', handleWrapper1Scroll);
+    wrapper2.addEventListener('scroll', handleWrapper2Scroll);
+
+    return () => {
+      wrapper1.removeEventListener('scroll', handleWrapper1Scroll);
+      wrapper2.removeEventListener('scroll', handleWrapper2Scroll);
+    };
+  }, []);
+
   return (
     <div className="CallsGrid">
       <Box className="Appbar" sx={{ display: 'flex', justifyContent: 'space-around' }}>
@@ -252,8 +238,12 @@ const Grid = ({ rows, webformSchema, onFilterChange, pageName }) => {
       </Box>
 
       <Box sx={{ height: 'inherit', overflowY: 'auto', overflowX: 'hidden' }}>
-        <TableContainer style={{ borderRadius: '10px', border: '1px solid #808080', height: 'max-content' }}>
-          <Table>
+      <div className="wrapper1" ref={wrapper1Ref}>
+        <div className="div1"></div>
+      </div>
+      <TableContainer style={{  border: '1px solid #808080', height: 'max-content', }}>
+        <div className="wrapper2" ref={wrapper2Ref}>
+          <Table style={{transform: 'rotate(180deg)'}}>
             <TableHead className='table-head' style={{ background: '#D9D9D9', color: 'white !important' }}>
               <TableRow className='table-head-row'>
                 <TableCell style={{
@@ -294,7 +284,6 @@ const Grid = ({ rows, webformSchema, onFilterChange, pageName }) => {
                       onChange={(e) => handleSearchChange(field.fieldName, e.target.value)}
                       inputProps={{ 'aria-label': 'search' }}
                       className="searchBox"
-                      // startAdornment={<SearchIcon style={{ color: 'gray' }} />}
                     />
                   </TableCell>
                 ))}
@@ -312,7 +301,6 @@ const Grid = ({ rows, webformSchema, onFilterChange, pageName }) => {
                 })
                 .map((row) => (
                   <TableRow className='table-body-row' key={row._id}>
-                    {/* Actions Column */}
                     <TableCell style={{
                       whiteSpace: 'nowrap',
                       overflow: 'hidden',
@@ -334,7 +322,6 @@ const Grid = ({ rows, webformSchema, onFilterChange, pageName }) => {
                         <MenuItem onClick={handleDelete}>Delete</MenuItem>
                       </Menu>
                     </TableCell>
-                    {/* Data Columns */}
                     {visibleColumns.map((field) => (
                       <TableCell
                         key={field.fieldName}
@@ -354,8 +341,9 @@ const Grid = ({ rows, webformSchema, onFilterChange, pageName }) => {
                 ))}
             </TableBody>
           </Table>
-        </TableContainer>
-      </Box>
+        </div>
+      </TableContainer>
+    </Box>
 
       {/* Modals */}
       <Modal open={modalOpen} onClose={() => setModalOpen(false)}>

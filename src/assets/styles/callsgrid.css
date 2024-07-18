@@ -2,7 +2,7 @@
   font-family: Arial, Helvetica, sans-serif;
   display: flex;
   flex-direction: column;
-  height: 80%;
+  height: 85%;
   /* padding: 10px; */
   /* color: #333; */
  /* margin-top: -7rem; */
@@ -315,4 +315,36 @@
 .searchBox input::placeholder{
   font-size: 14px;
   text-align: center;
+}
+
+
+.wrapper1, .wrapper2 {
+  /* width: 300px;
+  overflow-x: scroll; */
+  overflow-y: hidden;
+  transform: rotate(180deg);
+}
+
+.wrapper1 { display: none; }
+/* .wrapper2 { height: 200px; } */
+
+/* .div1 {
+  width: 1000px;
+  height: 20px;
+}
+
+.div2 {
+  width: 1000px;
+  height: 200px;
+  background-color: #88FF88;
+  overflow: auto;
+  transform: rotate(180deg);
+} */
+
+.wrapper2::-webkit-scrollbar{
+  height: 10px;
+}
+.wrapper2::-webkit-scrollbar-thumb{
+  background-color: #D9D9D9;
+  border-radius: 10px;
 }
