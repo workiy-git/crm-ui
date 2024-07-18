@@ -1,61 +1,83 @@
-import React, { useState } from 'react';
-import axios from 'axios';
-import { useLocation, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { Box, Button, TextField, Typography } from '@mui/material';
+import axios from 'axios';
 import config from '../../config/config';
 
-const Edit = () => {
+const EditPage = () => {
+  const { id } = useParams();
   const location = useLocation();
   const navigate = useNavigate();
   const { rowData, schema, pageName } = location.state;
-  const [formData, setFormData] = useState(rowData);
-  const [errors, setErrors] = useState('');
+  const [formData, setFormData] = useState({});
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
+  useEffect(() => {
+    if (rowData) {
+      setFormData(rowData);
+    } else {
+      // Fetch data if not passed from the previous page
+      const fetchData = async () => {
+        const apiUrl = `${config.apiUrl.replace(/\/$/, '')}/appdata/${id}`;
+        try {
+          const response = await axios.get(apiUrl);
+          setFormData(response.data);
+        } catch (error) {
+          console.error('Error fetching data:', error);
+        }
+      };
+      fetchData();
+    }
+  }, [id, rowData]);
+
+  const handleInputChange = (event) => {
+    const { name, value } = event.target;
     setFormData({ ...formData, [name]: value });
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    const apiUrl = `${config.apiUrl.replace(/\/$/, '')}/appdata/${formData._id}`;
-    console.log('API URL:', apiUrl);
-    console.log('Form Data:', formData);
-
+  const handleSave = async () => {
+    const { _id, ...updateData } = formData; // Exclude _id from form data
+    const apiUrl = `${config.apiUrl.replace(/\/$/, '')}/appdata/${id}`;
     try {
-      const response = await axios.put(apiUrl, { appdata: formData });
-      console.log('Response:', response);
-
-      if (response.status === 200) {
-        navigate('/', { state: { pageName } });
-      } else {
-        setErrors('Error updating data: ' + response.data.message);
-      }
+      await axios.put(apiUrl, updateData);
+      alert('Data updated successfully');
+      navigate(`/${pageName}`);
     } catch (error) {
       console.error('Error updating data:', error);
-      setErrors('Error updating data');
+      alert('Error updating data');
     }
   };
 
+  const handleCancel = () => {
+    navigate(`/${pageName}`);
+  };
+
   return (
-    <Box component="form" onSubmit={handleSubmit} sx={{ padding: '20px', maxWidth: '500px', margin: '50px auto', backgroundColor: 'white' }}>
-      {errors && <Typography color="error">{errors}</Typography>}
+    <Box sx={{ maxWidth: '600px', margin: '50px auto', padding: '20px', backgroundColor: 'white' }}>
+      <Typography variant="h6" gutterBottom>
+        Edit {pageName}
+      </Typography>
       {schema.map((field) => (
         <TextField
           key={field.fieldName}
+          label={field.required ? `${field.label} *` : field.label} 
           name={field.fieldName}
-          label={field.label}
           value={formData[field.fieldName] || ''}
-          onChange={handleChange}
+          onChange={handleInputChange}
           fullWidth
           margin="normal"
+          variant="outlined"
         />
       ))}
-      <Button type="submit" variant="contained" color="primary">
-        Save
-      </Button>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', marginTop: '20px' }}>
+        <Button variant="contained" color="primary" onClick={handleSave}>
+          Save
+        </Button>
+        <Button variant="outlined" onClick={handleCancel}>
+          Cancel
+        </Button>
+      </Box>
     </Box>
   );
 };
 
-export default Edit;
+export default EditPage;
