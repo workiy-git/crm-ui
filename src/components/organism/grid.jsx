@@ -202,6 +202,7 @@ const Grid = ({ rows, webformSchema, onFilterChange, pageName }) => {
     };
   }, []);
 
+
   return (
     <div className="CallsGrid">
       <Box className="Appbar" sx={{ display: 'flex', justifyContent: 'space-around' }}>
@@ -243,7 +244,7 @@ const Grid = ({ rows, webformSchema, onFilterChange, pageName }) => {
       </div>
       <TableContainer style={{  border: '1px solid #808080', height: 'max-content', }}>
         <div className="wrapper2" ref={wrapper2Ref}>
-          <Table style={{transform: 'rotate(180deg)'}}>
+          <Table>{/* style={{transform: 'rotate(180deg)'}} */}
             <TableHead className='table-head' style={{ background: '#D9D9D9', color: 'white !important' }}>
               <TableRow className='table-head-row'>
                 <TableCell style={{
@@ -267,7 +268,7 @@ const Grid = ({ rows, webformSchema, onFilterChange, pageName }) => {
               </TableRow>
             </TableHead>
 
-            <TableHead style={{ background: '#DADEFD', color: 'white !important' }}>
+            <TableHead style={{ background: '#808080', color: 'white !important' }}>
               <TableRow className='table-head-row'>
                 <TableCell style={{
                   whiteSpace: 'nowrap',
@@ -276,11 +277,11 @@ const Grid = ({ rows, webformSchema, onFilterChange, pageName }) => {
                   textAlign: 'center',
                   color: 'black',
                   padding:'10px 15px'
-                }}><Text style={{background:'#FFC03D', padding:'5px 15px', borderRadius:'5px', fontSize:'14px'}}>Apply</Text></TableCell>
+                }}><Text></Text></TableCell>
                 {visibleColumns.map((field) => (
                   <TableCell key={field.fieldName} style={{ textAlign: 'center', color: 'black', padding:'10px 15px' }}>
                     <InputBase
-                      placeholder={`Search`}
+                      // placeholder={`Search`}
                       onChange={(e) => handleSearchChange(field.fieldName, e.target.value)}
                       inputProps={{ 'aria-label': 'search' }}
                       className="searchBox"

@@ -52,7 +52,8 @@ function Loginpage() {
   return (
     <div>
       {companylogoData && companylogoData.background ? (
-        <div className="login-container" style={{background:'#121A2C' }}>
+        <div className="login-container" style={{backgroundImage: `url(${companylogoData.background.BG})`}}
+        >
           <div className="login-main">
 
           <div className="login-left-section">

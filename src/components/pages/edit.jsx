@@ -2,6 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { Box, Button, TextField, Typography } from '@mui/material';
 import axios from 'axios';
+import Header from '../organism/header';
+import SideMenu from "../organism/sidemenu";
+import Grid from '../organism/grid';
 import config from '../../config/config';
 
 const EditPage = () => {
@@ -33,14 +36,14 @@ const EditPage = () => {
     const { name, value } = event.target;
     setFormData({ ...formData, [name]: value });
   };
-
+  const [ishover, setIshover] = useState(false);
   const handleSave = async () => {
     const { _id, ...updateData } = formData; // Exclude _id from form data
     const apiUrl = `${config.apiUrl.replace(/\/$/, '')}/appdata/${id}`;
     try {
       await axios.put(apiUrl, updateData);
       alert('Data updated successfully');
-      navigate(`/${pageName}`);
+      navigate(`/container/${pageName}`);
     } catch (error) {
       console.error('Error updating data:', error);
       alert('Error updating data');
@@ -48,35 +51,66 @@ const EditPage = () => {
   };
 
   const handleCancel = () => {
-    navigate(`/${pageName}`);
+    navigate(`/container/${pageName}`);
   };
 
+
   return (
-    <Box sx={{ maxWidth: '600px', margin: '50px auto', padding: '20px', backgroundColor: 'white' }}>
-      <Typography variant="h6" gutterBottom>
-        Edit {pageName}
-      </Typography>
-      {schema.map((field) => (
-        <TextField
-          key={field.fieldName}
-          label={field.required ? `${field.label} *` : field.label} 
-          name={field.fieldName}
-          value={formData[field.fieldName] || ''}
-          onChange={handleInputChange}
-          fullWidth
-          margin="normal"
-          variant="outlined"
-        />
-      ))}
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', marginTop: '20px' }}>
-        <Button variant="contained" color="primary" onClick={handleSave}>
-          Save
-        </Button>
-        <Button variant="outlined" onClick={handleCancel}>
-          Cancel
-        </Button>
-      </Box>
-    </Box>
+    <div style={{ height: '100vh', display: "flex", flexDirection: "column", overflow: 'hidden' }}>
+      <div style={{ display: 'flex', height: '-webkit-fill-available', overflow: 'hidden' }}>
+        <div style={{ backgroundColor: "#121A2C" }}>
+          <SideMenu />
+        </div>
+        <div style={{ width: '100%', overflow: 'hidden' }}>
+          <Header />
+          <div style={{display:'flex', justifyContent:'space-between', background:'#212529', color:'white', height:'150px'}}>
+            <h2  style={{ margin: '20px', borderBottom:'10px solid #FFC03D', height:'fit-content', padding:'5px'}}> 
+              Edit {pageName}
+            </h2>
+            <Box style={{ display: 'flex', justifyContent: 'center', alignItems:'center', marginRight:'5%'}}>
+            <button  onClick={handleCancel} style={{height:'fit-content', padding:'8px 30px', marginRight:'15px', background:'none', borderRadius:'5px', border:'1px solid white', color:'white'}} variant="contained">
+              Close
+            </button>
+            <button  onClick={handleSave} style={{
+              height: 'fit-content',
+              marginLeft: '15px',
+              background: '#FFC03D',
+              color: 'black',
+              padding:'8px 30px',
+              borderRadius:'5px',
+            }}>
+              Save
+            </button>
+
+            </Box>
+          </div>
+         
+        <div style={{height:'70%', margin:'20px', border:'1px solid gray', borderRadius:'10px', position:'relative', marginTop:'-35px', background:'white'}}>
+          <div style={{padding:'10px 20px', borderBottom:'1px solid gray', fontWeight:'bold', fontSize:'20px',textTransform: 'capitalize'}}>{pageName} information</div>
+          <div style={{height:'90%', overflow:'auto',}}> 
+          <div style={{ padding: '20px', columnCount:2 }}>
+          {schema.map((field) => (
+          <div style={{display:'flex', justifyContent:'space-between', margin:'10px'}}>
+            <label style={{alignContent:'center'}}>
+            {field.required ? `${field.label} *` : field.label}
+            </label>
+            <input 
+            required= {field.required ? `${field.label} *` : field.label}
+            style={{height:'40px', width:'50%', borderRadius:'5px'}}
+            key={field.fieldName}
+            name={field.fieldName}
+            value={formData[field.fieldName] || ''}
+            onChange={handleInputChange} 
+            type="text" />
+          </div>
+          ))}
+      
+        </div>
+        </div> 
+    </div>
+        </div>
+      </div>
+    </div>
   );
 };
 

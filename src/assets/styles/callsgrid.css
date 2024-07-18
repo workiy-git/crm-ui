@@ -2,7 +2,7 @@
   font-family: Arial, Helvetica, sans-serif;
   display: flex;
   flex-direction: column;
-  height: 85%;
+  height: 83%;
   /* padding: 10px; */
   /* color: #333; */
  /* margin-top: -7rem; */
@@ -71,6 +71,9 @@
   font-weight: bold;
 }
 
+.table-body .table-body-row:nth-child(odd) {
+  background-color: #ffff;
+}
 .table-body .table-body-row:nth-child(even) {
   background-color: #DADEFD;
 }
@@ -322,7 +325,7 @@
   /* width: 300px;
   overflow-x: scroll; */
   overflow-y: hidden;
-  transform: rotate(180deg);
+  /* transform: rotate(180deg); */
 }
 
 .wrapper1 { display: none; }
