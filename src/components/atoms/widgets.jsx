@@ -23,6 +23,7 @@ const CreateWidgetItem = styled(Paper)(({ theme }) => ({
   marginLeft: '5%',
   padding: '0',
   justifyContent: 'space-between',
+
 }));
 
 const Icon = styled('div')({
@@ -147,7 +148,7 @@ const CreateWidget = ({ backgroundColor, dashboardName }) => {
         <Grid container spacing={1} columns={{ xs: 5 }}>
           {widgets.length > 0 ? widgets.map((widget, index) => (
             <Grid item xs={1} sm={1} md={1} key={index} sx={{ marginBottom: '10px' }}>
-              <CreateWidgetItem style={{ background: `linear-gradient(${backgroundColor})` }}>
+              <CreateWidgetItem sx={{ height: { xs: '200px' } }} style={{ background: `linear-gradient(${backgroundColor})` }}>
                 <Icon>
                   <div style={{ background: 'white', borderRadius: '100px', padding: '20px', margin: 'auto', display: 'flex' }}>
                     <img style={{ height: '30px', width: 'auto', margin: 'auto', filter: 'brightness(0) saturate(100%) invert(50%) sepia(100%) saturate(500%) hue-rotate(190deg)' }} src={widget.icon_url || 'default_icon_url'} alt={widget.title} />
