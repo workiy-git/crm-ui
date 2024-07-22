@@ -30,7 +30,6 @@ const Icon = styled('div')({
   height: '100%',
   display: 'flex',
   alignItems: 'center',
-  // background: '#212529',
   color: 'white',
   width: '40%',
   borderRadius: '10px'
@@ -142,6 +141,12 @@ const CreateWidget = ({ backgroundColor, dashboardName }) => {
     fetchData();
   }, [dashboardName]);
 
+  const handleWidgetClick = (widget) => {
+    navigate(widget.apiRedirectEndpoint, {
+      state: { filter: widget.apiRedirectEndpointFilter }
+    });
+  };
+
   return (
     <ScrollContainer>
       <Box sx={{ flexGrow: 1 }}>
@@ -157,7 +162,7 @@ const CreateWidget = ({ backgroundColor, dashboardName }) => {
                 <div
                   variant="contained"
                   color="primary"
-                  onClick={() => navigate(`/container/${dashboardName}`)}
+                  onClick={() => handleWidgetClick(widget)}
                   style={{ width: '60%', height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}
                 >
                   <Title>{widget.title}</Title>
