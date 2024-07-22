@@ -206,18 +206,18 @@ const Grid = ({ rows, webformSchema, onFilterChange, pageName }) => {
   return (
     <div className="CallsGrid">
       <Box className="Appbar" sx={{ display: 'flex', justifyContent: 'space-around' }}>
-        <ActionButton />
+        {/* <ActionButton /> */}
         <Button sx={{ color: 'black' }} onClick={() => setShowColumnModal(true)}>
           {/* <WidgetsOutlinedIcon /> */}
           Columns <KeyboardArrowDownIcon />
         </Button>
         <Dropdown pageName={pageName} onOptionSelected={handleFilterChange} />
         <div className="pagination-container">
-          <div className='tatoal-pageination-div'>
+          {/* <div className='tatoal-pageination-div'>
             <Text style={{ marginRight: '20px' }}><span>Showing : </span><span className='pagination-current-page'>{startIndex + 1} - {Math.min(endIndex, rows.length)}</span><span> of </span><span className='pagination-current-page'>{rows.length}</span></Text>
-            {/* <span style={{ marginRight: '20px' }}>{`Showing ${rows.length}`}</span> */}
-            {/* <span style={{ border: '1px solid #98BCFD', padding: '8px', borderRadius: '5px' }}>{`Page ${pageNumber} of ${totalPages}`}</span> */}
-          </div>
+            <span style={{ marginRight: '20px' }}>{`Showing ${rows.length}`}</span>
+            <span style={{ border: '1px solid #98BCFD', padding: '8px', borderRadius: '5px' }}>{`Page ${pageNumber} of ${totalPages}`}</span>
+          </div> */}
           <Box className="pagination-box">
             <button
               onClick={() => setPageNumber(pageNumber - 1)}

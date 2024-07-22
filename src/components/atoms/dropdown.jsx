@@ -24,7 +24,6 @@ function Dropdown({ onOptionSelected, pageName }) {
 
         if (control && control.value) {
           setOptions(control.value);
-          setSelectedOption(control.value[0].name);
         } else {
           setOptions([]);
         }
@@ -55,6 +54,9 @@ function Dropdown({ onOptionSelected, pageName }) {
         sx={{color:'white', background:'#212529'}}
         
       >
+        <MenuItem value="">
+          <em>None</em>
+        </MenuItem>
         {options.map(option => (
           <MenuItem key={option.name} value={option.name}>
             {option.name}
