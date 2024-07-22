@@ -87,7 +87,7 @@ const FullScreen = () => {
            
            
           >
-            <img className="full_screen_img" alt="" src={logoData.full_screen_icon}  style={{ height: 20, padding:'15px 15px', filter: "brightness(0) invert(1)" }} />
+            <img className="full_screen_img" alt="" src={isFullScreen ? logoData.full_screen_icon_after : logoData.full_screen_icon}  style={{ height: 20, padding:'15px 15px', filter: "brightness(0) invert(1)" }} />
           </Button>
         </div>
     </div>

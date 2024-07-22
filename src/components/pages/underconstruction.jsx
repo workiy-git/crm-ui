@@ -65,13 +65,13 @@ function Underconstruction() {
   return (
     <div style={{ height: '100vh', display: "flex", flexDirection: "column", overflow: 'hidden', backgroundColor: "#dde1e9", paddingLeft: 0 }}>
       <div style={{ display: 'flex', height: '-webkit-fill-available', overflow: 'hidden' }}>
-        <div style={{ backgroundColor: "#121A2C" }}>
+        {/* <div style={{ backgroundColor: "#121A2C" }}>
           <SideMenu backgroundColor={backgroundColor} />
-        </div>
+        </div> */}
         <div style={{ width: '100%', marginRight: "-10px", backgroundColor: backgroundColor, overflow: 'hidden' }}>
-          <div>
+          {/* <div>
             <Header backgroundColor={backgroundColor} />
-          </div>
+          </div> */}
           <div style={{textAlign:'center', position:'relative', top:'20%'}}>
             <img src={Icon} alt="Under Construction"  />
           </div>

@@ -72,13 +72,13 @@ const Users = () => {
     return (
         <div style={{ height: '100vh', display: "flex", flexDirection: "column", overflow: 'hidden', backgroundColor: "gray", paddingLeft: 0 }}>
             <div style={{ display: 'flex', height: '100%', overflow: 'hidden' }}>
-                <div style={{ backgroundColor: "#121A2C" }}>
+                {/* <div style={{ backgroundColor: "#121A2C" }}>
                     <SideMenu />
-                </div>
+                </div> */}
                 <div style={{ width: '100%', background:'#D9D9D9' }}>
-                    <div>
+                    {/* <div>
                         <Header />
-                    </div>
+                    </div> */}
                     <div>
                         <Typography style={{ height: '4rem', color: 'white', padding: '10px', fontSize: '30px', background: 'linear-gradient(90deg, rgba(12,45,78,1) 0%, rgba(28,104,180,1) 100%)' }}>
                             Users
