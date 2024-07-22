@@ -29,14 +29,13 @@ const Icon = styled('div')({
   height: '100%',
   display: 'flex',
   alignItems: 'center',
-  // background: '#212529',
-  color:'white',
+  color: 'white',
   width: '40%',
-  borderRadius:'10px'
+  borderRadius: '10px'
 });
 
 const Title = styled('div')({
-  color:'black',
+  color: 'black',
   fontSize: '16px',
 });
 
@@ -141,6 +140,12 @@ const CreateWidget = ({ backgroundColor, dashboardName }) => {
     fetchData();
   }, [dashboardName]);
 
+  const handleWidgetClick = (widget) => {
+    navigate(widget.apiRedirectEndpoint, {
+      state: { filter: widget.apiRedirectEndpointFilter }
+    });
+  };
+
   return (
     <ScrollContainer>
       <Box sx={{ flexGrow: 1 }}>
@@ -149,18 +154,18 @@ const CreateWidget = ({ backgroundColor, dashboardName }) => {
             <Grid item xs={1} sm={1} md={1} key={index} sx={{ marginBottom: '10px' }}>
               <CreateWidgetItem style={{ background: `linear-gradient(${backgroundColor})` }}>
                 <Icon>
-                  <div style={{background:'white', borderRadius:'100px', padding:'20px', margin:'auto',display:'flex'}}>
-                  <img style={{ height:'30px', width:'auto', margin:'auto',filter: 'brightness(0) saturate(100%) invert(50%) sepia(100%) saturate(500%) hue-rotate(190deg)' }} src={widget.icon_url || 'default_icon_url'} alt={widget.title} />
+                  <div style={{ background: 'white', borderRadius: '100px', padding: '20px', margin: 'auto', display: 'flex' }}>
+                    <img style={{ height: '30px', width: 'auto', margin: 'auto', filter: 'brightness(0) saturate(100%) invert(50%) sepia(100%) saturate(500%) hue-rotate(190deg)' }} src={widget.icon_url || 'default_icon_url'} alt={widget.title} />
                   </div>
                 </Icon>
                 <div
                   variant="contained"
                   color="primary"
-                  onClick={() => navigate(widget.apiRedirectEndpoint)}
-                  style={{ width: '60%', height: '100%', display: 'flex', flexDirection:'column', justifyContent: 'center' }}
+                  onClick={() => handleWidgetClick(widget)}
+                  style={{ width: '60%', height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}
                 >
-                <Title>{widget.title}</Title>
-                <Count>{counts[widget.name] !== undefined ? counts[widget.name] : 'Loading...'}</Count>
+                  <Title>{widget.title}</Title>
+                  <Count>{counts[widget.name] !== undefined ? counts[widget.name] : 'Loading...'}</Count>
                 </div>
               </CreateWidgetItem>
             </Grid>
