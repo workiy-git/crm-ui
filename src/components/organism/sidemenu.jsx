@@ -29,6 +29,7 @@ const SideMenu = () => {
   const [isHorizontal, setIsHorizontal] = useState(false); // Default to false for vertical mode
   const [open, setOpen] = useState(false);
   const [selectedMenuItems, setSelectedMenuItems] = useState([]);
+  const [availableMenuItems, setAvailableMenuItems] = useState([]);
   const maxVerticalItems = 7;
   const maxHorizontalItems = 7;
   const [expandicon, setexpandicon] = useState(null); // Initialize as null to handle loading state
@@ -68,6 +69,9 @@ const SideMenu = () => {
 
             const selectedIndex = mappedMenuItems.findIndex((item) => item.path === location.pathname);
             setSelectedOptionIndex(selectedIndex);
+
+            // Update available menu items whenever menuItems or selectedMenuItems change
+            setAvailableMenuItems(mappedMenuItems.filter(item => !savedSelectedMenuItems.some(selected => selected.title === item.title)));
           } else {
             console.warn('No sidemenu data found in response.');
           }
@@ -107,6 +111,7 @@ const SideMenu = () => {
   };
 
   const handleMoreClick = () => {
+    setAvailableMenuItems(menuItems.filter(item => !selectedMenuItems.some(selected => selected.title === item.title)));
     setOpen(true);
   };
 
@@ -114,22 +119,21 @@ const SideMenu = () => {
     setOpen(false);
   };
 
-  const handleSelect = (index) => {
-    const selectedIndex = selectedMenuItems.findIndex((item) => item.title === menuItems[index].title);
-    let newSelectedMenuItems = [];
-
-    if (selectedIndex === -1) {
-      newSelectedMenuItems = [...selectedMenuItems, menuItems[index]];
+  const handleSelect = (item) => {
+    const newSelectedMenuItems = [...selectedMenuItems];
+    if (newSelectedMenuItems.length < maxVerticalItems) {
+      newSelectedMenuItems.push(item);
     } else {
-      newSelectedMenuItems = selectedMenuItems.filter((item) => item.title !== menuItems[index].title);
+      newSelectedMenuItems[maxVerticalItems - 1] = item;
     }
 
-    if (newSelectedMenuItems.length <= (isHorizontal ? maxHorizontalItems : maxVerticalItems)) {
-      setSelectedMenuItems(newSelectedMenuItems);
-      localStorage.setItem('selectedMenuItems', JSON.stringify(newSelectedMenuItems));
-    } else {
-      alert(`You can select up to ${isHorizontal ? maxHorizontalItems : maxVerticalItems} items only.`);
+    setSelectedMenuItems(newSelectedMenuItems);
+    localStorage.setItem('selectedMenuItems', JSON.stringify(newSelectedMenuItems));
+    
+    if (item.path) {
+      navigate(item.path);
     }
+    handleClose();
   };
 
   const isSelected = (index) => selectedMenuItems.some((item) => item.title === menuItems[index].title);
@@ -206,11 +210,11 @@ const SideMenu = () => {
         <DialogTitle>Select Menu Items</DialogTitle>
         <DialogContent>
           <List>
-            {menuItems.map((menuItem, index) => (
+            {availableMenuItems.map((menuItem, index) => (
               <ListItem
                 key={menuItem.title}
                 button
-                onClick={() => handleSelect(index)}
+                onClick={() => handleSelect(menuItem)}
                 style={{
                   backgroundColor: isSelected(index) ? 'black' : 'white',
                   color: isSelected(index) ? 'white' : 'black',
@@ -218,7 +222,7 @@ const SideMenu = () => {
                   margin: '5px',
                   borderRadius: '100px',
                   padding: '5px 20px',
-                  cursor:'pointer'
+                  cursor: 'pointer'
                 }}
               >
                 <ListItemText primary={menuItem.title} />
@@ -226,7 +230,7 @@ const SideMenu = () => {
                   <Checkbox
                     edge="end"
                     checked={isSelected(index)}
-                    onChange={() => handleSelect(index)}
+                    onChange={() => handleSelect(menuItem)}
                     style={{ color: isSelected(index) ? 'white' : 'black' }}
                   />
                 </ListItemSecondaryAction>
