@@ -82,6 +82,8 @@ function Loginpage() {
         },
         onFailure: (err) => {
           console.error("Authentication failed", err);
+          setErrorMessage("Invalid username or password. Please try again.");
+
           // Handle login failure
         },
         newPasswordRequired: (userAttributes, requiredAttributes) => {
