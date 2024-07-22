@@ -77,6 +77,12 @@ function Loginpage() {
       cognitoUser.authenticateUser(authenticationDetails, {
         onSuccess: (result) => {
           console.log("Authentication successful", result);
+          localStorage.setItem("isLoggedIn", "true");
+          localStorage.setItem(
+            "accessToken",
+            result.getAccessToken().getJwtToken()
+          );
+
           // Redirect to home or another page
           window.location.href = "/home";
         },
@@ -99,6 +105,10 @@ function Loginpage() {
             {
               onSuccess: (result) => {
                 console.log("Password changed successfully", result);
+                setErrorMessage(
+                  "Password changed successfully. Please login with your new password."
+                );
+
                 // Navigate to the home page or another page
               },
               onFailure: (err) => {
