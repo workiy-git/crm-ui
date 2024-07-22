@@ -42,7 +42,13 @@ const Grid = ({ rows, webformSchema, onFilterChange, pageName }) => {
 
     const columns = webformSchema.map(field => ({ fieldName: field.fieldName, label: field.label })) || [];
     setAvailableColumns(columns);
-    setVisibleColumns(columns);
+
+    // Initialize columns from localStorage
+    const storedColumns = localStorage.getItem('selectedColumns');
+    const initialColumns = storedColumns ? JSON.parse(storedColumns) : columns;
+    
+    setVisibleColumns(initialColumns);
+    setTempVisibleColumns(initialColumns);
   }, [rows, webformSchema]);
 
   const totalPages = Math.ceil(rows.length / recordsPerPage);
@@ -68,11 +74,10 @@ const Grid = ({ rows, webformSchema, onFilterChange, pageName }) => {
     handleMenuClose();
     navigate(`/edit/${currentRow._id}`, { state: { rowData: currentRow, schema: webformSchema, pageName } });
   };
-  
 
   const handleDetails = () => {
     handleMenuClose();
-    navigate(`/details/${currentRow._id}`, { state: { rowData: currentRow } });
+    navigate(`/details/${currentRow._id}`, { state: { rowData: currentRow, schema: webformSchema, pageName } });
   };
 
   const handleDelete = async () => {
@@ -98,7 +103,8 @@ const Grid = ({ rows, webformSchema, onFilterChange, pageName }) => {
 
   const handleApplyColumns = () => {
     setVisibleColumns(tempVisibleColumns);
-    closeColumnModal();
+    localStorage.setItem('selectedColumns', JSON.stringify(tempVisibleColumns)); // Save selected columns
+    setShowColumnModal(false);
   };
 
   const handleSelectAll = () => {
@@ -109,7 +115,13 @@ const Grid = ({ rows, webformSchema, onFilterChange, pageName }) => {
     setTempVisibleColumns([]);
   };
 
-
+  const handleColumnChange = (column, isAdding) => {
+    if (isAdding) {
+      setTempVisibleColumns([...tempVisibleColumns, column]);
+    } else {
+      setTempVisibleColumns(tempVisibleColumns.filter(col => col.fieldName !== column.fieldName));
+    }
+  };
 
   const handleSearchChange = (columnName, value) => {
     setSearchTerms(prevSearchTerms => ({
@@ -202,22 +214,14 @@ const Grid = ({ rows, webformSchema, onFilterChange, pageName }) => {
     };
   }, []);
 
-
   return (
     <div className="CallsGrid">
       <Box className="Appbar" sx={{ display: 'flex', justifyContent: 'space-around' }}>
-        <ActionButton />
         <Button sx={{ color: 'black' }} onClick={() => setShowColumnModal(true)}>
-          {/* <WidgetsOutlinedIcon /> */}
           Columns <KeyboardArrowDownIcon />
         </Button>
         <Dropdown pageName={pageName} onOptionSelected={handleFilterChange} />
         <div className="pagination-container">
-          <div className='tatoal-pageination-div'>
-            <Text style={{ marginRight: '20px' }}><span>Showing : </span><span className='pagination-current-page'>{startIndex + 1} - {Math.min(endIndex, rows.length)}</span><span> of </span><span className='pagination-current-page'>{rows.length}</span></Text>
-            {/* <span style={{ marginRight: '20px' }}>{`Showing ${rows.length}`}</span> */}
-            {/* <span style={{ border: '1px solid #98BCFD', padding: '8px', borderRadius: '5px' }}>{`Page ${pageNumber} of ${totalPages}`}</span> */}
-          </div>
           <Box className="pagination-box">
             <button
               onClick={() => setPageNumber(pageNumber - 1)}
@@ -239,129 +243,111 @@ const Grid = ({ rows, webformSchema, onFilterChange, pageName }) => {
       </Box>
 
       <Box sx={{ height: 'inherit', overflowY: 'auto', overflowX: 'hidden' }}>
-      <div className="wrapper1" ref={wrapper1Ref}>
-        <div className="div1"></div>
-      </div>
-      <TableContainer style={{  border: '1px solid #808080', height: 'max-content', }}>
-        <div className="wrapper2" ref={wrapper2Ref}>
-          <Table>{/* style={{transform: 'rotate(180deg)'}} */}
-            <TableHead className='table-head' style={{ background: '#D9D9D9', color: 'white !important' }}>
-              <TableRow className='table-head-row'>
-                <TableCell style={{
-                  whiteSpace: 'nowrap',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  textAlign: 'center',
-                  color: 'white'
-                }}>Actions</TableCell>
-                {visibleColumns.map((field) => (
-                  <TableCell
-                    key={field.fieldName}
-                    style={{
-                      whiteSpace: 'nowrap',
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis',
-                      textAlign: 'center',
-                      color: 'white'
-                    }}>{field.label}</TableCell>
-                ))}
-              </TableRow>
-            </TableHead>
-
-            <TableHead style={{ background: '#808080', color: 'white !important' }}>
-              <TableRow className='table-head-row'>
-                <TableCell style={{
-                  whiteSpace: 'nowrap',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  textAlign: 'center',
-                  color: 'black',
-                  padding:'10px 15px'
-                }}><Text></Text></TableCell>
-                {visibleColumns.map((field) => (
-                  <TableCell key={field.fieldName} style={{ textAlign: 'center', color: 'black', padding:'10px 15px' }}>
-                    <InputBase
-                      // placeholder={`Search`}
-                      onChange={(e) => handleSearchChange(field.fieldName, e.target.value)}
-                      inputProps={{ 'aria-label': 'search' }}
-                      className="searchBox"
-                    />
-                  </TableCell>
-                ))}
-              </TableRow>
-            </TableHead>
-
-            <TableBody className='table-body'>
-              {paginatedData
-                .filter((row) => {
-                  return Object.keys(searchTerms).every((columnName) => {
-                    const searchTerm = searchTerms[columnName];
-                    const value = row[columnName];
-                    return value.toLowerCase().includes(searchTerm);
-                  });
-                })
-                .map((row) => (
-                  <TableRow className='table-body-row' key={row._id}>
-                    <TableCell style={{
-                      whiteSpace: 'nowrap',
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis',
-                      textAlign: 'center',
-                      padding: '10px',
-                      fontWeight: 'bold'
-                    }}>
-                      <IconButton onClick={(event) => handleMenuOpen(event, row)}>
-                        <MoreVertIcon />
-                      </IconButton>
-                      <Menu
-                        anchorEl={anchorEl}
-                        open={Boolean(anchorEl)}
-                        onClose={handleMenuClose}
-                      >
-                        <MenuItem onClick={handleDetails}>Details</MenuItem>
-                        <MenuItem onClick={handleEdit}>Edit</MenuItem>
-                        <MenuItem onClick={handleDelete}>Delete</MenuItem>
-                      </Menu>
-                    </TableCell>
-                    {visibleColumns.map((field) => (
-                      <TableCell
-                        key={field.fieldName}
-                        style={{
-                          whiteSpace: 'nowrap',
-                          overflow: 'hidden',
-                          textOverflow: 'ellipsis',
-                          textAlign: 'center',
-                          padding: '10px',
-                          fontWeight: 'bold'
-                        }}
-                      >
-                        {row[field.fieldName]}
-                      </TableCell>
-                    ))}
-                  </TableRow>
-                ))}
-            </TableBody>
-          </Table>
+        <div className="wrapper1" ref={wrapper1Ref}>
+          <div className="div1"></div>
         </div>
-      </TableContainer>
-    </Box>
+        <TableContainer style={{ border: '1px solid #808080', height: 'max-content' }}>
+          <div className="wrapper2" ref={wrapper2Ref}>
+            <Table>
+              <TableHead className='table-head' style={{ background: '#D9D9D9', color: 'white !important' }}>
+                <TableRow className='table-head-row'>
+                  <TableCell style={{
+                    whiteSpace: 'nowrap',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    textAlign: 'center',
+                    color: 'white'
+                  }}>Actions</TableCell>
+                  {visibleColumns.map((field) => (
+                    <TableCell
+                      key={field.fieldName}
+                      style={{
+                        whiteSpace: 'nowrap',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        textAlign: 'center',
+                        color: 'white'
+                      }}>{field.label}</TableCell>
+                  ))}
+                </TableRow>
+              </TableHead>
 
-      {/* Modals */}
-      <Modal open={modalOpen} onClose={() => setModalOpen(false)}>
-        <Box
-          component="form"
-          sx={{
-            margin: '50px auto',
-            padding: '20px',
-            backgroundColor: 'white',
-            maxWidth: '500px',
-          }}
-        >
-          <Button type="submit" variant="contained" color="primary">
-            Save
-          </Button>
-        </Box>
-      </Modal>
+              <TableHead style={{ background: '#808080', color: 'white !important' }}>
+                <TableRow className='table-head-row'>
+                  <TableCell style={{
+                    whiteSpace: 'nowrap',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    textAlign: 'center',
+                    color: 'black',
+                    padding:'10px 15px'
+                  }}><Text></Text></TableCell>
+                  {visibleColumns.map((field) => (
+                    <TableCell key={field.fieldName} style={{ textAlign: 'center', color: 'black', padding:'10px 15px' }}>
+                      <InputBase
+                        onChange={(e) => handleSearchChange(field.fieldName, e.target.value)}
+                        inputProps={{ 'aria-label': 'search' }}
+                        className="searchBox"
+                      />
+                    </TableCell>
+                  ))}
+                </TableRow>
+              </TableHead>
+
+              <TableBody className='table-body'>
+                {paginatedData
+                  .filter((row) => {
+                    return Object.keys(searchTerms).every((columnName) => {
+                      const searchTerm = searchTerms[columnName];
+                      const value = row[columnName];
+                      return value.toLowerCase().includes(searchTerm);
+                    });
+                  })
+                  .map((row) => (
+                    <TableRow className='table-body-row' key={row._id}>
+                      <TableCell style={{
+                        whiteSpace: 'nowrap',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        textAlign: 'center',
+                        padding: '10px',
+                        fontWeight: 'bold'
+                      }}>
+                        <IconButton onClick={(event) => handleMenuOpen(event, row)}>
+                          <MoreVertIcon />
+                        </IconButton>
+                        <Menu
+                          anchorEl={anchorEl}
+                          open={Boolean(anchorEl)}
+                          onClose={handleMenuClose}
+                        >
+                          <MenuItem onClick={handleDetails}>Details</MenuItem>
+                          <MenuItem onClick={handleEdit}>Edit</MenuItem>
+                          <MenuItem onClick={handleDelete}>Delete</MenuItem>
+                        </Menu>
+                      </TableCell>
+                      {visibleColumns.map((field) => (
+                        <TableCell
+                          key={field.fieldName}
+                          style={{
+                            whiteSpace: 'nowrap',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            textAlign: 'center',
+                            padding: '10px',
+                            fontWeight: 'bold'
+                          }}
+                        >
+                          {row[field.fieldName]}
+                        </TableCell>
+                      ))}
+                    </TableRow>
+                  ))}
+              </TableBody>
+            </Table>
+          </div>
+        </TableContainer>
+      </Box>
 
       <Modal open={showColumnModal} onClose={closeColumnModal}>
         <Box
@@ -387,11 +373,7 @@ const Grid = ({ rows, webformSchema, onFilterChange, pageName }) => {
                   <input
                     type="checkbox"
                     checked={true}
-                    onChange={(e) => {
-                      if (!e.target.checked) {
-                        setTempVisibleColumns(tempVisibleColumns.filter(col => col.fieldName !== column.fieldName));
-                      }
-                    }}
+                    onChange={() => handleColumnChange(column, false)}
                   />
                   <Typography sx={{ marginLeft: '8px' }}>{column.label}</Typography>
                 </Box>
@@ -404,11 +386,7 @@ const Grid = ({ rows, webformSchema, onFilterChange, pageName }) => {
                   <input
                     type="checkbox"
                     checked={false}
-                    onChange={(e) => {
-                      if (e.target.checked) {
-                        setTempVisibleColumns([...tempVisibleColumns, column]);
-                      }
-                    }}
+                    onChange={() => handleColumnChange(column, true)}
                   />
                   <Typography sx={{ marginLeft: '8px' }}>{column.label}</Typography>
                 </Box>
@@ -421,6 +399,22 @@ const Grid = ({ rows, webformSchema, onFilterChange, pageName }) => {
             <Button variant="contained" onClick={handleApplyColumns} sx={{ marginLeft: '8px' }}>Apply</Button>
             <Button variant="contained" onClick={closeColumnModal} sx={{ marginLeft: '8px' }}>Close</Button>
           </Box>
+        </Box>
+      </Modal>
+
+      <Modal open={modalOpen} onClose={() => setModalOpen(false)}>
+        <Box
+          component="form"
+          sx={{
+            margin: '50px auto',
+            padding: '20px',
+            backgroundColor: 'white',
+            maxWidth: '500px',
+          }}
+        >
+          <Button type="submit" variant="contained" color="primary">
+            Save
+          </Button>
         </Box>
       </Modal>
     </div>

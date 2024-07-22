@@ -27,7 +27,7 @@ export default function TabComponent() {
   }, []);
 
   return (
-    <div style={{ background: '#0d2d4e', padding: '5px', borderRadius: '10px', width: '45%',height:'70vh' }}>
+    <div style={{ background: '#0d2d4e', padding: '5px', borderRadius: '10px', width: '85%' }}>
       <Box sx={{ background: '#0d2d4e', borderRadius: '10px' }}>
         <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
             <Tabs

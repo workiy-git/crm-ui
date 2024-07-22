@@ -66,7 +66,7 @@ const Header = () => {
                 <Notification />
               </Badge>
             </Box>
-            <Companylogo />
+            <Companylogo  style={{background:'white'}}/>
           </Box>
         </Toolbar>
       </div>

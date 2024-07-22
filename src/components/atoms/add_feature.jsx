@@ -8,15 +8,16 @@ import '../../assets/styles/AddFeature.css'; // Import the CSS file
 const AddFeature = ({ onSaveSelectedText, storedSelectedTexts }) => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [options, setOptions] = useState([]);
-  const [selectedOptions, setSelectedOptions] = useState(storedSelectedTexts || []);
+  const [selectedOptions, setSelectedOptions] = useState([]);
+
+  useEffect(() => {
+    const savedOptions = JSON.parse(localStorage.getItem('selectedTexts')) || storedSelectedTexts;
+    setSelectedOptions(savedOptions);
+  }, [storedSelectedTexts]);
 
   useEffect(() => {
     fetchMenuData();
   }, []);
-
-  useEffect(() => {
-    setSelectedOptions(storedSelectedTexts);
-  }, [storedSelectedTexts]);
 
   const fetchMenuData = async () => {
     try {
@@ -34,6 +35,13 @@ const AddFeature = ({ onSaveSelectedText, storedSelectedTexts }) => {
 
       console.log("Flattened options:", flattenedOptions); // Debugging log
       setOptions(flattenedOptions);
+
+      if (storedSelectedTexts.length === 0 && !localStorage.getItem('selectedTexts')) {
+        const defaultSelectedOptions = flattenedOptions.slice(0, 4);
+        setSelectedOptions(defaultSelectedOptions);
+        onSaveSelectedText(defaultSelectedOptions);
+        localStorage.setItem('selectedTexts', JSON.stringify(defaultSelectedOptions));
+      }
     } catch (error) {
       console.error('Error fetching menu data:', error);
     }

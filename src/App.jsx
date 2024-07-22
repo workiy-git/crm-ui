@@ -1,5 +1,5 @@
 import React from "react";
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import { BrowserRouter as Router, Route, Routes, useLocation } from "react-router-dom";
 import WelcomePage from "./components/pages/welcome";
 import Container from "./components/pages/container";  // Ensure this path is correct
 import Home from "./components/pages/home";
@@ -10,22 +10,49 @@ import DetailsPage from "./components/pages/details";
 import Users from "./components/pages/users";
 import UserForm from "./components/organism/usersForm";
 import Underconstruction from "./components/pages/underconstruction";
+import Header from "./components/organism/header";
+import SideMenu from "./components/organism/sidemenu";
+
+const Layout = ({ children }) => {
+  const location = useLocation();
+  const isLoginPage = location.pathname === '/';
+
+  return (
+    <div style={{ display: 'flex', height: '100vh', overflow: 'hidden' }}>
+      {!isLoginPage && (
+        <div style={{ backgroundColor: "#121A2C" }}>
+          <SideMenu />
+        </div>
+      )}
+      <div style={{ width: '100%', marginRight: "-10px", overflow: 'hidden' }}>
+        {!isLoginPage && (
+          <div>
+            <Header />
+          </div>
+        )}
+        {children}
+      </div>
+    </div>
+  );
+};
 
 const App = () => {
   return (
     <Router>
-      <Routes>
-        <Route path="/" element={<Loginpage />} />
-        <Route path="/welcome" element={<WelcomePage />} />
-        <Route path="/home" element={<Home />} />
-        <Route path="/container/:pageName" element={<Container />} />
-        <Route path="/grid" element={<Grid />} />
-        <Route path="/edit/:id" element={<Edit />} />
-        <Route path="/details/:id" element={<DetailsPage />} />
-        <Route path="/users" element={<Users />} />
-        <Route path="/adduser" element={<UserForm />} />
-        <Route path="/underconstruction" element={<Underconstruction />} />
-      </Routes>
+      <Layout>
+        <Routes>
+          <Route path="/" element={<Loginpage />} />
+          <Route path="/welcome" element={<WelcomePage />} />
+          <Route path="/home" element={<Home />} />
+          <Route path="/container/:pageName" element={<Container />} />
+          <Route path="/grid" element={<Grid />} />
+          <Route path="/edit/:id" element={<Edit />} />
+          <Route path="/details/:id" element={<DetailsPage />} />
+          <Route path="/users" element={<Users />} />
+          <Route path="/adduser" element={<UserForm />} />
+          <Route path="/underconstruction" element={<Underconstruction />} />
+        </Routes>
+      </Layout>
     </Router>
   );
 };
