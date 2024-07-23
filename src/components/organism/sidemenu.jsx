@@ -33,7 +33,7 @@ const SideMenu = () => {
   const maxVerticalItems = 7;
   const maxHorizontalItems = 7;
   const [expandicon, setexpandicon] = useState(null); // Initialize as null to handle loading state
-
+  
   useEffect(() => {
     const initializeState = async () => {
       const savedIsHorizontal = localStorage.getItem('isHorizontal') === 'true';
@@ -206,18 +206,19 @@ const SideMenu = () => {
           </div>
         )}
       </div>
-      <Dialog style={{ display: 'flex', marginLeft: '10%' }} open={open} onClose={handleClose}>
+      <Dialog style={{ display: 'flex', marginLeft: '3rem' }} open={open} onClose={handleClose}>
         <DialogTitle>Select Menu Items</DialogTitle>
-        <DialogContent>
+        <DialogContent >
           <List>
             {availableMenuItems.map((menuItem, index) => (
               <ListItem
+                className="sidemenu-menu-item-popup"
                 key={menuItem.title}
                 button
                 onClick={() => handleSelect(menuItem)}
                 style={{
-                  backgroundColor: isSelected(index) ? 'black' : 'white',
-                  color: isSelected(index) ? 'white' : 'black',
+                  backgroundColor: isSelected(index) ? 'white' : 'black',
+                  color: isSelected(index) ? 'black' : 'white',
                   border: isSelected(index) ? '' : '1px solid black',
                   margin: '5px',
                   borderRadius: '100px',
@@ -225,13 +226,25 @@ const SideMenu = () => {
                   cursor: 'pointer'
                 }}
               >
+                <img
+                src={menuItem.icon}
+                alt={menuItem.title}
+                style={{
+                  width: '20px',
+                  height: '20px',
+                  cursor: 'pointer',
+                  borderRadius: '0',
+                  margin: '0',
+                  filter: 'brightness(1) invert(1)'
+                }}
+              /> &nbsp; &nbsp;
                 <ListItemText primary={menuItem.title} />
                 <ListItemSecondaryAction>
                   <Checkbox
                     edge="end"
                     checked={isSelected(index)}
                     onChange={() => handleSelect(menuItem)}
-                    style={{ color: isSelected(index) ? 'white' : 'black' }}
+                    style={{ color: isSelected(index) ? 'white' : 'black', visibility: 'hidden' }}
                   />
                 </ListItemSecondaryAction>
               </ListItem>

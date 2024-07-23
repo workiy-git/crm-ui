@@ -1,4 +1,4 @@
-.sidemenu-scrollable-container {
+/* .sidemenu-scrollable-container {
     background-color: #0d2d4e;
   }
   
@@ -45,5 +45,8 @@
     font-size: 10px !important;
     color: white;
     transition: color 0.3s ease;
-  }
+  } */
   
+  .items.dragging{
+    opacity: 0.5;
+  }
