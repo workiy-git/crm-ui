@@ -77,11 +77,6 @@ const DetailsPage = ({ endpoint }) => {
           </div>
         </div>
       </div>
-   
-
- 
-    
-
   );
 };
 
