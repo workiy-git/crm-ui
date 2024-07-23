@@ -24,8 +24,13 @@ function Dropdown({ onOptionSelected, pageName }) {
 
         if (control && control.value) {
           setOptions(control.value);
+          setSelectedOption(control.value[0]?.name || '');
+          if (control.value[0]?.filter) {
+            onOptionSelected(control.value[0].filter);
+          }
         } else {
           setOptions([]);
+          setSelectedOption('');
         }
       } catch (error) {
         console.error('Failed to fetch controls data:', error);
@@ -33,7 +38,7 @@ function Dropdown({ onOptionSelected, pageName }) {
     };
 
     fetchControls();
-  }, [pageName]);
+  }, [pageName, onOptionSelected]);
 
   const handleChange = (event) => {
     setSelectedOption(event.target.value);
@@ -43,20 +48,15 @@ function Dropdown({ onOptionSelected, pageName }) {
     }
   };
 
-
   return (
-    <FormControl className='dropdown' sx={{ m: 1, width:'300px' }}>
+    <FormControl className='dropdown' sx={{ m: 1, width: '300px' }}>
       <Select
         value={selectedOption}
         onChange={handleChange}
         displayEmpty
         inputProps={{ 'aria-label': 'Without label' }}
-        sx={{color:'white', background:'#212529'}}
-        
+        sx={{ color: 'white', background: '#212529' }}
       >
-        <MenuItem value="">
-          <em>None</em>
-        </MenuItem>
         {options.map(option => (
           <MenuItem key={option.name} value={option.name}>
             {option.name}

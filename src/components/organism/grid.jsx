@@ -151,7 +151,6 @@ const Grid = ({ rows, webformSchema, onFilterChange, pageName }) => {
           onClick={() => setPageNumber(1)}
           className={`page-btn ${pageNumber === 1 ? 'active' : ''}`}
         >
-          1
         </button>
       );
 
