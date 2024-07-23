@@ -75,17 +75,47 @@ function Loginpage() {
       const cognitoUser = new CognitoUser(userData);
 
       cognitoUser.authenticateUser(authenticationDetails, {
-        onSuccess: (result) => {
+        onSuccess: async (result) => {
           console.log("Authentication successful", result);
-          localStorage.setItem("isLoggedIn", "true");
-          localStorage.setItem(
-            "accessToken",
-            result.getAccessToken().getJwtToken()
-          );
 
-          // Redirect to home or another page
-          window.location.href = "/home";
-        },
+          try {
+            const response = await fetch(`${config.apiUrl}users/${username}`, {
+              method: 'GET',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': result.getAccessToken().getJwtToken(),
+              },
+            });
+      
+            if (!response.ok) {
+              throw new Error('User verification failed');
+            }
+      
+            const userData = await response.json();
+
+            // Add logging to check the values
+            // console.log("Fetched user data:", userData);
+            // console.log("Fetched company name:", userData.data.company);
+            // console.log("Entered company name:", companyName);
+
+            if (userData && userData.data.company === companyName) {
+
+              localStorage.setItem("isLoggedIn", "true");
+              localStorage.setItem(
+                "accessToken",
+                result.getAccessToken().getJwtToken()
+              );
+
+              // Redirect to home or another page
+              window.location.href = "/home";
+            } else {
+              throw new Error('User not found in the database or company mismatch');
+            }
+            } catch (error) {
+              console.error("User verification failed", error);
+              setErrorMessage("Entered Company Name does not match with the user. Please try again.");
+            }
+          },
         onFailure: (err) => {
           console.error("Authentication failed", err);
           setErrorMessage("Invalid username or password. Please try again.");
