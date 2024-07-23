@@ -322,7 +322,7 @@ const Grid = ({ rows, webformSchema, onFilterChange, pageName }) => {
                           onClose={handleMenuClose}
                         >
                           <MenuItem onClick={handleDetails}>Details</MenuItem>
-                          <MenuItem onClick={handleEdit}>Edit</MenuItem>
+                          {/* <MenuItem onClick={handleEdit}>Edit</MenuItem> */}
                           <MenuItem onClick={handleDelete}>Delete</MenuItem>
                         </Menu>
                       </TableCell>
