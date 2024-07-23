@@ -23,8 +23,7 @@ background-color: blue;
   }
   
   .hamburger-box,
-  .fullscreen-box,
-  .search-box {
+  .fullscreen-box {
     display: none;
   }
   

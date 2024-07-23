@@ -11,6 +11,7 @@ import axios from 'axios';
 import config from '../../config/config';
 import '../../assets/styles/callsgrid.css';
 import ActionButton from '../atoms/actionbutton';
+import WidgetsIcon from '@mui/icons-material/WidgetsOutlined';
 import Dropdown from '../atoms/dropdown';
 import { useNavigate } from 'react-router-dom';
 
@@ -217,9 +218,7 @@ const Grid = ({ rows, webformSchema, onFilterChange, pageName }) => {
   return (
     <div className="CallsGrid">
       <Box className="Appbar" sx={{ display: 'flex', justifyContent: 'space-around' }}>
-        <Button sx={{ color: 'black' }} onClick={() => setShowColumnModal(true)}>
-          Columns <KeyboardArrowDownIcon />
-        </Button>
+        
         <Dropdown pageName={pageName} onOptionSelected={handleFilterChange} />
         <div className="pagination-container">
           <Box className="pagination-box">
@@ -240,6 +239,10 @@ const Grid = ({ rows, webformSchema, onFilterChange, pageName }) => {
             </button>
           </Box>
         </div>
+        <Button sx={{ color: 'black' }} onClick={() => setShowColumnModal(true)}>
+        <WidgetsIcon /> 
+        {/* <KeyboardArrowDownIcon /> */}
+        </Button>
       </Box>
 
       <Box sx={{ height: 'inherit', overflowY: 'auto', overflowX: 'hidden' }}>

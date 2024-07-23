@@ -68,6 +68,13 @@
   transform: scale(1.1);
   font-size: 10px;
 }
+.sidemenu-menu-item-popup:hover{
+  background-color: black !important;
+  color: white !important;
+}
+.sidemenu-menu-item-popup:hover img{
+  filter: brightness(0) invert(1) !important;
+}
 
 .sidemenu-menu-item-selected {
   background-color: #DADEFD;

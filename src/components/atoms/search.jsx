@@ -8,13 +8,14 @@ const Search = () => {
   const [isSearchOpen, setIsSearchOpen] = useState(false); // State to control search container visibility
 
   useEffect(() => {
-    axios.get(`${config.apiUrl}/menudata`) // Use apiUrl from the configuration file
+    axios.get(`${config.apiUrl}/menus/menu_bar`) // Use apiUrl from the configuration file
       .then((response) => {
-        console.log('Data received:', response.data);
-        setMenuData(response.data);
+        console.log('Search Data received:', response.data.data.menu_images);
+        setMenuData(response.data.data.menu_images || []);
       })
       .catch((error) => {
         console.error('Error fetching data:', error);
+        setMenuData([]); // Set an empty array in case of an error
       });
   }, []);
 
@@ -29,15 +30,16 @@ const Search = () => {
   return (
     <Container style={{padding:'10px'}}>
       <Grid container spacing={2}>
-        {menuData.map((menuItem, index) => (
+        {Array.isArray(menuData) && menuData.map((menuItem, index) => (
           <Grid item key={index}>
-            {/* Assuming menuItem.menubar_images.search_icon.icon is the URL of the image */}
-            <img
-              src={menuItem.menu.menu_bar.menu_images.search_icon.icon}
+            {/* Assuming menuItem.search_icon.icon is the URL of the image */}
+            {/* <img
+              src={menuItem.search_icon.icon}
               alt='icon'
               style={{ width: '30px', height: 'auto', cursor: 'pointer' }} // Adjust styling as needed
               onClick={handleSearchClick}
-            />
+            /> */}
+            <div>hiuhj</div>
           </Grid>
         ))}
       </Grid>

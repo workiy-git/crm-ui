@@ -53,7 +53,7 @@ const Header = () => {
           <Box className="fullscreen-box">
             <FullScreen />
           </Box>
-          <Box className="search-box">
+          <Box>
             <Search />
           </Box>
           <Box className="flex-grow" />
