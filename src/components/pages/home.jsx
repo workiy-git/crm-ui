@@ -110,17 +110,17 @@ function Home() {
 
   useEffect(() => {
     document.title = "Home";
-    const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
-    const accessToken = localStorage.getItem("accessToken");
+    // const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
+    // const accessToken = localStorage.getItem("accessToken");
 
-    if (!isLoggedIn) {
-      // Redirect to login page
-      window.location.href = "/";
-    } else {
-      // Use accessToken for API calls or other authentication-dependent operations
-      console.log("User is logged in with accessToken:", accessToken);
-      // Fetch home data or perform other operations that require authentication here
-    }
+    // if (!isLoggedIn) {
+    //   // Redirect to login page
+    //   window.location.href = "/";
+    // } else {
+    //   // Use accessToken for API calls or other authentication-dependent operations
+    //   console.log("User is logged in with accessToken:", accessToken);
+    //   // Fetch home data or perform other operations that require authentication here
+    // }
     axios
       .get(`${config.apiUrl}/pages`)
       .then((response) => {
