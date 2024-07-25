@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
+
 import axios from 'axios';
-import config from '../../config/config'; // Import the configuration file
+import config from '../../config/config';
 
-const Refresh = ({ onClick }) => {
+const CloseButton = ({ onClick }) => {
   const [menuData, setMenuData] = useState(null);
-
+  
   useEffect(() => {
     // Fetch notification icon
     axios.get(`${config.apiUrl}/menus/menu_bar`)
@@ -16,21 +17,20 @@ const Refresh = ({ onClick }) => {
         console.error('Error fetching menu data:', error);
       });
   }, []);
-
   return (
     <div>
-      <div>
-        {menuData && menuData.notifications_icon && (
-          <img
-            src={menuData.refresh_icon.icon}
-            alt='icon'
-            style={{ width: '30px', height: 'auto', cursor: 'pointer' }}
-            onClick={onClick}
-          />
-        )}
-      </div>
+    <div>
+      {menuData && menuData.notifications_icon && (
+        <img
+          src={menuData.close_icon.icon}
+          alt='icon'
+          style={{ width: '30px', height: 'auto', cursor: 'pointer' }}
+          onClick={onClick}
+        />
+      )}
     </div>
+  </div>
   );
-}
+};
 
-export default Refresh;
+export default CloseButton;

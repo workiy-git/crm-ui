@@ -319,8 +319,19 @@
   font-size: 14px;
   text-align: center;
 }
-
-
+.header-controls{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  height: 50px;
+box-shadow: 0 2px 4px #c2c2c2;
+border-radius: 30px;
+padding: 0 10px;
+}
+.restore-box{
+  padding: 15px;
+}
 .wrapper1, .wrapper2 {
   /* width: 300px;
   overflow-x: scroll; */

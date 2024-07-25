@@ -11,9 +11,14 @@ import axios from 'axios';
 import config from '../../config/config';
 import '../../assets/styles/callsgrid.css';
 import ActionButton from '../atoms/actionbutton';
-import WidgetsIcon from '@mui/icons-material/WidgetsOutlined';
 import Dropdown from '../atoms/dropdown';
 import { useNavigate } from 'react-router-dom';
+import Refresh from '../atoms/refresh';
+import Minimize from '../atoms/minimize';
+import Maximize from '../atoms/maximize';
+
+import PlusButton from '../atoms/plus_button';
+import CloseButton from '../atoms/close_button';
 
 const Grid = ({ rows, webformSchema, onFilterChange, pageName }) => {
   const [modalOpen, setModalOpen] = useState(false);
@@ -28,6 +33,11 @@ const Grid = ({ rows, webformSchema, onFilterChange, pageName }) => {
   const [tempVisibleColumns, setTempVisibleColumns] = useState([]);
   const [searchTerms, setSearchTerms] = useState({});
   const navigate = useNavigate();
+  const [isMinimized, setIsMinimized] = useState(false);
+  const [isMaximized, setIsMaximized] = useState(false);
+  const [isClosed, setIsClosed] = useState(false);
+  const [headerData, setHeaderData] = useState(null);
+  const [refreshKey, setRefreshKey] = useState(Date.now());
 
   useEffect(() => {
     const validated = rows.map((data) => {
@@ -213,12 +223,45 @@ const Grid = ({ rows, webformSchema, onFilterChange, pageName }) => {
       wrapper2.removeEventListener('scroll', handleWrapper2Scroll);
     };
   }, []);
+  const handleMinimizeClick = () => {
+    setIsMinimized(true);
+  };
+
+  const handleMaximizeClick = () => {
+    setIsMaximized(!isMaximized);
+  };
+
+  const handleCloseClick = () => {
+    setIsClosed(true);
+  };
+
+  const handleRestoreClick = () => {
+    setIsMinimized(false);
+    setIsClosed(false);
+  };
+
+  if (isMinimized || isClosed) {
+    return (
+      <Box className="restore-box" >
+        <PlusButton onClick={handleRestoreClick} />
+      </Box>
+    );
+  }
 
   return (
     <div className="CallsGrid">
-      <Box className="Appbar" sx={{ display: 'flex', justifyContent: 'space-around' }}>
-        
+     <Box  key={refreshKey} className="Appbar" sx={{ display: 'flex', justifyContent: 'space-around' }}>
+        <Button sx={{ color: 'black' }} onClick={() => setShowColumnModal(true)}>
+          Columns <KeyboardArrowDownIcon />
+        </Button>
         <Dropdown pageName={pageName} onOptionSelected={handleFilterChange} />
+        <Box className="header-controls">
+      
+      <Minimize onClick={handleMinimizeClick} />
+      <Maximize onClick={handleMaximizeClick} />
+      <Refresh onClick={() => setRefreshKey(Date.now())} />
+      <CloseButton onClick={handleCloseClick} />
+    </Box>
         <div className="pagination-container">
           <Box className="pagination-box">
             <button
@@ -238,10 +281,6 @@ const Grid = ({ rows, webformSchema, onFilterChange, pageName }) => {
             </button>
           </Box>
         </div>
-        <Button sx={{ color: 'black' }} onClick={() => setShowColumnModal(true)}>
-        <WidgetsIcon /> 
-        {/* <KeyboardArrowDownIcon /> */}
-        </Button>
       </Box>
 
       <Box sx={{ height: 'inherit', overflowY: 'auto', overflowX: 'hidden' }}>
