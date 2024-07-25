@@ -4,9 +4,10 @@ import AddFeature from "../atoms/add_feature";
 import Refresh from '../atoms/refresh';
 import SlideButton from '../atoms/slide_button';
 import CreateWidget from '../atoms/widgets';
-import { AppBar, Toolbar, IconButton, Button, Box } from '@material-ui/core';
+import { AppBar, Toolbar, IconButton, Button, Box } from '@mui/material';
 import '../../assets/styles/MenuComponent.css';
-import config from '../../config/config';  // Ensure the correct path to config file
+import config from '../../config/config'; 
+ // Ensure the correct path to config file
 
 const localStorageKey = 'selectedTexts';
 const selectedButtonIndexKey = 'selectedButtonIndex';

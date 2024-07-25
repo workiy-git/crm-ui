@@ -1,75 +1,69 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import {
-  Timeline,
-  TimelineItem,
-  TimelineSeparator,
-  TimelineConnector,
-  TimelineContent,
-  TimelineOppositeContent,
-  TimelineDot
-} from '@mui/lab';
-import { Typography, Paper, Box } from '@mui/material';
+import { Timeline, TimelineItem, TimelineSeparator, TimelineConnector, TimelineContent, TimelineDot, TimelineOppositeContent } from '@mui/lab';
+import { Paper, Box } from '@mui/material';
 import config from '../../config/config';
-import { useParams, useNavigate } from 'react-router-dom';
 
-const Comment = () => {
-  const [updates, setUpdates] = useState([]);
-  const { id } = useParams(); // Assuming you get id from route params
-  const navigate = useNavigate();
+const UserUpdatesTimeline = () => {
+  const [groupedUpdates, setGroupedUpdates] = useState({});
 
   useEffect(() => {
-    const fetchUpdates = async () => {
-      const apiUrl = `${config.apiUrl.replace(/\/$/, '')}/appdata/${id}`;
-      try {
-        const response = await axios.get(apiUrl);
-        setUpdates(response.data.updates || []);
-      } catch (error) {
-        console.error('Error fetching updates:', error);
-      }
-    };
+    axios.get(`${config.apiUrl}/userinfoupdates`)
+      .then((response) => {
+        console.log('Data received:', response.data.data);
 
-    fetchUpdates();
-  }, [id]);
+        // Group and sort updates by timestamp
+        const updates = response.data.data;
+        const grouped = updates.reduce((acc, update) => {
+          const date = new Date(update.updatedAt).toLocaleString();
+          if (!acc[date]) {
+            acc[date] = [];
+          }
+          acc[date].push(update);
+          return acc;
+        }, {});
 
-  const handleCancel = () => {
-    navigate(`/container/${id}`);
-  };
+        // Sort dates in descending order
+        const sortedDates = Object.keys(grouped).sort((a, b) => new Date(b) - new Date(a));
+        const sortedGrouped = sortedDates.reduce((acc, date) => {
+          acc[date] = grouped[date];
+          return acc;
+        }, {});
+
+        setGroupedUpdates(sortedGrouped);
+      })
+      .catch((error) => {
+        console.error('Error fetching data:', error);
+      });
+  }, []);
 
   return (
-    <Box sx={{ margin: 'auto', padding: 2 }}>
-      <Paper sx={{ padding: 2 }}>
-        <Timeline position="alternate">
-          {updates.length ? (
-            updates.map((update, index) => (
-              <TimelineItem key={index}>
-                <TimelineOppositeContent sx={{ m: 'auto 0' }} variant="body2" color="text.secondary">
-                  {new Date(update.updatedAt).toLocaleString()}
-                </TimelineOppositeContent>
-                <TimelineSeparator>
-                  <TimelineConnector />
-                  <TimelineDot color="primary">
-                    <Typography>🗨️</Typography>
-                  </TimelineDot>
-                  <TimelineConnector />
-                </TimelineSeparator>
-                <TimelineContent sx={{ py: '12px', px: 2 }}>
-                  <Typography variant="h6" component="span">
-                    {update.field}
-                  </Typography>
-                  <Typography>
-                    Changed from "{update.oldValue}" to "{update.newValue}" by {update.updatedBy}
-                  </Typography>
-                </TimelineContent>
-              </TimelineItem>
-            ))
-          ) : (
-            <Typography>No updates available</Typography>
-          )}
-        </Timeline>
-      </Paper>
+    <Box sx={{ maxHeight: '500px', overflowY: 'auto' }}>
+      <Timeline>
+        {Object.keys(groupedUpdates).map(date => (
+          <TimelineItem key={date}>
+            <TimelineOppositeContent sx={{ color: 'white', paddingRight: 2 }}>
+              {date} {/* Display the date only once for grouped updates */}
+            </TimelineOppositeContent>
+            <TimelineSeparator>
+              <TimelineDot />
+              <TimelineConnector />
+            </TimelineSeparator>
+            <TimelineContent>
+              {groupedUpdates[date].map(update => (
+                <Paper key={update._id} elevation={3} sx={{ padding: '10px', margin: '10px 0', backgroundColor: '#fff' }}>
+                  <div><strong>Changed By:</strong> {update.changedBy}</div>
+                  <div><strong>Field:</strong> {update.field}</div>
+                  <div><strong>Old Value:</strong> {update.oldValue}</div>
+                  <div><strong>New Value:</strong> {update.newValue}</div>
+                </Paper>
+              ))}
+            </TimelineContent>
+          </TimelineItem>
+        ))}
+      </Timeline>
     </Box>
   );
 };
 
-export default Comment;
+export default UserUpdatesTimeline;
