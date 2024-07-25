@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from 'react';
+import { Button } from '@mui/material';
 import axios from 'axios';
 import config from '../../config/config'; // Import the configuration file
 
-const Refresh = ({ onClick }) => {
+
+
+const PlusButton = ({ onClick }) => {
   const [menuData, setMenuData] = useState(null);
 
   useEffect(() => {
@@ -16,21 +19,21 @@ const Refresh = ({ onClick }) => {
         console.error('Error fetching menu data:', error);
       });
   }, []);
-
   return (
     <div>
       <div>
         {menuData && menuData.notifications_icon && (
-          <img
-            src={menuData.refresh_icon.icon}
+      <img
+            src={menuData.plus_icon.icon}
             alt='icon'
-            style={{ width: '30px', height: 'auto', cursor: 'pointer' }}
+            style={{ width: '25px', height: 'auto', cursor: 'pointer', padding: 2, background:'#fff', borderRadius: '50%',backgroundopacity: '50%'}}    
             onClick={onClick}
           />
+        
         )}
       </div>
     </div>
   );
-}
+};
 
-export default Refresh;
+export default PlusButton;
