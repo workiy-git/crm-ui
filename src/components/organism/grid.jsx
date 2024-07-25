@@ -283,7 +283,7 @@ const Grid = ({ rows, webformSchema, onFilterChange, pageName }) => {
                     textAlign: 'center',
                     color: 'black',
                     padding:'10px 15px'
-                  }}><Text></Text></TableCell>
+                  }}></TableCell>
                   {visibleColumns.map((field) => (
                     <TableCell key={field.fieldName} style={{ textAlign: 'center', color: 'black', padding:'10px 15px' }}>
                       <InputBase

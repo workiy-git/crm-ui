@@ -48,5 +48,11 @@
   } */
   
   .items.dragging{
-    opacity: 0.5;
+    opacity: 1;
+  }
+  .widget-hide-btn{
+    visibility: hidden;
+  }
+  .widget-main:hover .widget-hide-btn{
+    visibility: visible;
   }

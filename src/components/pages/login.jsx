@@ -292,9 +292,12 @@ function Loginpage() {
                   </Grid>
                 </Grid>
                 <div className="login-center login-submit-block">
-                  <Typography variant="body2" className="login-forgot-password">
+                  <a 
+                    className="login-forgot-password" 
+                    href={companylogoData.forget?.url || "/"}
+                  >
                     {companylogoData.forget?.title}
-                  </Typography>
+                  </a>
                 </div>
                 <div className="login-center">
                   {errorMessage && (
