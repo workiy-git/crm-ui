@@ -1,37 +1,24 @@
-import React, { useState, useEffect } from 'react';
+// src/atoms/WindowControls.js
+import React from 'react';
+import IconButton from '@mui/material/IconButton';
+import MinimizeIcon from '@mui/icons-material/Minimize';
+import MaximizeIcon from '@mui/icons-material/CheckBoxOutlineBlank';
+import CloseIcon from '@mui/icons-material/Close';
 
-import axios from 'axios';
-import config from '../../config/config';
-
-const Minimize = ({ onClick }) => {
-  
-    const [menuData, setMenuData] = useState(null);
-  
-    useEffect(() => {
-      // Fetch notification icon
-      axios.get(`${config.apiUrl}/menus/menu_bar`)
-        .then((response) => {
-          console.log('Data received:', response.data);
-          setMenuData(response.data.data.menu_images);
-        })
-        .catch((error) => {
-          console.error('Error fetching menu data:', error);
-        });
-    }, []);
+const WindowControls = ({ onMinimize, onMaximize, onClose }) => {
   return (
-    <div>
-      <div>
-        {menuData && menuData.notifications_icon && (
-          <img
-            src={menuData.minimize_icon.icon}
-            alt='icon'
-            style={{ width: '30px', height: 'auto', cursor: 'pointer',padding: '0 0  10px 0'}}
-            onClick={onClick}
-          />
-        )}
-      </div>
-    </div>
+    <>
+      <IconButton onClick={onMinimize}>
+        <MinimizeIcon />
+      </IconButton>
+      <IconButton onClick={onMaximize}>
+        <MaximizeIcon />
+      </IconButton>
+      <IconButton onClick={onClose}>
+        <CloseIcon />
+      </IconButton>
+    </>
   );
 };
 
-export default Minimize;
+export default WindowControls;
