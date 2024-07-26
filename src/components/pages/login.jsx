@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import axios from "axios";
-
 import {
   Button,
   Typography,
@@ -33,7 +32,6 @@ function Loginpage() {
   const [showPassword, setShowPassword] = React.useState(false);
 
   const handleClickShowPassword = () => setShowPassword((show) => !show);
-  let navigate = useNavigate();
 
   const handleMouseDownPassword = (event) => {
     event.preventDefault();
@@ -82,17 +80,17 @@ function Loginpage() {
 
           try {
             const response = await fetch(`${config.apiUrl}users/${username}`, {
-              method: "GET",
+              method: 'GET',
               headers: {
-                "Content-Type": "application/json",
-                Authorization: result.getAccessToken().getJwtToken(),
+                'Content-Type': 'application/json',
+                'Authorization': result.getAccessToken().getJwtToken(),
               },
             });
-
+      
             if (!response.ok) {
-              throw new Error("User verification failed");
+              throw new Error('User verification failed');
             }
-
+      
             const userData = await response.json();
 
             // Add logging to check the values
@@ -101,6 +99,7 @@ function Loginpage() {
             // console.log("Entered company name:", companyName);
 
             if (userData && userData.data.company === companyName) {
+
               localStorage.setItem("isLoggedIn", "true");
               localStorage.setItem(
                 "accessToken",
@@ -108,20 +107,15 @@ function Loginpage() {
               );
 
               // Redirect to home or another page
-              // window.location.href = "/home";
-              navigate("/home"); // Redirect to a home page or dashboard after login
+              window.location.href = "/home";
             } else {
-              throw new Error(
-                "User not found in the database or company mismatch"
-              );
+              throw new Error('User not found in the database or company mismatch');
             }
-          } catch (error) {
-            console.error("User verification failed", error);
-            setErrorMessage(
-              "Entered Company Name does not match with the user. Please try again."
-            );
-          }
-        },
+            } catch (error) {
+              console.error("User verification failed", error);
+              setErrorMessage("Entered Company Name does not match with the user. Please try again.");
+            }
+          },
         onFailure: (err) => {
           console.error("Authentication failed", err);
           setErrorMessage("Invalid username or password. Please try again.");
@@ -298,9 +292,12 @@ function Loginpage() {
                   </Grid>
                 </Grid>
                 <div className="login-center login-submit-block">
-                  <Typography variant="body2" className="login-forgot-password">
+                  <a 
+                    className="login-forgot-password" 
+                    href={companylogoData.forget?.url || "/"}
+                  >
                     {companylogoData.forget?.title}
-                  </Typography>
+                  </a>
                 </div>
                 <div className="login-center">
                   {errorMessage && (
