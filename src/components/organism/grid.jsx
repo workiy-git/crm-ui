@@ -75,7 +75,7 @@ const Grid = ({ rows, webformSchema, onFilterChange, pageName }) => {
 
   const handleDetails = () => {
     handleMenuClose();
-    navigate(`/details/${currentRow._id}`, { state: { rowData: currentRow } });
+    navigate(`/details/${currentRow._id}`, { state: { rowData: currentRow, schema: webformSchema, pageName } });
   };
 
   const handleDelete = async () => {
