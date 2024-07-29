@@ -153,16 +153,6 @@ function Loginpage() {
     }
   };
 
-  // const handleLogin = () => {
-  //   if (!companyName.trim() || !username.trim() || !password.trim()) {
-  //     setErrorMessage("Please fill in all required fields.");
-  //   } else {
-  //     setErrorMessage("");
-  //     // Navigate to the home page
-  //     // You can add your navigation logic here
-  //   }
-  // };
-
   useEffect(() => {
     axios
       .get(`${config.apiUrl}/pages/Login`)
@@ -182,12 +172,19 @@ function Loginpage() {
     );
   }, [companyName, username, password]);
 
+  const handleKeyPress = (event) => {
+    if (event.key === "Enter") {
+      handleLogin(event);
+    }
+  };
+
   return (
     <div>
       {companylogoData && companylogoData.background ? (
         <div
           className="login-container"
           style={{ backgroundImage: `url(${companylogoData.background.BG})` }}
+          onKeyPress={handleKeyPress}
         >
           <div className="login-main">
             <div className="login-left-section">
@@ -205,9 +202,6 @@ function Loginpage() {
                     {companylogoData.login?.title}
                   </Typography>
                 </div>
-                {/* <Typography className="login-sub-title" variant="h6">
-              {companylogoData.welcome?.title}
-            </Typography> */}
                 <Grid>
                   <Grid item xs={12} sm={6} className="login-form-group">
                     <div className="login-align-items">
