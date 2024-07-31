@@ -24,7 +24,7 @@ function Dropdown({ onOptionSelected, pageName }) {
 
         if (control && control.value) {
           setOptions(control.value);
-          setSelectedOption(control.value[0].name);
+          setSelectedOption(control.value[0].name); // Default to the first option
         } else {
           setOptions([]);
         }
@@ -37,23 +37,22 @@ function Dropdown({ onOptionSelected, pageName }) {
   }, [pageName]);
 
   const handleChange = (event) => {
-    setSelectedOption(event.target.value);
-    const selectedOption = options.find(option => option.name === event.target.value);
+    const selectedName = event.target.value;
+    setSelectedOption(selectedName);
+    const selectedOption = options.find(option => option.name === selectedName);
     if (selectedOption) {
       onOptionSelected(selectedOption.filter);
     }
   };
 
-
   return (
-    <FormControl className='dropdown' sx={{ m: 1, width:'300px' }}>
+    <FormControl className='dropdown' sx={{ m: 1, width: '300px' }}>
       <Select
         value={selectedOption}
         onChange={handleChange}
         displayEmpty
         inputProps={{ 'aria-label': 'Without label' }}
-        sx={{color:'white', background:'#212529'}}
-        
+        sx={{ color: 'white', background: '#212529' }}
       >
         {options.map(option => (
           <MenuItem key={option.name} value={option.name}>

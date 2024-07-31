@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { Box, Button, TextField, Select, MenuItem, Checkbox, FormControlLabel, FormControl } from '@mui/material';
 import axios from 'axios';
+import ModeEditOutlinedIcon from '@mui/icons-material/ModeEditOutlined';
 import Tab from '../organism/details-tab';
 import config from '../../config/config';
 
@@ -54,6 +55,10 @@ const DetailsPage = () => {
 
   const handleEdit = () => {
     setIsEditing(true); // Enable editing
+  };
+  const handleNext = () => {
+    // navigate(`/details/${id}`);
+    
   };
 
   const renderInputField = (field) => {
@@ -195,7 +200,7 @@ const DetailsPage = () => {
           onChange={handleInputChange}
           fullWidth
           multiline
-          rows={2}
+          rows={1}
         />
       );
     }
@@ -211,12 +216,11 @@ const DetailsPage = () => {
       />
     );
   };
-
   return (
     <div style={{ height: '100vh', display: "flex", flexDirection: "column", overflow: 'hidden' }}>
       <div style={{ display: 'flex', height: '-webkit-fill-available', overflow: 'hidden' }}>
         <div style={{ width: '100%', overflow: 'hidden' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', background: '#212529', color: 'white', height: '150px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', background: '#212529', color: 'white', height: '110px' }}>
             <h2 style={{ margin: '20px', borderBottom: '10px solid #FFC03D', height: 'fit-content', padding: '5px', textTransform: 'capitalize' }}>
               {pageName} Details View
             </h2>
@@ -226,20 +230,52 @@ const DetailsPage = () => {
                   Edit
                 </Button>
               )}
-              <Button onClick={handleCancel} style={{ height: 'fit-content', padding: '8px 30px', marginRight: '15px', background: 'none', borderRadius: '5px', border: '1px solid white', color: 'white' }} variant="contained">
-                Close
-              </Button>
               {isEditing && (
-                <Button onClick={handleSave} style={{ height: 'fit-content', marginLeft: '15px', background: '#FFC03D', color: 'black', padding: '8px 30px', borderRadius: '5px' }}>
+                <Button onClick={handleSave} style={{ height: 'fit-content',  marginRight: '15px', background: '#FFC03D', color: 'black', padding: '8px 30px', borderRadius: '5px' }}>
                   Save
                 </Button>
               )}
+              <Button onClick={handleCancel} style={{ height: 'fit-content', padding: '8px 30px',marginLeft: '15px', background: 'none', borderRadius: '5px', border: '1px solid white', color: 'white' }} variant="contained">
+                Close
+              </Button>
+              <Button onClick={handleNext} style={{ height: 'fit-content', padding: '8px 30px',marginLeft: '15px', background: 'none', borderRadius: '5px', border: '1px solid white', color: 'white' }} variant="contained">
+                Next
+              </Button>
+              
             </Box>
           </div>
+          <div style={{display:'flex'}}>
+            <div style={{margin:'20px 30px', fontSize:'20px'}}>
+              User Name :<span style={{fontWeight:'bold', marginLeft:'20px'}}>{formData.caller_name || 'N/A'}</span>
+            </div>
+            <div style={{margin:'20px 30px', fontSize:'20px'}}>
+              Caller Number :<span style={{fontWeight:'bold', marginLeft:'20px'}}>{formData.caller_number || 'N/A'}</span>
+            </div>
+            <div style={{margin:'20px 30px', fontSize:'20px'}}>
+              Call Status :<span style={{fontWeight:'bold', marginLeft:'20px'}}>{formData.call_status || 'N/A'}</span>
+            </div>
+          </div>
           <div style={{ display: 'flex', height: '70%' }}>
-            <div style={{ height: '100%', width: '50%', margin: '20px', border: '1px solid gray', borderRadius: '10px', position: 'relative', marginTop: '-35px', background: 'white' }}>
+            <div style={{ height: '80%', width: '50%', margin: '20px', border: '1px solid gray', borderRadius: '10px', position: 'relative', background: 'white' }}>
               <div style={{ padding: '10px 20px', borderBottom: '1px solid gray', fontWeight: 'bold', fontSize: '20px', textTransform: 'capitalize' }}>{pageName} information</div>
-              <div style={{ height: '90%', overflow: 'auto' }}>
+              <div>
+                <Box style={{ display: 'flex', justifyContent: 'end', alignItems: 'center', padding:'5px' }}>
+                  {/* {!isEditing && (
+                    <Button onClick={handleEdit} style={{ height: 'fit-content', padding: '3px 20px 3px 15px', background: 'none', borderRadius: '5px', border: '1px solid gray', color: 'black' }} variant="contained">
+                      <ModeEditOutlinedIcon style={{marginRight:'5px', fontSize:'20px'}}/>Edit
+                    </Button>
+                  )}
+                  {isEditing && (
+                    <Button onClick={handleSave} style={{ height: 'fit-content', marginLeft: '15px', background: '#FFC03D', color: 'black', padding: '3px 20px 3px 15px', borderRadius: '5px' }}>
+                      Save
+                    </Button>
+                  )} */}
+                  <div style={{margin:'auto 20px'}}>
+                    CT : <span style={{fontWeight:'bold'}}>{formData.created_time || 'N/A'}</span>
+                  </div>
+                </Box>
+              </div>
+              <div style={{ height: '75%', overflow: 'auto' }}>
                 <div style={{ padding: '20px'}}>
                   {schema.map((field) => (
                     <div style={{ display: 'flex', justifyContent: 'space-between', margin: '20px', width: '90%' }} key={field.fieldName}>
@@ -252,7 +288,7 @@ const DetailsPage = () => {
                 </div>
               </div>
             </div>
-            <div style={{ display: 'flex', justifyContent: "space-around", width: '60%', overflow: 'hidden', marginTop: '-35px' }}>
+            <div style={{ display: 'flex', justifyContent: "space-around", width: '60%', overflow: 'hidden' }}>
               <Tab />
             </div>
           </div>
