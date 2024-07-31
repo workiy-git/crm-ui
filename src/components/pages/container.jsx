@@ -15,7 +15,6 @@ const Container = () => {
   const [rows, setRows] = useState([]);
   const [webformSchema, setWebformSchema] = useState([]);
   const [errors, setErrors] = useState('');
-
   const fetchData = async (filter = {}) => {
     try {
       const postData = [

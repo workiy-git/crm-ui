@@ -1,11 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { styled, alpha } from '@mui/material/styles';
 import InputBase from '@mui/material/InputBase';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Box, Button, Modal, Typography, IconButton, Menu, MenuItem } from '@mui/material';
 import Text from '@mui/material/Typography';
-import WidgetsOutlinedIcon from '@mui/icons-material/WidgetsOutlined';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
-import SearchIcon from '@mui/icons-material/Search';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import axios from 'axios';
 import config from '../../config/config';
@@ -13,8 +10,9 @@ import '../../assets/styles/callsgrid.css';
 import ActionButton from '../atoms/actionbutton';
 import Dropdown from '../atoms/dropdown';
 import { useNavigate } from 'react-router-dom';
+import Loader from '../molecules/loader';
 
-const Grid = ({ rows, webformSchema, onFilterChange, pageName }) => {
+const Grid = ({ rows, webformSchema, onFilterChange, pageName, loading }) => {
   const [modalOpen, setModalOpen] = useState(false);
   const [pageNumber, setPageNumber] = useState(1);
   const [recordsPerPage, setRecordsPerPage] = useState(15);
@@ -71,13 +69,6 @@ const Grid = ({ rows, webformSchema, onFilterChange, pageName }) => {
     setAnchorEl(null);
     setCurrentRow(null);
   };
-
-  // const handleEdit = () => {
-  //   handleMenuClose();
-  //   navigate(`/edit/${currentRow._id}`, { state: { rowData: currentRow, schema: webformSchema, pageName } });
-  // };
-  
-
   const handleDetails = () => {
     handleMenuClose();
     navigate(`/details/${currentRow._id}`, { state: { rowData: currentRow, schema: webformSchema, pageName } });
@@ -126,9 +117,6 @@ const Grid = ({ rows, webformSchema, onFilterChange, pageName }) => {
   const handleDeselectAll = () => {
     setTempVisibleColumns([]);
   };
-
-
-
   const handleSearchChange = (columnName, value) => {
     setSearchTerms(prevSearchTerms => ({
       ...prevSearchTerms,
@@ -219,24 +207,15 @@ const Grid = ({ rows, webformSchema, onFilterChange, pageName }) => {
       wrapper2.removeEventListener('scroll', handleWrapper2Scroll);
     };
   }, []);
-  
-
-
   return (
     <div className="CallsGrid">
       <Box className="Appbar" sx={{ display: 'flex', justifyContent: 'space-around' }}>
-        {/* <ActionButton /> */}
+        <ActionButton />
         <Button sx={{ color: 'black' }} onClick={() => setShowColumnModal(true)}>
-          <WidgetsOutlinedIcon />
-          {/* Columns <KeyboardArrowDownIcon /> */}
+          Columns <KeyboardArrowDownIcon />
         </Button>
         <Dropdown pageName={pageName} onOptionSelected={handleFilterChange} />
         <div className="pagination-container">
-          {/* <div className='tatoal-pageination-div'>
-            <Text style={{ marginRight: '20px' }}><span>Showing : </span><span className='pagination-current-page'>{startIndex + 1} - {Math.min(endIndex, rows.length)}</span><span> of </span><span className='pagination-current-page'>{rows.length}</span></Text>
-            <span style={{ marginRight: '20px' }}>{`Showing ${rows.length}`}</span>
-            <span style={{ border: '1px solid #98BCFD', padding: '8px', borderRadius: '5px' }}>{`Page ${pageNumber} of ${totalPages}`}</span>
-          </div> */}
           <Box className="pagination-box">
             <button
               onClick={() => setPageNumber(pageNumber - 1)}
@@ -356,30 +335,41 @@ const Grid = ({ rows, webformSchema, onFilterChange, pageName }) => {
                         {row[field.fieldName]}
                       </TableCell>
                     ))}
+                    <TableCell>Actions</TableCell>
                   </TableRow>
-                ))}
-            </TableBody>
-          </Table>
-        </div>
-      </TableContainer>
-    </Box>
-
-      {/* Modals */}
-      <Modal open={modalOpen} onClose={() => setModalOpen(false)}>
-        <Box
-          component="form"
-          sx={{
-            margin: '50px auto',
-            padding: '20px',
-            backgroundColor: 'white',
-            maxWidth: '500px',
-          }}
-        >
-          <Button type="submit" variant="contained" color="primary">
-            Save
-          </Button>
-        </Box>
-      </Modal>
+                </TableHead>
+                <TableBody>
+                  {paginatedData.map((row) => (
+                    <TableRow key={row._id}>
+                      {visibleColumns.map(column => (
+                        <TableCell key={column.fieldName}>{row[column.fieldName]}</TableCell>
+                      ))}
+                      <TableCell>
+                        <IconButton
+                          aria-controls="simple-menu"
+                          aria-haspopup="true"
+                          onClick={(event) => handleMenuOpen(event, row)}
+                        >
+                          <MoreVertIcon />
+                        </IconButton>
+                        <Menu
+                          anchorEl={anchorEl}
+                          keepMounted
+                          open={Boolean(anchorEl)}
+                          onClose={handleMenuClose}
+                        >
+                          <MenuItem onClick={handleDetails}>Details</MenuItem>
+                          <MenuItem onClick={handleDelete}>Delete</MenuItem>
+                        </Menu>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            )}
+          </div>
+        </TableContainer>
+      </Box>
 
       <Modal open={showColumnModal} onClose={closeColumnModal}>
   <Box
