@@ -4,10 +4,12 @@ import { Typography } from '@mui/material';
 import axios from 'axios';
 import Grid from '../organism/grid';
 import config from '../../config/config';
+import Loader from '../molecules/loader';
 
 const Container = () => {
   const { pageName } = useParams();
   const endpoint = '/appdata/retrieve';
+  
   const [backgroundColor] = useState(() => {
     return localStorage.getItem('backgroundColor') || '#d9d9d9';
   });
@@ -15,7 +17,10 @@ const Container = () => {
   const [rows, setRows] = useState([]);
   const [webformSchema, setWebformSchema] = useState([]);
   const [errors, setErrors] = useState('');
+  const [loading, setLoading] = useState(true);  // Manage loading state
+
   const fetchData = async (filter = {}) => {
+    setLoading(true);  // Set loading to true before fetching data
     try {
       const postData = [
         {
@@ -41,6 +46,8 @@ const Container = () => {
     } catch (error) {
       console.error('Error fetching data:', error);
       setErrors('Error fetching data');
+    } finally {
+      setLoading(false);  // Set loading to false after data is fetched
     }
   };
 
@@ -52,10 +59,6 @@ const Container = () => {
     fetchData(filter);
   };
 
-  if (!pageName) {
-    return <div>Loading...</div>;
-  }
-
   return (
     <div style={{ height: '100vh', display: "flex", flexDirection: "column", overflow: 'hidden' }}>
       <div style={{ display: 'flex', height: '-webkit-fill-available', overflow: 'hidden' }}>
@@ -64,7 +67,7 @@ const Container = () => {
           <Typography style={{ color: 'white', padding: '5px 10px', fontSize: '25px', background: 'linear-gradient(90deg, rgba(12,45,78,1) 0%, rgba(28,104,180,1) 100%)', fontWeight:'bold' }}>
             {pageName.charAt(0).toUpperCase() + pageName.slice(1)}
           </Typography>
-          <Grid rows={rows} webformSchema={webformSchema} onFilterChange={handleFilterChange} pageName={pageName} />
+          <Grid rows={rows} webformSchema={webformSchema} onFilterChange={handleFilterChange} pageName={pageName} loading={loading} />
         </div>
       </div>
     </div>
