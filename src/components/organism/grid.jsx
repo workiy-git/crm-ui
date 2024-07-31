@@ -27,6 +27,7 @@ const Grid = ({ rows, webformSchema, onFilterChange, pageName, loading }) => {
   const navigate = useNavigate();
 
   useEffect(() => {
+    // Initialize validated data
     const validated = rows.map((data) => {
       const validatedData = {};
       webformSchema.forEach((field) => {
@@ -35,13 +36,20 @@ const Grid = ({ rows, webformSchema, onFilterChange, pageName, loading }) => {
       validatedData._id = data._id; // Ensure ObjectId is included for key
       return validatedData;
     });
-
+  
     setValidatedData(validated);
-
+  
+    // Initialize columns from schema
     const columns = webformSchema.map(field => ({ fieldName: field.fieldName, label: field.label })) || [];
+    
+    // Fetch saved visible columns from local storage or set all as default
+    const savedVisibleColumns = JSON.parse(localStorage.getItem('visibleColumns')) || columns;
+  
     setAvailableColumns(columns);
-    setVisibleColumns(columns);
+    setVisibleColumns(savedVisibleColumns);
+    setTempVisibleColumns(savedVisibleColumns);
   }, [rows, webformSchema]);
+  
 
   const totalPages = Math.ceil(rows.length / recordsPerPage);
   const startIndex = (pageNumber - 1) * recordsPerPage;
@@ -61,7 +69,6 @@ const Grid = ({ rows, webformSchema, onFilterChange, pageName, loading }) => {
     setAnchorEl(null);
     setCurrentRow(null);
   };
-
   const handleDetails = () => {
     handleMenuClose();
     navigate(`/details/${currentRow._id}`, { state: { rowData: currentRow, schema: webformSchema, pageName } });
@@ -89,9 +96,19 @@ const Grid = ({ rows, webformSchema, onFilterChange, pageName, loading }) => {
   };
 
   const handleApplyColumns = () => {
-    setVisibleColumns(tempVisibleColumns);
+    // Sort tempVisibleColumns based on webformSchema order
+    const sortedVisibleColumns = tempVisibleColumns.sort((a, b) => {
+      const indexA = webformSchema.findIndex(field => field.fieldName === a.fieldName);
+      const indexB = webformSchema.findIndex(field => field.fieldName === b.fieldName);
+      return indexA - indexB;
+    });
+  
+    setVisibleColumns(sortedVisibleColumns);
+    localStorage.setItem('visibleColumns', JSON.stringify(sortedVisibleColumns));
     closeColumnModal();
   };
+  
+  
 
   const handleSelectAll = () => {
     setTempVisibleColumns(availableColumns);
@@ -100,7 +117,6 @@ const Grid = ({ rows, webformSchema, onFilterChange, pageName, loading }) => {
   const handleDeselectAll = () => {
     setTempVisibleColumns([]);
   };
-
   const handleSearchChange = (columnName, value) => {
     setSearchTerms(prevSearchTerms => ({
       ...prevSearchTerms,
@@ -191,7 +207,6 @@ const Grid = ({ rows, webformSchema, onFilterChange, pageName, loading }) => {
       wrapper2.removeEventListener('scroll', handleWrapper2Scroll);
     };
   }, []);
-
   return (
     <div className="CallsGrid">
       <Box className="Appbar" sx={{ display: 'flex', justifyContent: 'space-around' }}>
@@ -201,9 +216,6 @@ const Grid = ({ rows, webformSchema, onFilterChange, pageName, loading }) => {
         </Button>
         <Dropdown pageName={pageName} onOptionSelected={handleFilterChange} />
         <div className="pagination-container">
-          <div className='tatoal-pageination-div'>
-            <Text style={{ marginRight: '20px' }}><span>Showing : </span><span className='pagination-current-page'>{startIndex + 1} - {Math.min(endIndex, rows.length)}</span><span> of </span><span className='pagination-current-page'>{rows.length}</span></Text>
-          </div>
           <Box className="pagination-box">
             <button
               onClick={() => setPageNumber(pageNumber - 1)}
@@ -225,37 +237,102 @@ const Grid = ({ rows, webformSchema, onFilterChange, pageName, loading }) => {
       </Box>
 
       <Box sx={{ height: 'inherit', overflowY: 'auto', overflowX: 'hidden' }}>
-        <div className="wrapper1" ref={wrapper1Ref}>
-          <div className="div1"></div>
-        </div>
-        <TableContainer style={{ border: '1px solid #808080', height: 'max-content', }}>
-          <div className="wrapper2" ref={wrapper2Ref}>
-            {loading ? (
-              <Loader />
-            ) : (
-              <Table>
-                <TableHead className='table-head' style={{ background: '#D9D9D9', border: '1px solid #D9D9D9' }}>
-                  <TableRow>
-                    {visibleColumns.map(column => (
-                      <TableCell key={column.fieldName}>
-                        <div style={{ display: 'flex', alignItems: 'center' }}>
-                          <span>{column.label}</span>
-                          <InputBase
-                            value={searchTerms[column.fieldName] || ''}
-                            onChange={(event) => handleSearchChange(column.fieldName, event.target.value)}
-                            placeholder={`Search ${column.label}`}
-                            inputProps={{ 'aria-label': `Search ${column.label}` }}
-                            sx={{
-                              width: '100%',
-                              padding: '6px 10px',
-                              fontSize: '0.8rem',
-                              border: 'none',
-                              outline: 'none',
-                              '&::placeholder': { color: 'rgba(0, 0, 0, 0.6)' },
-                              '& .MuiInputBase-input': { padding: 0 },
-                            }}
-                          />
-                        </div>
+      <div className="wrapper1" ref={wrapper1Ref}>
+        <div className="div1"></div>
+      </div>
+      <TableContainer style={{  border: '1px solid #808080', height: 'max-content', }}>
+        <div className="wrapper2" ref={wrapper2Ref}>
+          <Table>{/* style={{transform: 'rotate(180deg)'}} */}
+            <TableHead className='table-head' style={{ background: '#D9D9D9', color: 'white !important' }}>
+              <TableRow className='table-head-row'>
+                <TableCell style={{
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  textAlign: 'center',
+                  color: 'white'
+                }}>Actions</TableCell>
+                {visibleColumns.map((field) => (
+                  <TableCell
+                    key={field.fieldName}
+                    style={{
+                      whiteSpace: 'nowrap',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      textAlign: 'center',
+                      color: 'white'
+                    }}>{field.label}</TableCell>
+                ))}
+              </TableRow>
+            </TableHead>
+
+            <TableHead style={{ background: '#808080', color: 'white !important' }}>
+              <TableRow className='table-head-row'>
+                <TableCell style={{
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  textAlign: 'center',
+                  color: 'black',
+                  padding:'10px 15px'
+                }}><Text></Text></TableCell>
+                {visibleColumns.map((field) => (
+                  <TableCell key={field.fieldName} style={{ textAlign: 'center', color: 'black', padding:'10px 15px' }}>
+                    <InputBase
+                      onChange={(e) => handleSearchChange(field.fieldName, e.target.value)}
+                      inputProps={{ 'aria-label': 'search' }}
+                      className="searchBox"
+                    />
+                  </TableCell>
+                ))}
+              </TableRow>
+            </TableHead>
+
+            <TableBody className='table-body'>
+              {paginatedData
+                .filter((row) => {
+                  return Object.keys(searchTerms).every((columnName) => {
+                    const searchTerm = searchTerms[columnName];
+                    const value = row[columnName];
+                    return value.toLowerCase().includes(searchTerm);
+                  });
+                })
+                .map((row) => (
+                  <TableRow className='table-body-row' key={row._id}>
+                    <TableCell style={{
+                      whiteSpace: 'nowrap',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      textAlign: 'center',
+                      padding: '10px',
+                      fontWeight: 'bold'
+                    }}>
+                      <IconButton onClick={(event) => handleMenuOpen(event, row)}>
+                        <MoreVertIcon />
+                      </IconButton>
+                      <Menu
+                        anchorEl={anchorEl}
+                        open={Boolean(anchorEl)}
+                        onClose={handleMenuClose}
+                      >
+                        <MenuItem onClick={handleDetails}>Details</MenuItem>
+                        {/* <MenuItem onClick={handleEdit}>Edit</MenuItem> */}
+                        <MenuItem onClick={handleDelete}>Delete</MenuItem>
+                      </Menu>
+                    </TableCell>
+                    {visibleColumns.map((field) => (
+                      <TableCell
+                        key={field.fieldName}
+                        style={{
+                          whiteSpace: 'nowrap',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          textAlign: 'center',
+                          padding: '10px',
+                          fontWeight: 'bold'
+                        }}
+                      >
+                        {row[field.fieldName]}
                       </TableCell>
                     ))}
                     <TableCell>Actions</TableCell>
@@ -295,36 +372,66 @@ const Grid = ({ rows, webformSchema, onFilterChange, pageName, loading }) => {
       </Box>
 
       <Modal open={showColumnModal} onClose={closeColumnModal}>
-        <Box className="modal-style">
-          <Typography variant="h6">Column Chooser</Typography>
-          <Box>
-            <Button onClick={handleSelectAll}>Select All</Button>
-            <Button onClick={handleDeselectAll}>Deselect All</Button>
+  <Box
+    sx={{
+      position: 'absolute',
+      top: '50%',
+      left: '50%',
+      transform: 'translate(-50%, -50%)',
+      bgcolor: 'background.paper',
+      border: '2px solid #000',
+      boxShadow: 24,
+      p: 4,
+    }}
+  >
+    <Typography variant="h6" gutterBottom>
+      Configure Columns - Calls
+    </Typography>
+    <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+      <Box className="configure-columns" sx={{ flex: 1, marginRight: '10px' }}>
+        <Typography variant="subtitle1">Selected Columns</Typography>
+        {tempVisibleColumns.map((column) => (
+          <Box key={column.fieldName} sx={{ display: 'flex', alignItems: 'center', marginBottom: '8px' }}>
+            <input
+              type="checkbox"
+              checked={true}
+              onChange={(e) => {
+                if (!e.target.checked) {
+                  setTempVisibleColumns(tempVisibleColumns.filter(col => col.fieldName !== column.fieldName));
+                }
+              }}
+            />
+            <Typography sx={{ marginLeft: '8px' }}>{column.label}</Typography>
           </Box>
-          <Box>
-            {availableColumns.map(column => (
-              <label key={column.fieldName}>
-                <input
-                  type="checkbox"
-                  checked={tempVisibleColumns.includes(column)}
-                  onChange={(event) => {
-                    if (event.target.checked) {
-                      setTempVisibleColumns([...tempVisibleColumns, column]);
-                    } else {
-                      setTempVisibleColumns(tempVisibleColumns.filter(col => col !== column));
-                    }
-                  }}
-                />
-                {column.label}
-              </label>
-            ))}
+        ))}
+      </Box>
+      <Box className="configure-columns" sx={{ flex: 1 }}>
+        <Typography variant="subtitle1">Available Columns</Typography>
+        {availableColumns.filter(col => !tempVisibleColumns.some(vc => vc.fieldName === col.fieldName)).map((column) => (
+          <Box key={column.fieldName} sx={{ display: 'flex', alignItems: 'center', marginBottom: '8px' }}>
+            <input
+              type="checkbox"
+              checked={false}
+              onChange={(e) => {
+                if (e.target.checked) {
+                  setTempVisibleColumns([...tempVisibleColumns, column]);
+                }
+              }}
+            />
+            <Typography sx={{ marginLeft: '8px' }}>{column.label}</Typography>
           </Box>
-          <Box>
-            <Button onClick={handleApplyColumns}>Apply</Button>
-            <Button onClick={closeColumnModal}>Close</Button>
-          </Box>
-        </Box>
-      </Modal>
+        ))}
+      </Box>
+    </Box>
+    <Box sx={{ display: 'flex', justifyContent: 'flex-end', marginTop: '16px' }}>
+      <Button variant="contained" onClick={handleSelectAll}>Select All</Button>
+      <Button variant="contained" onClick={handleDeselectAll} sx={{ marginLeft: '8px' }}>Deselect All</Button>
+      <Button variant="contained" onClick={handleApplyColumns} sx={{ marginLeft: '8px' }}>Apply</Button>
+      <Button variant="contained" onClick={closeColumnModal} sx={{ marginLeft: '8px' }}>Close</Button>
+    </Box>
+  </Box>
+</Modal>
+
     </div>
   );
 };

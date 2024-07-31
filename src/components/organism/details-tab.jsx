@@ -27,8 +27,8 @@ export default function TabComponent() {
   }, []);
 
   return (
-    <div style={{ background: '#0d2d4e', padding: '5px', borderRadius: '10px', width: '85%' }}>
-      <Box sx={{ background: '#0d2d4e', borderRadius: '10px' }}>
+    <div style={{ padding: '5px', borderRadius: '10px', width: '85%' }}>
+      <Box sx={{ background: '#FFC03D', borderRadius: '10px', padding:'10px' }}>
         <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
             <Tabs
               value={value}
@@ -40,7 +40,7 @@ export default function TabComponent() {
                   key={index}
                   style={{
                     color: value === index ? '#0d2d4e' : '#ffffff',
-                    background: value === index ? '#ffffff' : '#0d2d4e',
+                    background: value === index ? '#ffffff' : '',
                     borderRadius: '5px 5px 0 0',
                     flexDirection: 'row',
                     gap: '10px'
@@ -55,8 +55,8 @@ export default function TabComponent() {
               ))}
             </Tabs>
         </Box>
-        {value === 0 && <Box><Update /></Box>}
-        {value === 1 && <Box><Comments /></Box>}
+        {value === 0 && <Box  style={{background:'white'}}><Update /></Box>}
+        {value === 1 && <Box  style={{background:'white'}}><Comments /></Box>}
         {/* Add similar conditional rendering for other tabs */}
       </Box>
     </div>

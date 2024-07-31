@@ -24,7 +24,7 @@ const Layout = ({ children }) => {
           <SideMenu />
         </div>
       )}
-      <div style={{ width: '100%', marginRight: "-10px", overflow: 'hidden' }}>
+      <div style={{ width: '100%', overflow: 'hidden' }}>
         {!isLoginPage && (
           <div>
             <Header />

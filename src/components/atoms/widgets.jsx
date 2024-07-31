@@ -7,10 +7,9 @@ import { useNavigate } from 'react-router-dom';
 import config from '../../config/config';
 import WidgetsIcon from '@mui/icons-material/WidgetsOutlined';
 import '../../assets/styles/style.css';
-import Loader from '../molecules/loader';
 
 const CreateWidgetItem = styled(Paper)(({ theme }) => ({
-  backgroundColor: '#DDE1E9 !important',
+  backgroundColor: '#4BB7D3 !important',
   ...theme.typography.body2,
   textAlign: 'center',
   color: theme.palette.text.secondary,
@@ -162,7 +161,7 @@ const CreateWidget = ({ backgroundColor, dashboardName }) => {
   const handleDragStart = (index) => {
     setDraggingIndex(index);
     setTimeout(() => {
-      document.querySelector(`.widget-${index}`).style.opacity = '1';
+      document.querySelector(`.widget-${index}`);
     }, 0);
   };
 
@@ -178,7 +177,7 @@ const CreateWidget = ({ backgroundColor, dashboardName }) => {
 
   const handleDragEnd = (index) => {
     setDraggingIndex(null);
-    document.querySelector(`.widget-${index}`).style.opacity = '1';
+    document.querySelector(`.widget-${index}`);
   };
 
   const handleWidgetClick = (widget) => {
@@ -205,51 +204,66 @@ const CreateWidget = ({ backgroundColor, dashboardName }) => {
     <ScrollContainer>
       <Box sx={{ flexGrow: 1 }}>
         <div style={{ width: '100%'}}>
-          <div style={{ position: 'absolute', top: '90%', right: '50px' }}>
-            <button style={{border:'none', alignItems:'center', display:'flex', padding:'8px', borderRadius:'5px'}} onClick={toggleShowHiddenWidgets}><WidgetsIcon /></button>
+          <div>
+            <button style={{border:'none', alignItems:'center', display:'flex', padding:'8px', borderRadius:'5px',marginRight:'5%', marginTop:'10px', marginLeft:'auto'}} onClick={toggleShowHiddenWidgets}><WidgetsIcon /></button>
           </div>
-          {showHiddenWidgets && hiddenWidgets.length > 0 && (
-            <div
-              ref={hiddenWidgetsRef}
-              style={{ position: 'absolute', top: '50%', right: '8%', background:'white', padding:'20px', maxHeight:'30%', overflow:'auto', borderRadius:'5px' }}
-            >
-              {hiddenWidgets.map((widget, index) => (
-                <div key={index}>
-                  <div
-                    style={{ display:'flex', background:'rgb(255, 192, 61)', padding:'5px', borderRadius:'5px', margin:'10px' }}
-                  > <div style={{ display:'flex', cursor:'pointer'}} onClick={() => handleRestoreWidget(index)}>
-                    <div style={{ background: 'white', borderRadius: '100px', padding: '5px', margin: 'auto', display: 'flex', marginRight:'5px' }}>
-                        <img style={{ height: '15px', width: 'auto', margin: 'auto', filter: 'brightness(0) saturate(100%) invert(50%) sepia(100%) saturate(500%) hue-rotate(190deg)' }} src={widget.icon_url || 'default_icon_url'} alt={widget.title} />
-                      </div>
-                    <div
-                    style={{marginRight:'5px'}}
-                      variant="contained"
-                      color="primary"
-                    >{widget.title }
-                    </div>
-                  </div>
-                  </div>
-                  
-                </div>
-              ))}
+          {showHiddenWidgets && (
+  <div
+    ref={hiddenWidgetsRef}
+    style={{ position: 'absolute', zIndex:'10', background: 'white', padding: '20px', maxHeight: '30%', top:'25%',right:'2%', overflow: 'auto', borderRadius: '5px' }}
+  >
+    <div style={{ borderBottom: '1px dashed gray', textAlign: 'center', marginBottom: '10px' }}>Available Filters</div>
+    {hiddenWidgets.length > 0 ? (
+      hiddenWidgets.map((widget, index) => (
+        <div key={index}>
+          <div
+            style={{ display: 'flex', background: '#212529', color:'white', padding: '5px', borderRadius: '5px', margin: '10px' }}
+          >
+            <div style={{ display: 'flex', cursor: 'pointer' }} onClick={() => handleRestoreWidget(index)}>
+              <div style={{ background: '#fff6', borderRadius: '100px', padding: '5px', margin: 'auto', display: 'flex', marginRight: '5px' }}>
+                <img style={{ height: '15px', width: 'auto', margin: 'auto', filter: 'brightness(0) invert(1)' }} src={widget.icon_url || 'default_icon_url'} alt={widget.title} />
+              </div>
+              <div style={{ marginRight: '5px' }}>{widget.title} </div>
             </div>
-          )}
-          {loading ? (
-            <Loader />
-          ) : (
-            widgets.map((widget, index) => (
-              <div
-                className={`widget-${index} widget-main`}
-                key={index}
-                item
-                draggable
-                onDragStart={() => handleDragStart(index)}
-                onDragEnter={() => handleDragEnter(index)}
-                onDragEnd={() => handleDragEnd(index)}
-                style={{ width: '250px', height: 'auto', margin:'20px', float: 'left', background:'#DDE1E9 !important' }}
+          </div>
+        </div>
+      ))
+    ) : (
+      <div style={{ textAlign: 'center', color: 'gray', marginTop: '10px' }}>No filters available</div>
+    )}
+  </div>
+)}
+
+          {widgets.length > 0 ? widgets.map((widget, index) => (
+            <div
+              className={`widget-${index} widget-main`}
+              key={index}
+              item
+              draggable
+              onDragStart={() => handleDragStart(index)}
+              onDragEnter={() => handleDragEnter(index)}
+              onDragEnd={() => handleDragEnd(index)}
+              style={{ width: '250px', height: 'auto', margin:'20px', float: 'left' }}
+            >
+              <div style={{ textAlign: 'end', marginBottom:'-20px', marginRight:'5px' }}>
+                <button className='widget-hide-btn' style={{position:'relative', border:'none', background:'wihite', borderRadius:'100px', cursor:'pointer'}} onClick={() => handleHideWidget(index)}>-</button>
+              </div>
+              <CreateWidgetItem
+                style={{ background:'#4BB7D3 !important' }}
               >
-                <div style={{ textAlign: 'end', marginBottom:'-20px', marginRight:'5px' }}>
-                  <button className='widget-hide-btn' style={{position:'relative', border:'none', background:'wihite', borderRadius:'100px', cursor:'pointer'}} onClick={() => handleHideWidget(index)}>-</button>
+                <Icon>
+                  <div style={{ background: '#fff6', borderRadius: '100px', padding: '20px', margin: 'auto', display: 'flex' }}>
+                    <img style={{ height: '30px', width: 'auto', margin: 'auto', filter: 'brightness(0) invert(1)' }} src={widget.icon_url || 'default_icon_url'} alt={widget.title} />
+                  </div>
+                </Icon>
+                <div
+                  variant="contained"
+                  color="primary"
+                  onClick={() => handleWidgetClick(widget)}
+                  style={{ width: '60%', height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}
+                >
+                  <Title>{widget.title}</Title>
+                  <Count>{counts[widget.name] !== undefined ? counts[widget.name] : 'Loading...'}</Count>
                 </div>
                 <CreateWidgetItem
                   style={{ background:'#DDE1E9 !important' }}
