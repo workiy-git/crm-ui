@@ -126,6 +126,7 @@ const CreateWidget = ({ backgroundColor, dashboardName }) => {
   const [draggingIndex, setDraggingIndex] = useState(null);
   const navigate = useNavigate();
   const hiddenWidgetsRef = useRef(null);
+  const [filter, setFilter] = React.useState({});
 
   useEffect(() => {
     const fetchData = async () => {
@@ -178,11 +179,68 @@ const CreateWidget = ({ backgroundColor, dashboardName }) => {
     document.querySelector(`.widget-${index}`).style.opacity = '1';
   };
 
-  const handleWidgetClick = (widget) => {
-    navigate(widget.apiRedirectEndpoint, {
-      state: { filter: widget.apiRedirectEndpointFilter }
+//   const handleWidgetClick = (widget) => {
+//     // Create the filter object based on widget data
+//     const filter = widget.apiRedirectEndpointFilter || {}; // Assume this is an object
+    
+//     // Convert filter to JSON string and remove unwanted characters
+//     const compactFilterString = JSON.stringify(filter).replace(/\\/g, '');
+    
+//     // Store the cleaned filter string in localStorage
+//     localStorage.setItem('widgetFilter', compactFilterString);
+    
+//     // Navigate to the specified endpoint
+//     navigate(widget.apiRedirectEndpoint);
+// };
+
+const handleWidgetClick = (widget) => {
+  // Log the entire apiRedirectEndpointFilter object for debugging
+  console.log('apiRedirectEndpointFilter:', widget.apiRedirectEndpointFilter);
+
+  // Log the type of apiRedirectEndpointFilter
+  console.log('Type of apiRedirectEndpointFilter:', typeof widget.apiRedirectEndpointFilter);
+
+  // Parse apiRedirectEndpointFilter if it's a string
+  let apiRedirectEndpointFilter = widget.apiRedirectEndpointFilter;
+  if (typeof apiRedirectEndpointFilter === 'string') {
+    try {
+      apiRedirectEndpointFilter = JSON.parse(apiRedirectEndpointFilter);
+    } catch (error) {
+      console.error('Failed to parse apiRedirectEndpointFilter:', error);
+      return;
+    }
+  }
+
+  // Check if apiRedirectEndpointFilter is an array
+  if (Array.isArray(apiRedirectEndpointFilter)) {
+    apiRedirectEndpointFilter.forEach((filter, index) => {
+      console.log(`Filter ${index}:`, filter);
+
+      // Extract $match object
+      const matchObj = filter?.$match;
+      if (matchObj) {
+        // Extract the value of the filter key that is not 'pageName'
+        const filterKey = Object.keys(matchObj).find(key => key !== 'pageName');
+        const filterValue = matchObj[filterKey];
+        console.log('Filter value:', filterValue);
+
+        // Check if filterValue is not empty before storing it in localStorage
+        if (filterValue) {
+          // Store the filter value in localStorage with the appropriate key
+          localStorage.setItem('widgetFilter', JSON.stringify({ [filterKey]: filterValue }));
+          console.log('Stored filter value in localStorage:', { [filterKey]: filterValue });
+        } else {
+          console.warn('No relevant filter value found in filter');
+        }
+      }
     });
-  };
+  } else {
+    console.warn('apiRedirectEndpointFilter is not an array');
+  }
+
+  // Navigate to the endpoint
+  navigate(widget.apiRedirectEndpoint);
+};
 
   const handleHideWidget = (index) => {
     setHiddenWidgets([...hiddenWidgets, widgets[index]]);
