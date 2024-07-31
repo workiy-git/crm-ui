@@ -193,7 +193,6 @@ function Home() {
         <div
           style={{
             width: "100%",
-            marginRight: "-10px",
             backgroundColor: backgroundColor,
             overflow: "hidden",
           }}
