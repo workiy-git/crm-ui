@@ -1,22 +1,26 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { Typography } from '@mui/material';
 import axios from 'axios';
 import Grid from '../organism/grid';
 import config from '../../config/config';
-import Loader from '../molecules/loader'; // Assuming Loader component is located here
+import Loader from '../molecules/loader';
 
 const Container = () => {
   const { pageName } = useParams();
   const endpoint = '/appdata/retrieve';
-  const [backgroundColor] = useState(localStorage.getItem('backgroundColor') || '#d9d9d9');
+  
+  const [backgroundColor] = useState(() => {
+    return localStorage.getItem('backgroundColor') || '#d9d9d9';
+  });
+
   const [rows, setRows] = useState([]);
   const [webformSchema, setWebformSchema] = useState([]);
   const [errors, setErrors] = useState('');
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(true);  // Manage loading state
 
-  const fetchData = useCallback(async (filter = {}) => {
-    setLoading(true);
+  const fetchData = async (filter = {}) => {
+    setLoading(true);  // Set loading to true before fetching data
     try {
       const postData = [
         {
@@ -43,13 +47,13 @@ const Container = () => {
       console.error('Error fetching data:', error);
       setErrors('Error fetching data');
     } finally {
-      setLoading(false);
+      setLoading(false);  // Set loading to false after data is fetched
     }
-  }, [endpoint, pageName]);
+  };
 
   useEffect(() => {
     fetchData();
-  }, [fetchData]);
+  }, [endpoint, pageName]);
 
   const handleFilterChange = (filter) => {
     fetchData(filter);
@@ -59,10 +63,11 @@ const Container = () => {
     <div style={{ height: '100vh', display: "flex", flexDirection: "column", overflow: 'hidden' }}>
       <div style={{ display: 'flex', height: '-webkit-fill-available', overflow: 'hidden' }}>
         <div style={{ width: '100%', backgroundColor: backgroundColor, overflow: 'hidden' }}>
+
           <Typography style={{ color: 'white', padding: '5px 10px', fontSize: '25px', background: 'linear-gradient(90deg, rgba(12,45,78,1) 0%, rgba(28,104,180,1) 100%)', fontWeight:'bold' }}>
             {pageName.charAt(0).toUpperCase() + pageName.slice(1)}
           </Typography>
-          {loading ? <Loader /> : <Grid rows={rows} webformSchema={webformSchema} onFilterChange={handleFilterChange} pageName={pageName} />}
+          <Grid rows={rows} webformSchema={webformSchema} onFilterChange={handleFilterChange} pageName={pageName} loading={loading} />
         </div>
       </div>
     </div>

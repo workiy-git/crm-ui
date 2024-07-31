@@ -4,12 +4,8 @@ import axios from "axios";
 import {
   Button,
   Typography,
-  TextField,
   Grid,
-  OutlinedInput,
-  InputLabel,
   InputAdornment,
-  IconButton,
   FormControl,
 } from "@mui/material";
 import config from "../../config/config";
@@ -27,7 +23,6 @@ function Loginpage() {
   const [password, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [companylogoData, setcompanylogoData] = useState({});
-  const [currentIndex, setCurrentIndex] = useState(0);
   const [allFieldsFilled, setAllFieldsFilled] = useState(false);
   const [showPassword, setShowPassword] = React.useState(false);
 

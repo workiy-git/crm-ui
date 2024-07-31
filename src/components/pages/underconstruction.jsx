@@ -1,17 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import Header from '../organism/header';
-import SideMenu from "../organism/sidemenu";
 import Footer from '../atoms/Footer';
 import config from '../../config/config';
 import Icon from '../../assets/underconstruction.png';
 
 function Underconstruction() {
-  const [backgroundColor, setBackgroundColor] = useState(() => {
+  const [backgroundColor] = useState(() => {
     return localStorage.getItem('backgroundColor') || '#d9d9d9';
   });
-
-  const [selectedWidgets, setSelectedWidgets] = useState([]);
   const [homeData, setHomeData] = useState(null);
 
   useEffect(() => {
@@ -34,15 +30,6 @@ function Underconstruction() {
       document.title = 'Default Title';
     };
   }, []);
-
-  const handleSaveSelectedText = (texts) => {
-    setSelectedWidgets(texts);
-  };
-
-  const handleColorChange = (color) => {
-    setBackgroundColor(color);
-    localStorage.setItem('backgroundColor', color);
-  };
 
   const randomGradientColors = [];
   function generateRandomLightColor() {

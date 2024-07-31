@@ -1,22 +1,18 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { styled, alpha } from '@mui/material/styles';
 import InputBase from '@mui/material/InputBase';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Box, Button, Modal, Typography, IconButton, Menu, MenuItem } from '@mui/material';
 import Text from '@mui/material/Typography';
-import WidgetsOutlinedIcon from '@mui/icons-material/WidgetsOutlined';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
-import SearchIcon from '@mui/icons-material/Search';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import axios from 'axios';
 import config from '../../config/config';
 import '../../assets/styles/callsgrid.css';
 import ActionButton from '../atoms/actionbutton';
-import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
-
 import Dropdown from '../atoms/dropdown';
 import { useNavigate } from 'react-router-dom';
+import Loader from '../molecules/loader';
 
-const Grid = ({ rows, webformSchema, onFilterChange, pageName }) => {
+const Grid = ({ rows, webformSchema, onFilterChange, pageName, loading }) => {
   const [modalOpen, setModalOpen] = useState(false);
   const [pageNumber, setPageNumber] = useState(1);
   const [recordsPerPage, setRecordsPerPage] = useState(15);
@@ -28,7 +24,6 @@ const Grid = ({ rows, webformSchema, onFilterChange, pageName }) => {
   const [currentRow, setCurrentRow] = useState(null);
   const [tempVisibleColumns, setTempVisibleColumns] = useState([]);
   const [searchTerms, setSearchTerms] = useState({});
-  const [sortConfig, setSortConfig] = useState({ key: '', direction: 'asc' });
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -67,15 +62,9 @@ const Grid = ({ rows, webformSchema, onFilterChange, pageName }) => {
     setCurrentRow(null);
   };
 
-  const handleEdit = () => {
-    handleMenuClose();
-    navigate(`/edit/${currentRow._id}`, { state: { rowData: currentRow, schema: webformSchema, pageName } });
-  };
-  
-
   const handleDetails = () => {
     handleMenuClose();
-    navigate(`/details/${currentRow._id}`, { state: { rowData: currentRow } });
+    navigate(`/details/${currentRow._id}`, { state: { rowData: currentRow, schema: webformSchema, pageName } });
   };
 
   const handleDelete = async () => {
@@ -111,38 +100,6 @@ const Grid = ({ rows, webformSchema, onFilterChange, pageName }) => {
   const handleDeselectAll = () => {
     setTempVisibleColumns([]);
   };
-
-
-  const handleSort = (column) => {
-    let direction = 'asc';
-    if (sortConfig.key === column && sortConfig.direction === 'asc') {
-      direction = 'desc';
-    }
-    setSortConfig({ key: column, direction });
-
-    const sortedData = [...validatedData].sort((a, b) => {
-      if (a[column] < b[column]) {
-        return direction === 'asc' ? -1 : 1;
-      }
-      if (a[column] > b[column]) {
-        return direction === 'asc' ? 1 : -1;
-      }
-      return 0;
-    });
-
-    setValidatedData(sortedData);
-  };
-
-  const renderSortIcon = (column) => {
-    if (sortConfig.key !== column) {
-      return <KeyboardArrowDownIcon />;
-    }
-    if (sortConfig.direction === 'asc') {
-      return <KeyboardArrowUpIcon />;
-    }
-    return <KeyboardArrowDownIcon />;
-  };
-
 
   const handleSearchChange = (columnName, value) => {
     setSearchTerms(prevSearchTerms => ({
@@ -238,17 +195,14 @@ const Grid = ({ rows, webformSchema, onFilterChange, pageName }) => {
   return (
     <div className="CallsGrid">
       <Box className="Appbar" sx={{ display: 'flex', justifyContent: 'space-around' }}>
-        {/* <ActionButton /> */}
+        <ActionButton />
         <Button sx={{ color: 'black' }} onClick={() => setShowColumnModal(true)}>
-          <WidgetsOutlinedIcon />
-          {/* Columns <KeyboardArrowDownIcon /> */}
+          Columns <KeyboardArrowDownIcon />
         </Button>
         <Dropdown pageName={pageName} onOptionSelected={handleFilterChange} />
         <div className="pagination-container">
           <div className='tatoal-pageination-div'>
-            {/* <Text style={{ marginRight: '20px' }}><span>Showing : </span><span className='pagination-current-page'>{startIndex + 1} - {Math.min(endIndex, rows.length)}</span><span> of </span><span className='pagination-current-page'>{rows.length}</span></Text> */}
-            {/* <span style={{ marginRight: '20px' }}>{`Showing ${rows.length}`}</span> */}
-            {/* <span style={{ border: '1px solid #98BCFD', padding: '8px', borderRadius: '5px' }}>{`Page ${pageNumber} of ${totalPages}`}</span> */}
+            <Text style={{ marginRight: '20px' }}><span>Showing : </span><span className='pagination-current-page'>{startIndex + 1} - {Math.min(endIndex, rows.length)}</span><span> of </span><span className='pagination-current-page'>{rows.length}</span></Text>
           </div>
           <Box className="pagination-box">
             <button
@@ -271,189 +225,103 @@ const Grid = ({ rows, webformSchema, onFilterChange, pageName }) => {
       </Box>
 
       <Box sx={{ height: 'inherit', overflowY: 'auto', overflowX: 'hidden' }}>
-      <div className="wrapper1" ref={wrapper1Ref}>
-        <div className="div1"></div>
-      </div>
-      <TableContainer style={{  border: '1px solid #808080', height: 'max-content', }}>
-        <div className="wrapper2" ref={wrapper2Ref}>
-          <Table>
-            <TableHead className='table-head' style={{ background: '#D9D9D9', color: 'white !important' }}>
-              <TableRow className='table-head-row'>
-                <TableCell style={{
-                  whiteSpace: 'nowrap',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  textAlign: 'center',
-                  color: 'white'
-                }}>Actions</TableCell>
-                {visibleColumns.map((field) => (
-                  <TableCell
-                    key={field.fieldName}
-                    onClick={() => handleSort(field.fieldName)}
-                    style={{
-                      whiteSpace: 'nowrap',
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis',
-                      textAlign: 'center',
-                      color: 'white'
-                    }}>{field.label}
-                    {renderSortIcon(field.fieldName)}</TableCell>
-                ))}
-              </TableRow>
-            </TableHead>
-
-            <TableHead style={{ background: '#DADEFD', color: 'white !important' }}>
-              <TableRow className='table-head-row'>
-                <TableCell style={{
-                  whiteSpace: 'nowrap',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  textAlign: 'center',
-                  color: 'black',
-                  padding:'10px 15px'
-                }}></TableCell>
-                {visibleColumns.map((field) => (
-                  <TableCell key={field.fieldName} style={{ textAlign: 'center', color: 'black', padding:'10px 15px' }}>
-                    <InputBase
-                      placeholder={`Search`}
-                      onChange={(e) => handleSearchChange(field.fieldName, e.target.value)}
-                      inputProps={{ 'aria-label': 'search' }}
-                      className="searchBox"
-                    />
-                  </TableCell>
-                ))}
-              </TableRow>
-            </TableHead>
-
-            <TableBody className='table-body'>
-              {paginatedData
-                .filter((row) => {
-                  return Object.keys(searchTerms).every((columnName) => {
-                    const searchTerm = searchTerms[columnName];
-                    const value = row[columnName];
-                    return value.toLowerCase().includes(searchTerm);
-                  });
-                })
-                .map((row) => (
-                  <TableRow className='table-body-row' key={row._id}>
-                    <TableCell style={{
-                      whiteSpace: 'nowrap',
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis',
-                      textAlign: 'center',
-                      padding: '10px',
-                      fontWeight: 'bold'
-                    }}>
-                      <IconButton onClick={(event) => handleMenuOpen(event, row)}>
-                        <MoreVertIcon />
-                      </IconButton>
-                      <Menu
-                        anchorEl={anchorEl}
-                        open={Boolean(anchorEl)}
-                        onClose={handleMenuClose}
-                      >
-                        <MenuItem onClick={handleDetails}>Details</MenuItem>
-                        <MenuItem onClick={handleEdit}>Edit</MenuItem>
-                        <MenuItem onClick={handleDelete}>Delete</MenuItem>
-                      </Menu>
-                    </TableCell>
-                    {visibleColumns.map((field) => (
-                      <TableCell
-                        key={field.fieldName}
-                        style={{
-                          whiteSpace: 'nowrap',
-                          overflow: 'hidden',
-                          textOverflow: 'ellipsis',
-                          textAlign: 'center',
-                          padding: '10px',
-                          fontWeight: 'bold'
-                        }}
-                      >
-                        {row[field.fieldName]}
+        <div className="wrapper1" ref={wrapper1Ref}>
+          <div className="div1"></div>
+        </div>
+        <TableContainer style={{ border: '1px solid #808080', height: 'max-content', }}>
+          <div className="wrapper2" ref={wrapper2Ref}>
+            {loading ? (
+              <Loader />
+            ) : (
+              <Table>
+                <TableHead className='table-head' style={{ background: '#D9D9D9', border: '1px solid #D9D9D9' }}>
+                  <TableRow>
+                    {visibleColumns.map(column => (
+                      <TableCell key={column.fieldName}>
+                        <div style={{ display: 'flex', alignItems: 'center' }}>
+                          <span>{column.label}</span>
+                          <InputBase
+                            value={searchTerms[column.fieldName] || ''}
+                            onChange={(event) => handleSearchChange(column.fieldName, event.target.value)}
+                            placeholder={`Search ${column.label}`}
+                            inputProps={{ 'aria-label': `Search ${column.label}` }}
+                            sx={{
+                              width: '100%',
+                              padding: '6px 10px',
+                              fontSize: '0.8rem',
+                              border: 'none',
+                              outline: 'none',
+                              '&::placeholder': { color: 'rgba(0, 0, 0, 0.6)' },
+                              '& .MuiInputBase-input': { padding: 0 },
+                            }}
+                          />
+                        </div>
                       </TableCell>
                     ))}
+                    <TableCell>Actions</TableCell>
                   </TableRow>
-                ))}
-            </TableBody>
-          </Table>
-        </div>
-      </TableContainer>
-    </Box>
-
-      {/* Modals */}
-      <Modal open={modalOpen} onClose={() => setModalOpen(false)}>
-        <Box
-          component="form"
-          sx={{
-            margin: '50px auto',
-            padding: '20px',
-            backgroundColor: 'white',
-            maxWidth: '500px',
-          }}
-        >
-          <Button type="submit" variant="contained" color="primary">
-            Save
-          </Button>
-        </Box>
-      </Modal>
+                </TableHead>
+                <TableBody>
+                  {paginatedData.map((row) => (
+                    <TableRow key={row._id}>
+                      {visibleColumns.map(column => (
+                        <TableCell key={column.fieldName}>{row[column.fieldName]}</TableCell>
+                      ))}
+                      <TableCell>
+                        <IconButton
+                          aria-controls="simple-menu"
+                          aria-haspopup="true"
+                          onClick={(event) => handleMenuOpen(event, row)}
+                        >
+                          <MoreVertIcon />
+                        </IconButton>
+                        <Menu
+                          anchorEl={anchorEl}
+                          keepMounted
+                          open={Boolean(anchorEl)}
+                          onClose={handleMenuClose}
+                        >
+                          <MenuItem onClick={handleDetails}>Details</MenuItem>
+                          <MenuItem onClick={handleDelete}>Delete</MenuItem>
+                        </Menu>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            )}
+          </div>
+        </TableContainer>
+      </Box>
 
       <Modal open={showColumnModal} onClose={closeColumnModal}>
-        <Box
-          sx={{
-            position: 'absolute',
-            top: '50%',
-            left: '50%',
-            transform: 'translate(-50%, -50%)',
-            bgcolor: 'background.paper',
-            border: '2px solid #000',
-            boxShadow: 24,
-            p: 4,
-          }}
-        >
-          <Typography variant="h6" gutterBottom>
-            Configure Columns - Calls
-          </Typography>
-          <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-            <Box className="configure-columns" sx={{ flex: 1, marginRight: '10px' }}>
-              <Typography variant="subtitle1">Selected Columns</Typography>
-              {tempVisibleColumns.map((column) => (
-                <Box key={column.fieldName} sx={{ display: 'flex', alignItems: 'center', marginBottom: '8px' }}>
-                  <input
-                    type="checkbox"
-                    checked={true}
-                    onChange={(e) => {
-                      if (!e.target.checked) {
-                        setTempVisibleColumns(tempVisibleColumns.filter(col => col.fieldName !== column.fieldName));
-                      }
-                    }}
-                  />
-                  <Typography sx={{ marginLeft: '8px' }}>{column.label}</Typography>
-                </Box>
-              ))}
-            </Box>
-            <Box className="configure-columns" sx={{ flex: 1 }}>
-              <Typography variant="subtitle1">Available Columns</Typography>
-              {availableColumns.filter(col => !tempVisibleColumns.some(vc => vc.fieldName === col.fieldName)).map((column) => (
-                <Box key={column.fieldName} sx={{ display: 'flex', alignItems: 'center', marginBottom: '8px' }}>
-                  <input
-                    type="checkbox"
-                    checked={false}
-                    onChange={(e) => {
-                      if (e.target.checked) {
-                        setTempVisibleColumns([...tempVisibleColumns, column]);
-                      }
-                    }}
-                  />
-                  <Typography sx={{ marginLeft: '8px' }}>{column.label}</Typography>
-                </Box>
-              ))}
-            </Box>
+        <Box className="modal-style">
+          <Typography variant="h6">Column Chooser</Typography>
+          <Box>
+            <Button onClick={handleSelectAll}>Select All</Button>
+            <Button onClick={handleDeselectAll}>Deselect All</Button>
           </Box>
-          <Box sx={{ display: 'flex', justifyContent: 'flex-end', marginTop: '16px' }}>
-            <Button variant="contained" onClick={handleSelectAll}>Select All</Button>
-            <Button variant="contained" onClick={handleDeselectAll} sx={{ marginLeft: '8px' }}>Deselect All</Button>
-            <Button variant="contained" onClick={handleApplyColumns} sx={{ marginLeft: '8px' }}>Apply</Button>
-            <Button variant="contained" onClick={closeColumnModal} sx={{ marginLeft: '8px' }}>Close</Button>
+          <Box>
+            {availableColumns.map(column => (
+              <label key={column.fieldName}>
+                <input
+                  type="checkbox"
+                  checked={tempVisibleColumns.includes(column)}
+                  onChange={(event) => {
+                    if (event.target.checked) {
+                      setTempVisibleColumns([...tempVisibleColumns, column]);
+                    } else {
+                      setTempVisibleColumns(tempVisibleColumns.filter(col => col !== column));
+                    }
+                  }}
+                />
+                {column.label}
+              </label>
+            ))}
+          </Box>
+          <Box>
+            <Button onClick={handleApplyColumns}>Apply</Button>
+            <Button onClick={closeColumnModal}>Close</Button>
           </Box>
         </Box>
       </Modal>

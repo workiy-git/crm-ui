@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import Header from '../organism/header';
-import SideMenu from '../organism/sidemenu';
 import { useNavigate } from 'react-router-dom';
 import { Typography, Button, Paper, TextField } from '@mui/material'; // Import TextField for editing
 import config from '../../config/config';
