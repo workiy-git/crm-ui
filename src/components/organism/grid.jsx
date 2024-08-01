@@ -464,7 +464,7 @@ import '../../assets/styles/callsgrid.css';
 import ActionButton from '../atoms/actionbutton';
 import Dropdown from '../atoms/dropdown';
 import { useNavigate } from 'react-router-dom';
-// import * as XLSX from 'xlsx'; // Import xlsx for Excel file generation
+import * as XLSX from 'xlsx'; // Import xlsx for Excel file generation
 
 const Grid = ({ rows, webformSchema, onFilterChange, pageName }) => {
   const [modalOpen, setModalOpen] = useState(false);
@@ -714,12 +714,12 @@ const Grid = ({ rows, webformSchema, onFilterChange, pageName }) => {
     }
 
     // Create a new workbook and add the data
-    // const wb = XLSX.utils.book_new();
-    // const ws = XLSX.utils.json_to_sheet(selectedData);
-    // XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
+    const wb = XLSX.utils.book_new();
+    const ws = XLSX.utils.json_to_sheet(selectedData);
+    XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
 
-    // // Generate the Excel file and trigger download
-    // XLSX.writeFile(wb, 'selected_data.xlsx');
+    // Generate the Excel file and trigger download
+    XLSX.writeFile(wb, 'selected_data.xlsx');
   };
 
   return (
