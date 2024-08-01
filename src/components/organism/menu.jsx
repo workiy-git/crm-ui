@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import AddFeature from "../atoms/add_feature";
 import SlideButton from '../atoms/slide_button';
-import CreateWidget from '../atoms/widgets';
+import WidgetsList from '../molecules/WidgetList';
 import { AppBar, Toolbar, IconButton, Button, Box } from '@material-ui/core';
 import '../../assets/styles/MenuComponent.css';
 import config from '../../config/config';  // Ensure the correct path to config file
@@ -58,58 +58,68 @@ const MenuComponent = ({ backgroundColor, onSaveSelectedText }) => {
     setScrollIndex(Math.min(selectedTexts.length - 6, scrollIndex + 1));
   };
 
-  const handleButtonClick = async (index, texts = selectedTexts) => {
+  // const handleButtonClick = async (index, texts = selectedTexts) => {
+  //   setSelectedButtonIndex(index);
+  //   localStorage.setItem(selectedButtonIndexKey, index);
+
+  //   if (texts.length > index && index >= 0) {
+  //     const selectedMenuKey = texts[index].title.toLowerCase(); // Convert title to lowercase
+  //     console.log('Selected Menu Key:', selectedMenuKey);
+
+  //     try {
+  //       const response = await axios.post(
+  //         `${config.apiUrl}/dashboards/retrieve`,
+  //         [
+  //           {
+  //             "$match": {
+  //               "dashboardName": selectedMenuKey
+  //             }
+  //           },
+  //           {
+  //             "$sort": { "createdAt": -1 }
+  //           }
+  //         ],
+  //         {
+  //           headers: {
+  //             'Content-Type': 'application/json',
+  //           }
+  //         }
+  //       );
+  //       console.log('dashboardName:', selectedMenuKey); // Log selected menu key for inspection
+  //       console.log('Response Data:', response.data); // Log entire response data for inspection
+
+  //       if (response.status === 200 && response.data && response.data.data) {
+  //         const fetchedWidgets = response.data.data;
+  //         console.log('Fetched Widgets:', fetchedWidgets); // Log fetched widgets for inspection
+
+  //         // Filter widgets based on selectedMenuKey
+  //         const matchedWidgets = fetchedWidgets.filter(widget => widget.dashboardName === selectedMenuKey);
+  //         console.log('Matched Widgets:', matchedWidgets); // Log matched widgets for inspection
+
+  //         setWidgets(matchedWidgets); // Set state with filtered widgets
+  //         setDashboardName(selectedMenuKey); // Set dashboardName state
+  //       } else {
+  //         console.log('No widget data found or incorrect structure');
+  //         setWidgets([]);
+  //         setDashboardName(null);
+  //       }
+  //     } catch (error) {
+  //       console.error('Error retrieving widgets data:', error);
+  //       setWidgets([]);
+  //       setDashboardName(null);
+  //     }
+  //   } else {
+  //     console.error('Invalid index or selectedTexts array');
+  //   }
+  // };
+
+  const handleButtonClick = (index, texts = selectedTexts) => {
     setSelectedButtonIndex(index);
     localStorage.setItem(selectedButtonIndexKey, index);
 
     if (texts.length > index && index >= 0) {
       const selectedMenuKey = texts[index].title.toLowerCase(); // Convert title to lowercase
-      console.log('Selected Menu Key:', selectedMenuKey);
-
-      try {
-        const response = await axios.post(
-          `${config.apiUrl}/dashboards/retrieve`,
-          [
-            {
-              "$match": {
-                "dashboardName": selectedMenuKey
-              }
-            },
-            {
-              "$sort": { "createdAt": -1 }
-            }
-          ],
-          {
-            headers: {
-              'Content-Type': 'application/json',
-            }
-          }
-        );
-
-        console.log('Response Data:', response.data); // Log entire response data for inspection
-
-        if (response.status === 200 && response.data && response.data.data) {
-          const fetchedWidgets = response.data.data;
-          console.log('Fetched Widgets:', fetchedWidgets); // Log fetched widgets for inspection
-
-          // Filter widgets based on selectedMenuKey
-          const matchedWidgets = fetchedWidgets.filter(widget => widget.dashboardName === selectedMenuKey);
-          console.log('Matched Widgets:', matchedWidgets); // Log matched widgets for inspection
-
-          setWidgets(matchedWidgets); // Set state with filtered widgets
-          setDashboardName(selectedMenuKey); // Set dashboardName state
-        } else {
-          console.log('No widget data found or incorrect structure');
-          setWidgets([]);
-          setDashboardName(null);
-        }
-      } catch (error) {
-        console.error('Error retrieving widgets data:', error);
-        setWidgets([]);
-        setDashboardName(null);
-      }
-    } else {
-      console.error('Invalid index or selectedTexts array');
+      setDashboardName(selectedMenuKey);
     }
   };
 
@@ -149,7 +159,7 @@ const MenuComponent = ({ backgroundColor, onSaveSelectedText }) => {
         </Toolbar>
       </AppBar>
       {dashboardName && (
-        <CreateWidget backgroundColor={backgroundColor} dashboardName={dashboardName} />
+        <WidgetsList backgroundColor={backgroundColor} dashboardName={dashboardName} />
       )}
     </>
   );
