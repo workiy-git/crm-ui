@@ -708,23 +708,54 @@ const Grid = ({ rows, webformSchema, onFilterChange, pageName }) => {
 
   const handleDownloadExcel = () => {
     const selectedData = validatedData.filter(row => selectedRows.has(row._id));
-    if (selectedData.length === 0) {
-      alert('No rows selected');
-      return;
-    }
+  if (selectedData.length === 0) {
+    alert('No rows selected');
+    return;
+  }
 
-    // Create a new workbook and add the data
-    const wb = XLSX.utils.book_new();
-    const ws = XLSX.utils.json_to_sheet(selectedData);
-    XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
+  // Create a new workbook and add the data
+  const ws = XLSX.utils.json_to_sheet(selectedData);
+  const csvData = XLSX.utils.sheet_to_csv(ws);
 
-    // Generate the Excel file and trigger download
-    XLSX.writeFile(wb, 'selected_data.xlsx');
+  // Create a Blob from the CSV string and trigger a download
+  const blob = new Blob([csvData], { type: 'text/csv' });
+  const url = window.URL.createObjectURL(blob);
+
+  // Create a link element and trigger a download
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'selected_data.csv';
+  document.body.appendChild(a);
+  a.click();
+
+  // Clean up and remove the link element
+  a.remove();
+  window.URL.revokeObjectURL(url);
+  };
+
+
+  const [menuAnchor, setMenuAnchor] = useState(null);
+
+  const openMenu = (event) => {
+    setMenuAnchor(event.currentTarget);
+  };
+
+  const closeMenu = () => {
+    setMenuAnchor(null);
   };
 
   return (
     <div className="CallsGrid">
       <Box className="Appbar" sx={{ display: 'flex', justifyContent: 'space-around' }}>
+      <Button onClick={openMenu} className='Action-btn' sx={{ color:'white', background:'#212529' }} >
+                      Actions
+                    </Button>
+                    <Menu
+                    anchorEl={menuAnchor}
+                    open={Boolean(menuAnchor)}
+                    onClose={closeMenu}>
+                      <MenuItem onClick={handleDownloadExcel}>Export Data</MenuItem>
+                    </Menu>
         <Button sx={{ color: 'black' }} onClick={() => setShowColumnModal(true)}>
           <WidgetsOutlinedIcon />
         </Button>
@@ -767,9 +798,7 @@ const Grid = ({ rows, webformSchema, onFilterChange, pageName }) => {
                     textAlign: 'center',
                     color: 'white'
                   }}>
-                    <Button sx={{ color: 'white' }} onClick={handleDownloadExcel}>
-                      Actions
-                    </Button></TableCell>
+                    </TableCell>
                   {visibleColumns.map((field) => (
                     <TableCell
                       key={field.fieldName}
