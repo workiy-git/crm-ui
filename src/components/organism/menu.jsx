@@ -5,7 +5,6 @@ import SlideButton from '../atoms/slide_button';
 import CreateWidget from '../atoms/widgets';
 import { AppBar, Toolbar, IconButton, Button, Box } from '@material-ui/core';
 import '../../assets/styles/MenuComponent.css';
-import MoleculeWidgets from '../molecules/MoleculeWidgets';
 import config from '../../config/config';  // Ensure the correct path to config file
 
 const localStorageKey = 'selectedTexts';
@@ -150,7 +149,7 @@ const MenuComponent = ({ backgroundColor, onSaveSelectedText }) => {
         </Toolbar>
       </AppBar>
       {dashboardName && (
-        <MoleculeWidgets backgroundColor={backgroundColor} dashboardName={dashboardName} />
+        <CreateWidget backgroundColor={backgroundColor} dashboardName={dashboardName} />
       )}
     </>
   );
