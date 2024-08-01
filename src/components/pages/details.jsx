@@ -306,7 +306,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
-import { Box, Button, TextField, Select, MenuItem, Checkbox, FormControlLabel, FormControl, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, InputLabel } from '@mui/material';
+import { Box, Button, TextField, Select, MenuItem, Checkbox, FormControlLabel, FormControl, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, InputLabel, Alert, Stack } from '@mui/material';
 import axios from 'axios';
 import ModeEditOutlinedIcon from '@mui/icons-material/ModeEditOutlined';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
@@ -325,6 +325,8 @@ const DetailsPage = () => {
   const [formErrors, setFormErrors] = useState({});
   const [openDialog, setOpenDialog] = useState(false);
   const [newFormData, setNewFormData] = useState({});
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
 
   useEffect(() => {
     if (rowData) {
@@ -372,11 +374,13 @@ const DetailsPage = () => {
     const apiUrl = `${config.apiUrl.replace(/\/$/, '')}/appdata/${id}`;
     try {
       await axios.put(apiUrl, updateData);
-      alert('Data updated successfully');
+      setSuccess('Data updated successfully');
+      setError(''); // Clear error message if successful
       navigate(`/container/${pageName}`);
     } catch (error) {
       console.error('Error updating data:', error);
-      alert('Error updating data');
+      setError('Error updating data');
+      setSuccess(''); // Clear success message if there's an error
     }
   };
 
@@ -401,12 +405,14 @@ const DetailsPage = () => {
     const apiUrl = `${config.apiUrl.replace(/\/$/, '')}/appdata`;
     try {
       await axios.post(apiUrl, newFormData);
-      alert('Data added successfully');
+      setSuccess('Data added successfully');
+      setError(''); // Clear error message if successful
       handleDialogClose();
       // Optionally, refresh data or navigate as needed
     } catch (error) {
       console.error('Error adding data:', error);
-      alert('Error adding data');
+      setError('Error adding data');
+      setSuccess(''); // Clear success message if there's an error
     }
   };
 
@@ -526,6 +532,15 @@ const DetailsPage = () => {
 
   return (
     <div style={{ height: '100vh', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+      {/* Show Stack only if there is an error or success message */}
+      {(error || success) && (
+        <Stack sx={{ width:'100%',position: 'absolute', zIndex: '10'}} spacing={2}>
+          <div style={{width:'fit-content', margin:'auto'}}>
+          {success && <Alert severity="success">{success}</Alert>}
+          {error && <Alert severity="error">{error}</Alert>}
+          </div>
+        </Stack>
+      )}
       <div style={{ display: 'flex', height: '100%', overflow: 'hidden' }}>
         <div style={{ width: '100%', overflow: 'hidden' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', background: '#212529', color: 'white', height: '110px' }}>
@@ -680,3 +695,4 @@ const DetailsPage = () => {
 };
 
 export default DetailsPage;
+
