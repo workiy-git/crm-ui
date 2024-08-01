@@ -578,7 +578,7 @@ const DetailsPage = () => {
             </div>
           </div>
           <div style={{ display: 'flex', height: '70%' }}>
-            <div style={{ height: '80%', width: '70%', border: '1px solid gray', borderRadius: '10px', position: 'relative', background: 'white' }}>
+            <div style={{ margin:'10px', height: '80%', width: '70%', border: '1px solid gray', borderRadius: '10px', position: 'relative', background: 'white' }}>
               <div style={{ padding: '10px 20px', borderBottom: '1px solid gray', fontWeight: 'bold', fontSize: '20px', textTransform: 'capitalize' }}>{pageName} information</div>
               <div>
                 <Box style={{ display: 'flex', justifyContent: 'end', alignItems: 'center', padding: '5px' }}>
@@ -588,9 +588,9 @@ const DetailsPage = () => {
                 </Box>
               </div>
               <div style={{ height: '75%', overflow: 'auto' }}>
-                <div style={{ padding: '20px' }}>
+                <div>
                   {schema.map((field) => (
-                    <div style={{ display: 'flex', justifyContent: 'space-between', margin: '20px', width: '90%' }} key={field.fieldName}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', margin: '5px 20px', width: '45%', float:'left' }} key={field.fieldName}>
                       <label style={{ alignContent: 'center' }}>
                         {field.required ? `${field.label} *` : field.label}
                       </label>
@@ -600,7 +600,7 @@ const DetailsPage = () => {
                 </div>
               </div>
             </div>
-            <div style={{ display: 'flex', justifyContent: 'space-around', width: '50%', overflow: 'hidden' }}>
+            <div style={{ margin:'10px', height:'80%', display: 'flex', justifyContent: 'space-around', width: '50%', overflow: 'hidden' }}>
               <Tab />
             </div>
           </div>
@@ -640,7 +640,7 @@ const DetailsPage = () => {
                   <Select
                     name={field.fieldName}
                     value={newFormData[field.fieldName] || ''}
-                    onChange={handleNewInputChange}
+                      onChange={handleNewInputChange}
                     displayEmpty
                   >
                     <MenuItem value="">
@@ -695,4 +695,3 @@ const DetailsPage = () => {
 };
 
 export default DetailsPage;
-
