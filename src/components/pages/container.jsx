@@ -5,6 +5,7 @@ import axios from 'axios';
 import Grid from '../organism/grid';
 import config from '../../config/config';
 import Loader from '../molecules/loader';
+import filteredData from '../atoms/dropdown';
 
 const Container = () => {
   const { pageName } = useParams();
@@ -67,7 +68,7 @@ const Container = () => {
           <Typography style={{ color: 'white', padding: '5px 10px', fontSize: '25px', background: 'linear-gradient(90deg, rgba(12,45,78,1) 0%, rgba(28,104,180,1) 100%)', fontWeight:'bold' }}>
             {pageName.charAt(0).toUpperCase() + pageName.slice(1)}
           </Typography>
-          <Grid rows={rows} webformSchema={webformSchema} onFilterChange={handleFilterChange} pageName={pageName} loading={loading} />
+          <Grid rows={rows} webformSchema={webformSchema} onFilterChange={handleFilterChange} pageName={pageName} loading={loading} data={filteredData} />
         </div>
       </div>
     </div>

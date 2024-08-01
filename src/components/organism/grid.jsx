@@ -464,7 +464,7 @@ import '../../assets/styles/callsgrid.css';
 import ActionButton from '../atoms/actionbutton';
 import Dropdown from '../atoms/dropdown';
 import { useNavigate } from 'react-router-dom';
-import * as XLSX from 'xlsx'; // Import xlsx for Excel file generation
+import * as XLSX from 'xlsx';
 
 const Grid = ({ rows, webformSchema, onFilterChange, pageName }) => {
   const [modalOpen, setModalOpen] = useState(false);
@@ -478,7 +478,9 @@ const Grid = ({ rows, webformSchema, onFilterChange, pageName }) => {
   const [currentRow, setCurrentRow] = useState(null);
   const [tempVisibleColumns, setTempVisibleColumns] = useState([]);
   const [searchTerms, setSearchTerms] = useState({});
-  const [selectedRows, setSelectedRows] = useState(new Set()); // New state for selected rows
+  const [selectedRows, setSelectedRows] = useState(new Set()); 
+  const [dropdownValue, setDropdownValue] = useState('');
+  const [filter, setFilter] = useState({});
   const navigate = useNavigate();
 
   const localStorageKey = `visibleColumns_${pageName}`; // Unique key for each tab
@@ -652,17 +654,76 @@ const Grid = ({ rows, webformSchema, onFilterChange, pageName }) => {
     const wrapper1 = wrapper1Ref.current;
     const wrapper2 = wrapper2Ref.current;
 
-    const handleWrapper1Scroll = () => handleScroll(wrapper1, wrapper2);
-    const handleWrapper2Scroll = () => handleScroll(wrapper2, wrapper1);
+    if (wrapper1 && wrapper2) {
+      const handleWrapper1Scroll = () => handleScroll(wrapper1, wrapper2);
+      const handleWrapper2Scroll = () => handleScroll(wrapper2, wrapper1);
 
-    wrapper1.addEventListener('scroll', handleWrapper1Scroll);
-    wrapper2.addEventListener('scroll', handleWrapper2Scroll);
+      wrapper1.addEventListener('scroll', handleWrapper1Scroll);
+      wrapper2.addEventListener('scroll', handleWrapper2Scroll);
 
-    return () => {
-      wrapper1.removeEventListener('scroll', handleWrapper1Scroll);
-      wrapper2.removeEventListener('scroll', handleWrapper2Scroll);
-    };
+      return () => {
+        wrapper1.removeEventListener('scroll', handleWrapper1Scroll);
+        wrapper2.removeEventListener('scroll', handleWrapper2Scroll);
+      };
+    }
   }, []);
+
+  useEffect(() => {
+    // Retrieve and apply the filter from localStorage
+    const storedFilter = localStorage.getItem('widgetFilter');
+    if (storedFilter) {
+      // Remove unnecessary characters and parse the filter
+      const cleanedFilterString = storedFilter.replace(/\\/g, '').replace(/^"|"$/g, '');
+      let parsedFilter;
+      try {
+        parsedFilter = JSON.parse(cleanedFilterString);
+  
+        if (parsedFilter) {
+          // Find the key and value from the parsedFilter
+          const filterKey = Object.keys(parsedFilter)[0];
+          const filterValue = parsedFilter[filterKey];
+  
+          // Log the key and value for debugging
+          // console.log('Filter Key:', filterKey);
+          // console.log('Filter Value:', filterValue);
+  
+          // Only update state if the value has changed
+          if (filterValue !== dropdownValue) {
+            setDropdownValue(filterValue); // Set the dropdown value
+          }
+  
+          const statusFilter = { [filterKey]: filterValue };
+  
+          // Only apply filter if it has changed
+          if (JSON.stringify(statusFilter) !== JSON.stringify(filter)) {
+            setFilter(statusFilter); // Apply the filter to the grid
+            handleFilterChange(statusFilter); // Call handleFilterChange with the statusFilter
+          }
+        }
+      } catch (error) {
+        console.error('Failed to parse the stored filter:', error);
+      }
+    }
+    // Delete the widgetFilter from localStorage after applying the filter
+    // localStorage.removeItem('widgetFilter');
+    // localStorage.removeItem('pageNameFilter');
+  }, [dropdownValue, filter, handleFilterChange]);
+
+  useEffect(() => {
+    if (Object.keys(filter).length > 0) {
+      onFilterChange(filter);
+    }
+  }, [filter]);
+
+  const handleDropdownChange = (filterKey, event) => {
+    console.log('Dropdown change handler called');
+    const value = event.target.value;
+    setDropdownValue(value);
+    const statusFilter = { [filterKey]: value };
+    setFilter(statusFilter);
+    console.log('Filter:', statusFilter);
+    handleFilterChange(statusFilter);
+  };
 
   const modalStyle = {
     position: 'absolute',
@@ -728,7 +789,7 @@ const Grid = ({ rows, webformSchema, onFilterChange, pageName }) => {
         <Button sx={{ color: 'black' }} onClick={() => setShowColumnModal(true)}>
           <WidgetsOutlinedIcon />
         </Button>
-        <Dropdown pageName={pageName} onOptionSelected={handleFilterChange} />
+        <Dropdown pageName={pageName} onOptionSelected={handleFilterChange} value={dropdownValue} onChange={handleDropdownChange} />
         <div className="pagination-container">
           <Box className="pagination-box">
             <button
