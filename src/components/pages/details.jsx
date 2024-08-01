@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { Box, Button, TextField, Select, MenuItem, Checkbox, FormControlLabel, FormControl } from '@mui/material';
 import axios from 'axios';
-import ModeEditOutlinedIcon from '@mui/icons-material/ModeEditOutlined';
 import Tab from '../organism/details-tab';
 import config from '../../config/config';
 
@@ -12,8 +11,7 @@ const DetailsPage = () => {
   const navigate = useNavigate();
   const { rowData, schema, pageName } = location.state;
   const [formData, setFormData] = useState({});
-  const [isEditing, setIsEditing] = useState(false); // New state for edit mode
-
+  const [isEditing, setIsEditing] = useState(false);
   useEffect(() => {
     if (rowData) {
       setFormData(rowData);
@@ -37,7 +35,7 @@ const DetailsPage = () => {
   };
 
   const handleSave = async () => {
-    const { _id, ...updateData } = formData; // Exclude _id from form data
+    const { _id, ...updateData } = formData;
     const apiUrl = `${config.apiUrl.replace(/\/$/, '')}/appdata/${id}`;
     try {
       await axios.put(apiUrl, updateData);
@@ -54,10 +52,9 @@ const DetailsPage = () => {
   };
 
   const handleEdit = () => {
-    setIsEditing(true); // Enable editing
+    setIsEditing(true); 
   };
   const handleNext = () => {
-    // navigate(`/details/${id}`);
     
   };
 

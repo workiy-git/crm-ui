@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { experimentalStyled as styled } from '@mui/material/styles';
 import Paper from '@mui/material/Paper';
+import Grid from '@mui/material/Grid';
 import { Box } from '@material-ui/core';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
@@ -123,13 +124,11 @@ const CreateWidget = ({ backgroundColor, dashboardName }) => {
   const [hiddenWidgets, setHiddenWidgets] = useState([]);
   const [showHiddenWidgets, setShowHiddenWidgets] = useState(false);
   const [draggingIndex, setDraggingIndex] = useState(null);
-  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const hiddenWidgetsRef = useRef(null);
 
   useEffect(() => {
     const fetchData = async () => {
-      setLoading(true);
       const retrievedWidgets = await retrieveWidgets(dashboardName);
       setWidgets(retrievedWidgets);
 
@@ -139,7 +138,6 @@ const CreateWidget = ({ backgroundColor, dashboardName }) => {
         countsData[widget.name] = count;
       }
       setCounts(countsData);
-      setLoading(false);
     };
 
     fetchData();
@@ -202,6 +200,7 @@ const CreateWidget = ({ backgroundColor, dashboardName }) => {
 
   return (
     <ScrollContainer>
+      
       <Box sx={{ flexGrow: 1 }}>
         <div style={{ width: '100%'}}>
           <div>
@@ -265,27 +264,9 @@ const CreateWidget = ({ backgroundColor, dashboardName }) => {
                   <Title>{widget.title}</Title>
                   <Count>{counts[widget.name] !== undefined ? counts[widget.name] : 'Loading...'}</Count>
                 </div>
-                <CreateWidgetItem
-                  style={{ background:'#DDE1E9 !important' }}
-                >
-                  <Icon>
-                    <div style={{ background: 'white', borderRadius: '100px', padding: '20px', margin: 'auto', display: 'flex' }}>
-                      <img style={{ height: '30px', width: 'auto', margin: 'auto', filter: 'brightness(0) saturate(100%) invert(50%) sepia(100%) saturate(500%) hue-rotate(190deg)' }} src={widget.icon_url || 'default_icon_url'} alt={widget.title} />
-                    </div>
-                  </Icon>
-                  <div
-                    variant="contained"
-                    color="primary"
-                    onClick={() => handleWidgetClick(widget)}
-                    style={{ width: '60%', height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}
-                  >
-                    <Title>{widget.title}</Title>
-                    <Count>{counts[widget.name] !== undefined ? counts[widget.name] : 'Loading...'}</Count>
-                  </div>
-                </CreateWidgetItem>
-              </div>
-            ))
-          )}
+              </CreateWidgetItem>
+            </div>
+          )) : <div>There is no data</div>}
         </div>
       </Box>
     </ScrollContainer>
