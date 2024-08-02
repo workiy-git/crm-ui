@@ -369,20 +369,26 @@ const DetailsPage = () => {
     if (!validateFormData()) {
       return;
     }
-
+  
     const { _id, ...updateData } = formData;
     const apiUrl = `${config.apiUrl.replace(/\/$/, '')}/appdata/${id}`;
     try {
       await axios.put(apiUrl, updateData);
       setSuccess('Data updated successfully');
       setError(''); // Clear error message if successful
-      navigate(`/container/${pageName}`);
+  
+      setTimeout(() => {
+        setSuccess('');
+        navigate(`/container/${pageName}`);
+      }, 2000); // Wait 2 seconds before navigating
     } catch (error) {
       console.error('Error updating data:', error);
       setError('Error updating data');
+      setTimeout(() => setError(''), 3000);
       setSuccess(''); // Clear success message if there's an error
     }
   };
+  
 
   const handleDialogOpen = () => {
     setOpenDialog(true);
@@ -406,12 +412,14 @@ const DetailsPage = () => {
     try {
       await axios.post(apiUrl, newFormData);
       setSuccess('Data added successfully');
+      setTimeout(() => setSuccess(''), 3000);
       setError(''); // Clear error message if successful
       handleDialogClose();
       // Optionally, refresh data or navigate as needed
     } catch (error) {
       console.error('Error adding data:', error);
       setError('Error adding data');
+      setTimeout(() => setError(''), 3000);
       setSuccess(''); // Clear success message if there's an error
     }
   };
@@ -420,6 +428,25 @@ const DetailsPage = () => {
     navigate(`/container/${pageName}`);
   };
 
+  const handleDelete = async () => {
+    const apiUrl = `${config.apiUrl.replace(/\/$/, '')}/appdata/${id}`;
+    try {
+      await axios.delete(apiUrl);
+      setSuccess('Data deleted successfully');
+      setError(''); // Clear error message if successful
+  
+      setTimeout(() => {
+        setSuccess('');
+        navigate(`/container/${pageName}`);
+      }, 2000); // Wait 2 seconds before navigating
+    } catch (error) {
+      console.error('Error deleting data:', error);
+      setError('Error deleting data');
+      setTimeout(() => setError(''), 3000);
+      setSuccess(''); // Clear success message if there's an error
+    }
+  };
+  
   const handleEdit = () => {
     setIsEditing(true);
   };
@@ -429,13 +456,14 @@ const DetailsPage = () => {
     const isError = formErrors[field.fieldName];
     const errorStyle = {
       cursor: 'not-allowed',
+      padding:'0 !important'
     };
 
     if (!isEditing) {
       return (
-        <TextField
+        <input
           name={field.fieldName}
-          style={{ width: '50%', borderRadius: '5px', ...(isError ? errorStyle : {}) }}
+          style={{ width: '50%', borderRadius: '5px',border:'none', ...(isError ? errorStyle : {}) }}
           value={value}
           InputProps={{ readOnly: true }}
           placeholder="Not Specified"
@@ -543,30 +571,33 @@ const DetailsPage = () => {
       )}
       <div style={{ display: 'flex', height: '100%', overflow: 'hidden' }}>
         <div style={{ width: '100%', overflow: 'hidden' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', background: '#212529', color: 'white', height: '110px' }}>
-            <h2 style={{ margin: '20px', borderBottom: '10px solid #FFC03D', height: 'fit-content', padding: '5px', textTransform: 'capitalize' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', background: '#212529', color: 'white', height: '65px' }}>
+            <h2 style={{ margin: 'auto 20px', borderBottom: '10px solid #FFC03D', height: 'fit-content', padding: '5px', textTransform: 'capitalize' }}>
               {pageName} Details View
             </h2>
             <Box style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginRight: '5%' }}>
-              <Button onClick={handleDialogOpen} style={{ height: 'fit-content', padding: '8px 30px', marginRight: '30px', background: 'none', borderRadius: '5px', border: '1px solid white', color: 'white' }} variant="contained">
+              <Button onClick={handleDialogOpen} style={{ height: 'fit-content', padding: '2px 15px', marginRight: '30px', background: 'none', borderRadius: '5px', border: '1px solid white', color: 'white' }} variant="contained">
                 <AddCircleOutlineIcon /> &nbsp; ADD
               </Button>
               {!isEditing && (
-                <Button onClick={handleEdit} style={{ height: 'fit-content', padding: '8px 30px', marginRight: '15px', background: 'none', borderRadius: '5px', border: '1px solid white', color: 'white' }} variant="contained">
+                <Button onClick={handleEdit} style={{ height: 'fit-content', padding: '2px 15px', marginRight: '15px', background: 'none', borderRadius: '5px', border: '1px solid white', color: 'white' }} variant="contained">
                   Edit
                 </Button>
               )}
               {isEditing && (
-                <Button onClick={handleSave} style={{ height: 'fit-content', marginRight: '15px', background: '#FFC03D', color: 'black', padding: '8px 30px', borderRadius: '5px' }}>
+                <Button onClick={handleSave} style={{ height: 'fit-content', marginRight: '15px', background: '#FFC03D', color: 'black', padding: '2px 15px', borderRadius: '5px' }}>
                   Save
                 </Button>
               )}
-              <Button onClick={handleCancel} style={{ height: 'fit-content', padding: '8px 30px', marginLeft: '15px', background: 'none', borderRadius: '5px', border: '1px solid white', color: 'white' }} variant="contained">
-                Close
+              <Button onClick={handleCancel} style={{ height: 'fit-content', padding: '2px 15px', marginLeft: '15px', background: 'none', borderRadius: '5px', border: '1px solid white', color: 'white' }} variant="contained">
+                Back
+              </Button>
+              <Button onClick={handleDelete} style={{ height: 'fit-content', padding: '2px 15px', marginLeft: '15px', background: 'none', borderRadius: '5px', border: '1px solid white', color: 'white' }} variant="contained">
+                Delete
               </Button>
             </Box>
           </div>
-          <div style={{ display: 'flex' }}>
+          {/* <div style={{ display: 'flex' }}>
             <div style={{ margin: '20px 30px', fontSize: '20px' }}>
               User Name :<span style={{ fontWeight: 'bold', marginLeft: '20px' }}>{formData.caller_name || 'N/A'}</span>
             </div>
@@ -576,9 +607,9 @@ const DetailsPage = () => {
             <div style={{ margin: '20px 30px', fontSize: '20px' }}>
               Call Status :<span style={{ fontWeight: 'bold', marginLeft: '20px' }}>{formData.call_status || 'N/A'}</span>
             </div>
-          </div>
-          <div style={{ display: 'flex', height: '70%' }}>
-            <div style={{ margin:'10px', height: '80%', width: '70%', border: '1px solid gray', borderRadius: '10px', position: 'relative', background: 'white' }}>
+          </div> */}
+          <div style={{ display: 'flex', height: '80vh' }}>
+            <div style={{ margin:'10px', width: '70%', border: '1px solid gray', borderRadius: '10px', position: 'relative', background: 'white' }}>
               <div style={{ padding: '10px 20px', borderBottom: '1px solid gray', fontWeight: 'bold', fontSize: '20px', textTransform: 'capitalize' }}>{pageName} information</div>
               <div>
                 <Box style={{ display: 'flex', justifyContent: 'end', alignItems: 'center', padding: '5px' }}>
@@ -590,7 +621,7 @@ const DetailsPage = () => {
               <div style={{ height: '75%', overflow: 'auto' }}>
                 <div>
                   {schema.map((field) => (
-                    <div style={{ display: 'flex', justifyContent: 'space-between', margin: '5px 20px', width: '45%', float:'left' }} key={field.fieldName}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', margin: '5px 20px',padding:'5px', borderBottom:'1px dashed gray' }} key={field.fieldName}>
                       <label style={{ alignContent: 'center' }}>
                         {field.required ? `${field.label} *` : field.label}
                       </label>
@@ -600,7 +631,7 @@ const DetailsPage = () => {
                 </div>
               </div>
             </div>
-            <div style={{ margin:'10px', height:'80%', display: 'flex', justifyContent: 'space-around', width: '50%', overflow: 'hidden' }}>
+            <div style={{ margin:'10px', display: 'flex', justifyContent: 'space-around', width: '50%', overflow: 'hidden' }}>
               <Tab />
             </div>
           </div>
