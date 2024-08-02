@@ -451,7 +451,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { styled, alpha } from '@mui/material/styles';
 import InputBase from '@mui/material/InputBase';
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Box, Button, Modal, Typography, IconButton, Menu, MenuItem } from '@mui/material';
+import { Table, Stack, Alert, TableBody, TableCell, TableContainer, TableHead, TableRow, Box, Button, Modal, Typography, IconButton, Menu, MenuItem } from '@mui/material';
 import Text from '@mui/material/Typography';
 import WidgetsOutlinedIcon from '@mui/icons-material/WidgetsOutlined';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
@@ -539,14 +539,17 @@ const Grid = ({ rows, webformSchema, onFilterChange, pageName }) => {
     try {
       const response = await axios.delete(apiUrl);
       if (response.status === 200) {
-        alert('Data deleted successfully');
+        setSuccess('Data deleted successfully');
+        setTimeout(() => setSuccess(''), 3000); // Clear success message after 3 seconds
         setValidatedData(validatedData.filter(item => item._id !== currentRow._id));
       } else {
         alert('Error deleting data: ' + response.data.message);
       }
     } catch (error) {
       console.error('Error deleting data:', error);
-      alert('Error deleting data');
+      setError('Error deleting data');
+      setTimeout(() => setSuccess(''), 3000); // Clear success message after 3 seconds
+      // alert('Error deleting data');
     }
   };
 
@@ -770,7 +773,9 @@ const Grid = ({ rows, webformSchema, onFilterChange, pageName }) => {
   const handleDownloadExcel = () => {
     const selectedData = validatedData.filter(row => selectedRows.has(row._id));
   if (selectedData.length === 0) {
-    alert('No rows selected');
+    setError('No rows selected');
+    setTimeout(() => setError(''), 3000);
+    // alert('No rows selected');
     return;
   }
 
@@ -792,6 +797,10 @@ const Grid = ({ rows, webformSchema, onFilterChange, pageName }) => {
   // Clean up and remove the link element
   a.remove();
   window.URL.revokeObjectURL(url);
+
+    // Set success message
+    setSuccess('Data downloaded successfully');
+    setTimeout(() => setSuccess(''), 3000); // Clear success message after 3 seconds
   };
 
 
@@ -804,9 +813,19 @@ const Grid = ({ rows, webformSchema, onFilterChange, pageName }) => {
   const closeMenu = () => {
     setMenuAnchor(null);
   };
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
 
   return (
     <div className="CallsGrid">
+      {(error || success) && (
+        <Stack sx={{ width:'100%',position: 'absolute', zIndex: '10'}} spacing={2}>
+          <div style={{width:'fit-content', margin:'auto'}}>
+          {success && <Alert severity="success">{success}</Alert>}
+          {error && <Alert severity="error">{error}</Alert>}
+          </div>
+        </Stack>
+      )}
       <Box className="Appbar" sx={{ display: 'flex', justifyContent: 'space-around' }}>
       <Button onClick={openMenu} className='Action-btn' sx={{ color:'white', background:'#212529' }} >
                       Actions
@@ -868,7 +887,8 @@ const Grid = ({ rows, webformSchema, onFilterChange, pageName }) => {
                         overflow: 'hidden',
                         textOverflow: 'ellipsis',
                         textAlign: 'center',
-                        color: 'white'
+                        color: 'white',
+                        cursor:'pointer'
                       }}
                       onClick={() => sortData(field.fieldName)}
                     >
@@ -891,6 +911,7 @@ const Grid = ({ rows, webformSchema, onFilterChange, pageName }) => {
                     color: 'white'
                   }}>
                     <input
+                      style={{cursor:'pointer'}}
                       type="checkbox"
                       onChange={() => {
                         const allSelected = paginatedData.every(row => selectedRows.has(row._id));
@@ -902,6 +923,9 @@ const Grid = ({ rows, webformSchema, onFilterChange, pageName }) => {
                       }}
                       checked={paginatedData.every(row => selectedRows.has(row._id))}
                     />
+                        <IconButton style={{visibility:'hidden'}}>
+                          <MoreVertIcon />
+                        </IconButton>
                   </TableCell>
                   {visibleColumns.map((field) => (
                     <TableCell key={field.fieldName} style={{ textAlign: 'center', color: 'black', padding: '10px 15px' }}>
@@ -935,6 +959,7 @@ const Grid = ({ rows, webformSchema, onFilterChange, pageName }) => {
                         fontWeight: 'bold'
                       }}>
                         <input
+                          style={{cursor:'pointer'}}
                           type="checkbox"
                           checked={selectedRows.has(row._id)}
                           onChange={() => handleSelectRow(row)}
