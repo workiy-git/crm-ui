@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useLocation, useNavigate } from "react-router-dom";
-
 import config from "../../config/config";
 import { DataGrid } from "@mui/x-data-grid";
 import WidgetsOutlinedIcon from "@mui/icons-material/WidgetsOutlined";
@@ -14,10 +13,13 @@ import {
   InputLabel,
   CircularProgress,
   Box,
+  Checkbox,
   Button,
   TextField,
   IconButton,
   Menu,
+  Modal,
+  Typography,
 } from "@mui/material";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 
@@ -38,6 +40,8 @@ const GridComponent = ({ pageName }) => {
   const location = useLocation();
   const [widget, setWidget] = useState(location.state);
   const [showColumnModal, setShowColumnModal] = useState(false);
+  const [tempVisibleColumns, setTempVisibleColumns] = useState([]);
+  const [availableColumns, setAvailableColumns] = useState([]);
   const [filterText, setFilterText] = useState("");
   // const [filteredRows, setFilteredRows] = useState(gridData);
   //not confirmed
@@ -47,6 +51,31 @@ const GridComponent = ({ pageName }) => {
   const navigate = useNavigate();
 
   // const widget = location.state;
+
+  const closeColumnModal = () => setShowColumnModal(false);
+  const modalStyle = {
+    position: "absolute",
+    top: "50%",
+    left: "50%",
+    transform: "translate(-50%, -50%)",
+    width: 400,
+    bgcolor: "background.paper",
+    boxShadow: 24,
+    p: 4,
+  };
+
+  const handleSelectAll = () => {
+    setTempVisibleColumns(availableColumns);
+  };
+
+  const handleDeselectAll = () => {
+    setTempVisibleColumns([]);
+  };
+
+  const handleApplyColumns = () => {
+    setColumns(tempVisibleColumns);
+    closeColumnModal();
+  };
 
   // Fetch select options
   useEffect(() => {
@@ -110,45 +139,35 @@ const GridComponent = ({ pageName }) => {
     fetchGridData(filter); // Fetch grid data for the selected option
   };
   // Fetch grid data based on the selected filter
-  const fetchGridData = async (filter) => {
-    try {
-      console.log("filter", filter);
-      const response = await axios.post(
-        `${config.apiUrl.replace(/\/$/, "")}${gridEndpoint}`,
-        filter
-      );
-      // Ensure each row has a unique `id` property
-      const dataWithIds = response.data.data.map((item, index) => ({
-        ...item,
-        id: item._id || index, // Use existing `_id` or fallback to index
-      }));
-      setGridData(dataWithIds); // Update grid data with the response
-      setTotalRows(dataWithIds.length); // Update total rows if available
-      // console.log("dataWithIds.total", response.data.data.length);
-      // console.log("totalRows", totalRows);
-      // console.log("page", page);
-      // console.log(
-      //   "Math.ceil(totalRows / pageSize)",
-      //   Math.ceil(totalRows / pageSize)
-      // );
+const fetchGridData = async (filter) => {
+  try {
+    const response = await axios.post(
+      `${config.apiUrl.replace(/\/$/, "")}${gridEndpoint}`,
+      filter
+    );
+    const dataWithIds = response.data.data.map((item, index) => ({
+      ...item,
+      id: item._id || index,
+    }));
+    setGridData(dataWithIds);
+    setTotalRows(dataWithIds.length);
 
-      // Dynamically set columns based on the keys of the first object in the data array
-      if (response.data.data.length > 0) {
-        const dynamicColumns = Object.keys(dataWithIds[0]).map((key) => ({
-          field: key,
-          headerName: key
-            .replace(/_/g, " ")
-            .replace(/\b\w/g, (char) => char.toUpperCase()), // Format header name
-          width: 150,
-        }));
-        // console.log("dynamicColumns", dynamicColumns);
-        setColumns(dynamicColumns);
-      }
-    } catch (error) {
-      // console.log("error", error);
-      console.error("Error fetching grid data:", error);
+    if (response.data.data.length > 0) {
+      const dynamicColumns = Object.keys(dataWithIds[0]).map((key) => ({
+        field: key,
+        headerName: key
+          .replace(/_/g, " ")
+          .replace(/\b\w/g, (char) => char.toUpperCase()),
+        width: 150,
+      }));
+      setColumns(dynamicColumns);
+      setAvailableColumns(dynamicColumns); // Set available columns here
     }
-  };
+  } catch (error) {
+    console.error("Error fetching grid data:", error);
+  }
+};
+
 
   // Filter grid data based on the search text
   // useEffect(() => {
@@ -221,10 +240,24 @@ const GridComponent = ({ pageName }) => {
 
   const columnsWithFilter = [
     {
-      field: "actions",
-      headerName: "Actions",
-      width: 100,
+      field: "select",
+      headerName: "",
+      width: 60,
       renderCell: (params) => (
+        <Checkbox
+          checked={selectedRows.includes(params.id)}
+          onChange={(event) =>
+            handleCheckboxChange(params.id, event.target.checked)
+          }
+        />
+      ),
+    },
+    {
+      // field: "actions",
+      // headerName: "Actions",
+      // width: 100,
+      renderCell: (params) => (
+        
         <div>
           <IconButton
             onClick={(event) => {
@@ -257,12 +290,13 @@ const GridComponent = ({ pageName }) => {
     ...columns.map((column) => ({
       ...column,
       renderHeader: (params) => (
+        
         <div
           style={{
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
-            padding: "8px",
+            padding: "0",
             width: "100%",
             boxSizing: "border-box",
             // color: "white",
@@ -285,13 +319,77 @@ const GridComponent = ({ pageName }) => {
             value={filterText[params.field] || ""}
             onClick={(e) => e.stopPropagation()} // Stop propagation to prevent sorting
             onChange={(e) => handleFilterChange(params.field, e.target.value)}
-            style={{ width: "100%", background: "#ffffff" }}
+            style={{ width: "80%", background: "#ffffff" }}
           />
         </div>
       ),
     })),
   ];
 
+
+  const [menuAnchor, setMenuAnchor] = useState(null);
+  const openMenu = (event) => {
+    setMenuAnchor(event.currentTarget);
+  };
+
+  const closeMenu = () => {
+    setMenuAnchor(null);
+  };
+
+  const exportSelectedRows = () => {
+    const selectedData = gridData.filter((row) =>
+      selectedRows.includes(row.id)
+    );
+
+    if (selectedData.length === 0) {
+      alert("No rows selected for export.");
+      return;
+    }
+
+    const csvRows = [];
+    const headers = Object.keys(selectedData[0]);
+    csvRows.push(headers.join(","));
+
+    for (const row of selectedData) {
+      const values = headers.map((header) => row[header]);
+      csvRows.push(values.join(","));
+    }
+
+    const csvString = csvRows.join("\n");
+    const blob = new Blob([csvString], { type: "text/csv;charset=utf-8;" });
+    const link = document.createElement("a");
+
+    if (link.download !== undefined) {
+      const url = URL.createObjectURL(blob);
+      link.setAttribute("href", url);
+      link.setAttribute("download", "exported_data.csv");
+      link.style.visibility = "hidden";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+  };
+  const openColumnModal = () => {
+    setTempVisibleColumns(columns);
+    setShowColumnModal(true);
+  };
+  const [selectedRows, setSelectedRows] = useState([]);
+  const handleCheckboxChange = (column, isChecked) => {
+    setTempVisibleColumns((prev) => {
+      if (isChecked) {
+        // Add column to selected list
+        return [...prev, column];
+      } else {
+        // Remove column from selected list
+        return prev.filter((col) => col.field !== column.field);
+      }
+    });
+  };
+
+  const handleExportClick = () => {
+    exportSelectedRows();
+  };
+  
   // Add some CSS to increase the header height
 
   return (
@@ -300,6 +398,15 @@ const GridComponent = ({ pageName }) => {
         className="Appbar"
         sx={{ display: "flex", justifyContent: "space-around" }}
       >
+        <Button onClick={openMenu} className='Action-btn' sx={{ color:'white', background:'#212529' }} >
+          Actions
+        </Button>
+        <Menu
+        anchorEl={menuAnchor}
+        open={Boolean(menuAnchor)}
+        onClose={closeMenu}>
+            <MenuItem onClick={handleExportClick}>Export Data</MenuItem>
+        </Menu>
         <FormControl
           variant="outlined"
           style={{ minWidth: 200, marginBottom: 20 }}
@@ -334,11 +441,13 @@ const GridComponent = ({ pageName }) => {
           </select>
         </div>
         <Pagination
-          count={Math.ceil(totalRows / pageSize)}
-          page={page}
-          onChange={handlePageChange}
-          color="primary"
-          style={{ marginTop: 20 }}
+          pageSize={pageSize}
+          paginationMode="server"
+          rowCount={totalRows}
+          onPageChange={handlePageChange}
+          page={page - 1}
+          disableSelectionOnClick
+          columnHeaderHeight={120}
         />
       </Box>
       {loading ? (
@@ -361,19 +470,60 @@ const GridComponent = ({ pageName }) => {
             onPageChange={handlePageChange}
             page={page - 1}
             disableSelectionOnClick
-            checkboxSelection
             columnHeaderHeight={120}
             className="custom-data-grid"
           />
         </div>
       )}
-      {/* <Pagination
-        count={Math.ceil(totalRows / pageSize)}
-        page={page}
-        onChange={handlePageChange}
-        color="primary"
-        style={{ marginTop: 20 }}
-      /> */}
+      <Modal open={showColumnModal} onClose={closeColumnModal} aria-labelledby="modal-title" aria-describedby="modal-description">
+  <Box sx={{ ...modalStyle, width: 500 }}>
+    <Typography id="modal-title" variant="h6" component="h2">
+      Choose Columns
+    </Typography>
+    <Box id="modal-description" sx={{ mt: 2, display: 'flex', justifyContent: 'space-between' }}>
+      <Box sx={{ width: '45%', height: '300px', overflow: 'auto' }}>
+        <Typography variant="subtitle1">Selected Columns</Typography>
+        <div className="column-options">
+          {tempVisibleColumns.map((column) => (
+            <div key={column.field}>
+              <input
+                type="checkbox"
+                checked={true}
+                onChange={() => handleCheckboxChange(column, false)}
+              />
+              <span>{column.headerName}</span>
+            </div>
+          ))}
+        </div>
+      </Box>
+      <Box sx={{ width: '45%', height: '300px', overflow: 'auto' }}>
+        <Typography variant="subtitle1">Available Columns</Typography>
+        <div className="column-options">
+          {availableColumns
+            .filter(column => !tempVisibleColumns.some(col => col.field === column.field))
+            .map((column) => (
+              <div key={column.field}>
+                <input
+                  type="checkbox"
+                  checked={false}
+                  onChange={() => handleCheckboxChange(column, true)}
+                />
+                <span>{column.headerName}</span>
+              </div>
+            ))}
+        </div>
+      </Box>
+    </Box>
+    <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
+      <Button onClick={handleSelectAll}>Select All</Button>
+      <Button onClick={handleDeselectAll}>Deselect All</Button>
+    </Box>
+    <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
+      <Button onClick={closeColumnModal}>Cancel</Button>
+      <Button onClick={handleApplyColumns}>Apply</Button>
+    </Box>
+  </Box>
+</Modal>
     </div>
   );
 };

@@ -69,7 +69,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 8px;
+  padding: 0 !important;
   width: 200px;
   /* Increase width to fit both controls */
   box-sizing: border-box;
@@ -121,7 +121,9 @@
   width: 100%;
 
 }
-
+.custom-data-grid{
+  height: 75vh !important;
+}
 .custom-data-grid .MuiFormControl-root {
   width: 100%;
 }
@@ -145,12 +147,19 @@
   font-weight: bold;
 }
 
-.table-body .table-body-row:nth-child(odd) {
+.table-body .table-body-row:nth-child(odd), .odd-row {
   background-color: #ffff;
 }
 
-.table-body .table-body-row:nth-child(even) {
+.table-body .table-body-row:nth-child(even), .even-row {
   background-color: #DADEFD;
+}
+.custom-data-grid .MuiDataGrid-row:nth-child(even) {
+  background-color: #ffff; /* Light grey for even rows */
+}
+
+.custom-data-grid .MuiDataGrid-row:nth-child(odd) {
+  background-color: #DADEFD; /* White for odd rows */
 }
 
 .table-body .table-body-row:hover {
@@ -446,4 +455,7 @@
 .Action-btn {
   color: white;
   background-color: #212529 !important;
+}
+.custom-data-grid .MuiDataGrid-menuIcon{
+  margin: 0 !important;
 }
