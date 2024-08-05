@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useLocation, useNavigate } from "react-router-dom";
-
 import config from "../../config/config";
 import { DataGrid } from "@mui/x-data-grid";
 import WidgetsOutlinedIcon from "@mui/icons-material/WidgetsOutlined";
@@ -210,14 +209,15 @@ const GridComponent = ({ pageName }) => {
     setSelectedRow(null);
   };
 
-  const handleNavigate = (path) => {
+  const handleNavigate = (path, mode) => {
     if (selectedRow) {
-      navigate(`${path}/${selectedRow.id}`, {
-        state: { rowData: selectedRow, pageName },
+      navigate(`${path}/${selectedRow._id}`, {
+        state: { rowData: selectedRow, pageName, mode },
       });
       handleMenuClose();
     }
   };
+  
 
   const columnsWithFilter = [
     {
@@ -243,13 +243,10 @@ const GridComponent = ({ pageName }) => {
             open={Boolean(anchorEl)}
             onClose={handleMenuClose}
           >
-            <MenuItem onClick={() => handleNavigate("/edit")}>Edit</MenuItem>
-            <MenuItem onClick={() => handleNavigate("/details")}>
-              Details
-            </MenuItem>
-            <MenuItem onClick={() => handleNavigate("/delete")}>
-              Delete
-            </MenuItem>
+            <MenuItem onClick={() => handleNavigate("/details", "details")}>Details</MenuItem>
+            <MenuItem onClick={() => handleNavigate("/details", "edit")}>Edit</MenuItem>
+            <MenuItem onClick={() => handleNavigate("/details", "delete")}>Delete</MenuItem>
+
           </Menu>
         </div>
       ),
