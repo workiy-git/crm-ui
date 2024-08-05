@@ -5,7 +5,7 @@
   height: 83%;
   /* padding: 10px; */
   /* color: #333; */
- /* margin-top: -7rem; */
+  /* margin-top: -7rem; */
 
 }
 
@@ -37,8 +37,10 @@
 }
 
 .table-wrapper {
-  overflow-y: auto; /* Vertical scroll */
-  flex-grow: 1; /* Takes remaining height */
+  overflow-y: auto;
+  /* Vertical scroll */
+  flex-grow: 1;
+  /* Takes remaining height */
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
@@ -50,23 +52,95 @@
 
 .table th,
 .table td {
-  padding: 12px 16px; /* Increase padding to add more space */
+  padding: 12px 16px;
+  /* Increase padding to add more space */
   border-bottom: 1px solid #ddd;
   white-space: nowrap;
-  text-align: center; /* Center-align text */
+  text-align: center;
+  /* Center-align text */
+}
+
+/* .MuiDataGrid-columnHeader .MuiDataGrid-columnHeader--sortable .MuiDataGrid-withBorderColor {
+  height: auto;
+} */
+
+
+.custom-data-grid .MuiDataGrid-columnHeader {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 8px;
+  width: 200px;
+  /* Increase width to fit both controls */
+  box-sizing: border-box;
+}
+
+.custom-data-grid .MuiDataGrid-columnHeaderTitleContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  text-align: center;
+  /* Center-align text */
+  background-color: #212529 !important;
+  color: white !important;
+  position: sticky;
+  /* Sticky headers */
+  top: 0;
+  z-index: 2;
+  text-transform: capitalize;
+  border-color: #212529 !important;
+}
+
+.custom-data-grid .MuiDataGrid-columnHeader--sorted {
+  border-bottom: 2px solid 212529;
+  /* Change the border color to blue */
+}
+
+.MuiDataGrid-sortIcon {
+  color: white !important;
+}
+
+.css-rbjqkq-MuiDataGrid-root .MuiDataGrid-container--top [role=row],
+.css-rbjqkq-MuiDataGrid-root .MuiDataGrid-container--bottom [role=row] {
+  background: #212529 !important;
+
+}
+
+.custom-data-grid .MuiDataGrid-columnHeaderTitleContainerContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+.custom-data-grid .MuiDataGrid-columnHeaderTitle {
+  margin-bottom: 8px;
+  font-weight: bold;
+  text-align: center;
+  width: 100%;
+
+}
+
+.custom-data-grid .MuiFormControl-root {
+  width: 100%;
 }
 
 .table-head {
-  padding-top: 12px;
-  padding-bottom: 12px;
-  text-align: center; /* Center-align text */
+  /* padding-top: 12px;
+  padding-bottom: 12px; */
+  text-align: center;
+  /* Center-align text */
   background-color: #212529 !important;
   color: white !important;
-  position: sticky; /* Sticky headers */
+  position: sticky;
+  /* Sticky headers */
   top: 0;
   z-index: 2;
-  text-transform: capitalize; /* Capitalize column names */
+  text-transform: capitalize;
+  /* Capitalize column names */
 }
+
 .table-head .table-head-row th {
   font-weight: bold;
 }
@@ -74,6 +148,7 @@
 .table-body .table-body-row:nth-child(odd) {
   background-color: #ffff;
 }
+
 .table-body .table-body-row:nth-child(even) {
   background-color: #DADEFD;
 }
@@ -222,17 +297,20 @@
   position: sticky;
   left: 0;
   z-index: 1;
-  background-color: #D9D9D9; /* Background color of the sticky column */
-  color: white; /* Text color of the sticky column */
+  background-color: #D9D9D9;
+  /* Background color of the sticky column */
+  color: white;
+  /* Text color of the sticky column */
 }
 
-.Appbar{
+.Appbar {
   display: flex;
   justify-content: space-around;
   align-items: center;
   background-color: white;
-  
+
 }
+
 /* @media (max-width: 600px) {
   .Appbar {
     display: block !important;
@@ -262,7 +340,8 @@
   /* transition: background-color 0.3s ease; */
   background-color: transparent;
 }
-.page-btn-arrow{
+
+.page-btn-arrow {
   border: none;
   border-radius: 10px;
   cursor: pointer;
@@ -287,48 +366,59 @@
   background-color: #ccc;
   cursor: not-allowed;
 }
-.tatoal-pageination-div{
+
+.tatoal-pageination-div {
   display: flex;
   align-items: center;
   margin-right: 20px;
 }
-.configure-columns{
+
+.configure-columns {
   height: 15rem;
   overflow: auto;
 }
-.dropdown svg{
+
+.dropdown svg {
   color: white;
 }
-.pagination-box{
+
+.pagination-box {
   border: 1px solid black;
   padding: 5px;
   border-radius: 5px;
 }
-.pagination-current-page{
-  padding:2px 5px;
+
+.pagination-current-page {
+  padding: 2px 5px;
   border: 1px solid black;
   border-radius: 5px;
 }
+
 .searchBox {
   background: white;
   padding: 5px;
   height: 30px;
   border-radius: 5px;
 }
-.searchBox input::placeholder{
+
+.searchBox input::placeholder {
   font-size: 14px;
   text-align: center;
 }
 
 
-.wrapper1, .wrapper2 {
+.wrapper1,
+.wrapper2 {
   /* width: 300px;
   overflow-x: scroll; */
   overflow-y: hidden;
   /* transform: rotate(180deg); */
 }
 
-.wrapper1 { display: none; }
+.wrapper1 {
+  display: none;
+}
+
 /* .wrapper2 { height: 200px; } */
 
 /* .div1 {
@@ -344,14 +434,16 @@
   transform: rotate(180deg);
 } */
 
-.wrapper2::-webkit-scrollbar{
+.wrapper2::-webkit-scrollbar {
   height: 10px;
 }
-.wrapper2::-webkit-scrollbar-thumb{
+
+.wrapper2::-webkit-scrollbar-thumb {
   background-color: #D9D9D9;
   border-radius: 10px;
 }
-.Action-btn{
+
+.Action-btn {
   color: white;
   background-color: #212529 !important;
 }
