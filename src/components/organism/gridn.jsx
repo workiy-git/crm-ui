@@ -229,14 +229,15 @@ const fetchGridData = async (filter) => {
     setSelectedRow(null);
   };
 
-  const handleNavigate = (path) => {
+  const handleNavigate = (path, mode) => {
     if (selectedRow) {
-      navigate(`${path}/${selectedRow.id}`, {
-        state: { rowData: selectedRow, pageName },
+      navigate(`${path}/${selectedRow._id}`, {
+        state: { rowData: selectedRow, pageName, mode },
       });
       handleMenuClose();
     }
   };
+  
 
   const columnsWithFilter = [
     {
@@ -276,13 +277,10 @@ const fetchGridData = async (filter) => {
             open={Boolean(anchorEl)}
             onClose={handleMenuClose}
           >
-            <MenuItem onClick={() => handleNavigate("/edit")}>Edit</MenuItem>
-            <MenuItem onClick={() => handleNavigate("/details")}>
-              Details
-            </MenuItem>
-            <MenuItem onClick={() => handleNavigate("/delete")}>
-              Delete
-            </MenuItem>
+            <MenuItem onClick={() => handleNavigate("/details", "details")}>Details</MenuItem>
+            <MenuItem onClick={() => handleNavigate("/details", "edit")}>Edit</MenuItem>
+            <MenuItem onClick={() => handleNavigate("/details", "delete")}>Delete</MenuItem>
+
           </Menu>
         </div>
       ),
