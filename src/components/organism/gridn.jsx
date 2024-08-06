@@ -20,6 +20,8 @@ import {
   Menu,
   Modal,
   Typography,
+  Stack,
+  Alert
 } from "@mui/material";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 
@@ -237,13 +239,28 @@ const fetchGridData = async (filter) => {
       handleMenuClose();
     }
   };
-  
+
+  const [selectedRows, setSelectedRows] = useState([]);  
+  const isAllSelected = selectedRows.length === filteredRows.length && filteredRows.length > 0;
 
   const columnsWithFilter = [
     {
       field: "select",
-      headerName: "",
-      width: 50,
+      width: 20,
+      padding: "0 10px",
+      cellClassName: 'center-align',
+      headerName: (
+        <div style={{display:'flex', flexDirection:'column', margin:'auto', padding:'0 10px'}}>
+        {/* <lable>Select All</lable> */}
+        <Checkbox
+          style={{color:'white', padding:'0'}}
+          className= "select-all-check-box"
+          checked={isAllSelected}
+          indeterminate={selectedRows.length > 0 && !isAllSelected}
+          onChange={(event) => handleSelectAllRows(event.target.checked)}
+        />
+        </div>
+      ),
       sortable: false,
       renderCell: (params) => (
         <Checkbox
@@ -255,9 +272,10 @@ const fetchGridData = async (filter) => {
       ),
     },
     {
-      // field: "actions",
-      // headerName: "Actions",
-      // width: 100,
+      field: "actions",
+      headerName: "",
+      sortable: false,
+      width: 20,
       renderCell: (params) => (
         
         <div>
@@ -270,6 +288,7 @@ const fetchGridData = async (filter) => {
               event.stopPropagation(); // Prevent checkbox selection
               handleMenuOpen(event, params.row); // Open the menu
             }}
+            className="morevet-icon"
           >
             <MoreVertIcon />
           </IconButton>
@@ -288,6 +307,8 @@ const fetchGridData = async (filter) => {
     },
     ...columns.map((column) => ({
       ...column,
+      cellClassName: 'center-align',
+
       renderHeader: (params) => (
         
         <div
@@ -318,7 +339,7 @@ const fetchGridData = async (filter) => {
             value={filterText[params.field] || ""}
             onClick={(e) => e.stopPropagation()} // Stop propagation to prevent sorting
             onChange={(e) => handleFilterChange(params.field, e.target.value)}
-            style={{ width: "80%", background: "#ffffff" }}
+            style={{ width: "80%", background: "#ffffff", borderRadius:'10px' }}
           />
         </div>
       ),
@@ -341,9 +362,13 @@ const fetchGridData = async (filter) => {
     );
 
     if (selectedData.length === 0) {
-      alert("No rows selected for export.");
+      setError('No rows selected');
+      setTimeout(() => setError(''), 3000);
       return;
     }
+    // Set success message
+    setSuccess('Data downloaded successfully');
+    setTimeout(() => setSuccess(''), 3000); // Clear success message after 3 seconds
 
     const csvRows = [];
     const headers = Object.keys(selectedData[0]);
@@ -372,7 +397,6 @@ const fetchGridData = async (filter) => {
     setTempVisibleColumns(columns);
     setShowColumnModal(true);
   };
-  const [selectedRows, setSelectedRows] = useState([]);
   const handleCheckboxChange = (column, isChecked) => {
     setTempVisibleColumns((prev) => {
       if (isChecked) {
@@ -388,6 +412,16 @@ const fetchGridData = async (filter) => {
   const handleExportClick = () => {
     exportSelectedRows();
   };
+
+  const handleSelectAllRows = (isChecked) => {
+    if (isChecked) {
+      const allRowIds = filteredRows.map((row) => row.id);
+      setSelectedRows(allRowIds);
+    } else {
+      setSelectedRows([]);
+    }
+  };
+  
   
   const handleRowSelection = (rowId, isChecked) => {
     setSelectedRows((prevSelectedRows) => {
@@ -398,10 +432,21 @@ const fetchGridData = async (filter) => {
       }
     });
   };
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
+  
   // Add some CSS to increase the header height
 
   return (
     <div className="CallsGrid">
+      {(error || success) && (
+        <Stack sx={{ width:'100%',position: 'absolute', zIndex: '10'}} spacing={2}>
+          <div style={{width:'fit-content', margin:'auto'}}>
+          {success && <Alert severity="success">{success}</Alert>}
+          {error && <Alert severity="error">{error}</Alert>}
+          </div>
+        </Stack>
+      )}
       <Box
         className="Appbar"
         sx={{ display: "flex", justifyContent: "space-around" }}
@@ -415,17 +460,7 @@ const fetchGridData = async (filter) => {
         onClose={closeMenu}>
             <MenuItem onClick={handleExportClick}>Export Data</MenuItem>
         </Menu>
-        <FormControl
-          variant="outlined"
-          style={{ minWidth: 200, marginBottom: 20 }}
-        >
-          <Button
-            sx={{ color: "black" }}
-            onClick={() => setShowColumnModal(true)}
-          >
-            <WidgetsOutlinedIcon />
-          </Button>
-        </FormControl>
+        
         <div className="dropdown" style={{ margin: "8px", width: "300px" }}>
           <select
             value={selectedValue}
@@ -448,7 +483,18 @@ const fetchGridData = async (filter) => {
             ))}
           </select>
         </div>
-        <Pagination
+        <FormControl
+          variant="outlined"
+          style={{ minWidth: 200, marginBottom: 20 }}
+        >
+          {/* <Button
+            sx={{ color: "black" }}
+            onClick={() => setShowColumnModal(true)}
+          >
+            <WidgetsOutlinedIcon />
+          </Button> */}
+        </FormControl>
+        {/* <Pagination
           pageSize={pageSize}
           paginationMode="server"
           rowCount={totalRows}
@@ -456,7 +502,7 @@ const fetchGridData = async (filter) => {
           page={page - 1}
           disableSelectionOnClick
           columnHeaderHeight={120}
-        />
+        /> */}
       </Box>
       {loading ? (
         <Box
