@@ -243,12 +243,13 @@ const fetchGridData = async (filter) => {
     {
       field: "select",
       headerName: "",
-      width: 60,
+      width: 50,
+      sortable: false,
       renderCell: (params) => (
         <Checkbox
           checked={selectedRows.includes(params.id)}
           onChange={(event) =>
-            handleCheckboxChange(params.id, event.target.checked)
+            handleRowSelection(params.id, event.target.checked)
           }
         />
       ),
@@ -388,6 +389,15 @@ const fetchGridData = async (filter) => {
     exportSelectedRows();
   };
   
+  const handleRowSelection = (rowId, isChecked) => {
+    setSelectedRows((prevSelectedRows) => {
+      if (isChecked) {
+        return [...prevSelectedRows, rowId];
+      } else {
+        return prevSelectedRows.filter((id) => id !== rowId);
+      }
+    });
+  };
   // Add some CSS to increase the header height
 
   return (
