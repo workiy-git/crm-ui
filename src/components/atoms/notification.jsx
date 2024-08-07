@@ -12,26 +12,26 @@ const Notification = () => {
     // Fetch notification icon
     axios.get(`${config.apiUrl}/menus/menu_bar`)
       .then((response) => {
-        console.log('Data received:', response.data);
+        // console.log('Data received:', response.data);
         setMenuData(response.data.data.menu_images);
       })
       .catch((error) => {
-        console.error('Error fetching menu data:', error);
+        // console.error('Error fetching menu data:', error);
       });
   
     // Fetch notification count
     axios.get(`${config.apiUrl}/appdata`)
       .then((response) => {
-        console.log('Notification data received:', response.data.data);
+        // console.log('Notification data received:', response.data.data);
         const a = response.data.data;
         setCount(a.length);
-        console.log("count", a.length); // Assuming 'a' is an array or string
+        // console.log("count", a.length); // Assuming 'a' is an array or string
         if (response.data && response.data.count) { // Assuming count is the property holding notification count
           setNotificationCount(response.data.count); // Adjust accordingly if count is named differently
         }
       })
       .catch((error) => {
-        console.error('Error fetching notification data:', error);
+        // console.error('Error fetching notification data:', error);
       });
   }, []);
   
@@ -43,10 +43,10 @@ const Notification = () => {
     // Additional code to mark notifications as read in the backend could be added here
     axios.post(`${config.apiUrl}/appdata`)
       .then((response) => {
-        console.log('Notifications marked as read:', response.data);
+        // console.log('Notifications marked as read:', response.data);
       })
       .catch((error) => {
-        console.error('Error marking notifications as read:', error);
+        // console.error('Error marking notifications as read:', error);
       });
   };
 

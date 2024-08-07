@@ -32,22 +32,22 @@ export default function Myprofile({ backgroundColor, value }) {
   useEffect(() => {
     axios.get(`${config.apiUrl}/menus/header`)
       .then((response) => {
-        console.log('myprofile Data received:', response.data);
+        // console.log('myprofile Data received:', response.data);
         setMyprofileData(response.data.data.myprofile);
       })
       .catch((error) => {
-        console.error('Error fetching data:', error);
+        // console.error('Error fetching data:', error);
       });
   }, []);
 
   useEffect(() => {
     axios.get(`${config.apiUrl}/users`)
       .then((response) => {
-        console.log('Users Data received:', response.data.data[1]);
+        // console.log('Users Data received:', response.data.data[1]);
         setuserData(response.data.data[1]);
       })
       .catch((error) => {
-        console.error('Error fetching data:', error);
+        // console.error('Error fetching data:', error);
       });
   }, []);
 

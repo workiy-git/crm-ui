@@ -20,6 +20,7 @@ const DetailsPage = () => {
   const [webformsData, setWebformsData] = useState([]);
   const [pageSchema, setPageSchema] = useState([]);
   const [isEditing, setIsEditing] = useState(false);
+  const [refreshTab, setRefreshTab] = useState(false);
 
   const initializeFormData = useCallback((data, schema) => {
     const initialData = {};
@@ -67,6 +68,7 @@ const DetailsPage = () => {
   const handleSaveSuccess = () => {
     setSuccess('Data updated successfully');
     setIsEditing(false);
+    setRefreshTab(prev => !prev);
     setTimeout(() => {
       setSuccess('');
     }, 2000);
@@ -138,7 +140,7 @@ const DetailsPage = () => {
               </div>
             </div>
             <div style={{ margin: '10px', display: 'flex', justifyContent: 'space-around', width: '50%', overflow: 'hidden' }}>
-              <Tab />
+              <Tab key={refreshTab} pageName={pageName}/>
             </div>
           </div>
         </div>

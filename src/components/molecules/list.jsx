@@ -28,7 +28,7 @@ export default function Hamburger() {
   const menuRef = useRef(null);
 
   const handleMenuItemClick = (menuItem) => {
-    console.log('Clicked on:', menuItem.path);
+    // console.log('Clicked on:', menuItem.path);
     const url = `${menuItem.path}`;
     window.location.href = url;
   };
@@ -36,11 +36,11 @@ export default function Hamburger() {
   useEffect(() => {
     axios.get(`${config.apiUrl}/menus/header`)
       .then((response) => {
-        console.log('Data received:', response.data.data.hamburger);
+        // console.log('Data received:', response.data.data.hamburger);
         setHamburgerData(response.data.data.hamburger);
       })
       .catch((error) => {
-        console.error('Error fetching data:', error);
+        // console.error('Error fetching data:', error);
       });
   }, []);
 
