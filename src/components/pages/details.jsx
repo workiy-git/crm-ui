@@ -1,13 +1,13 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
-import { Box, Button, Stack, Alert } from '@mui/material';
+import { Box, Button, Stack } from '@mui/material';
 import axios from 'axios';
 import config from '../../config/config';
 import Tab from '../organism/details-tab';
 import EditComponent from '../organism/edit';
 import ViewComponent from '../organism/view';
-import ConfirmationDialog from '../molecules/confirmation-dialog'; // Import the ConfirmationDialog component
-import AlertWrapper from '../organism/alert'; // Import the AlertWrapper component
+import ConfirmationDialog from '../molecules/confirmation-dialog'; 
+import AlertWrapper from '../organism/alert'; 
 
 const DetailsPage = () => {
   const { id } = useParams();
@@ -21,8 +21,8 @@ const DetailsPage = () => {
   const [webformsData, setWebformsData] = useState([]);
   const [pageSchema, setPageSchema] = useState([]);
   const [isEditing, setIsEditing] = useState(mode === 'edit');
-  const [isAdding, setIsAdding] = useState(!id && mode !== 'edit'); // Determine if adding new data
-  const [isDialogOpen, setIsDialogOpen] = useState(false); // State to control the dialog visibility
+  const [isAdding, setIsAdding] = useState(!id && mode !== 'edit'); 
+  const [isDialogOpen, setIsDialogOpen] = useState(false); 
 
 
   const initializeFormData = useCallback((data, schema) => {
