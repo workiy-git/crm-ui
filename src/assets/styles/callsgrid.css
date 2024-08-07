@@ -71,7 +71,7 @@
   align-items: center;
   padding: 0 !important;
   width: 200px;
-  height: 100px !important;
+  height: 86px !important;
   /* Increase width to fit both controls */
   box-sizing: border-box;
 }
@@ -124,12 +124,20 @@
 
 }
 .custom-data-grid{
-  height: 80vh !important;
+  height: 100% !important;
 }
 .custom-data-grid .MuiFormControl-root {
   width: 100%;
 }
-
+.custom-data-grid .MuiDataGrid-scrollbar--horizontal{
+  top: 80px;
+}
+.custom-data-grid .MuiDataGrid-scrollbar--horizontal::-webkit-scrollbar{
+  height: 15px;
+}
+.custom-data-grid .MuiDataGrid-footerContainer{
+  display: none;
+}
 .table-head {
   /* padding-top: 12px;
   padding-bottom: 12px; */
@@ -472,4 +480,7 @@
 } */
 .custom-data-grid .MuiDataGrid-columnHeader[aria-colindex="1"] .MuiDataGrid-menuIcon, .custom-data-grid .MuiDataGrid-columnHeader[aria-colindex="2"] .MuiDataGrid-menuIcon {
   display: none;
+}
+.grid_search input{
+  padding: 0;
 }
