@@ -34,7 +34,7 @@ const GridComponent = ({ pageName }) => {
   const [columns, setColumns] = useState([]);
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(5); // Adjust this value as needed
+  const [pageSize, setPageSize] = useState(10); // Adjust this value as needed
   const [totalRows, setTotalRows] = useState(0);
   const [selectOptions, setSelectOptions] = useState([]);
   const [selectedValue, setSelectedValue] = useState("");
@@ -340,6 +340,7 @@ const fetchGridData = async (filter) => {
             onClick={(e) => e.stopPropagation()} // Stop propagation to prevent sorting
             onChange={(e) => handleFilterChange(params.field, e.target.value)}
             style={{ width: "80%", background: "#ffffff", borderRadius:'10px' }}
+            className="grid_search"
           />
         </div>
       ),
@@ -434,6 +435,11 @@ const fetchGridData = async (filter) => {
   };
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+
+  const handlePageSizeChange = (event) => {
+    setPageSize(event.target.value);
+    setPage(1); // Reset to the first page when the page size changes
+  };
   
   // Add some CSS to increase the header height
 
@@ -483,26 +489,32 @@ const fetchGridData = async (filter) => {
             ))}
           </select>
         </div>
-        <FormControl
-          variant="outlined"
-          style={{ minWidth: 200, marginBottom: 20 }}
+        <Box mt={2} mb={2}>
+        <Pagination
+          count={Math.ceil(totalRows / pageSize)}
+          siblingCount={0}
+          page={page}
+          style={{justifyContent:'center', display:'flex'}}
+          onChange={handlePageChange}
+        />
+        <span style={{ marginLeft: "16px" }}>
+          Page {page} of {Math.ceil(totalRows / pageSize)}
+        </span>
+        <span style={{ marginLeft: "16px" }}>
+          Total Rows: {totalRows}
+        </span>
+        <Select
+          value={pageSize}
+          onChange={handlePageSizeChange}
+          displayEmpty
+          style={{ marginLeft: "16px" }}
         >
-          {/* <Button
-            sx={{ color: "black" }}
-            onClick={() => setShowColumnModal(true)}
-          >
-            <WidgetsOutlinedIcon />
-          </Button> */}
-        </FormControl>
-        {/* <Pagination
-          pageSize={pageSize}
-          paginationMode="server"
-          rowCount={totalRows}
-          onPageChange={handlePageChange}
-          page={page - 1}
-          disableSelectionOnClick
-          columnHeaderHeight={120}
-        /> */}
+          <MenuItem value={10}>10</MenuItem>
+          <MenuItem value={25}>25</MenuItem>
+          <MenuItem value={50}>50</MenuItem>
+        </Select>
+      </Box>
+      
       </Box>
       {loading ? (
         <Box
@@ -514,9 +526,9 @@ const fetchGridData = async (filter) => {
           <CircularProgress />
         </Box>
       ) : (
-        <div>
+        <div style={{height:'calc(100vh - 180px)'}}>
           <DataGrid
-            rows={filteredRows}
+            rows={filteredRows.slice((page - 1) * pageSize, page * pageSize)}
             columns={columnsWithFilter}
             pageSize={pageSize}
             paginationMode="server"
