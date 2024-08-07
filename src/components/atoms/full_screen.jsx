@@ -9,7 +9,7 @@ const FullScreen = () => {
   const [logoData, setLogoData] = useState([]);
 
   const handleResize = _.debounce(() => {
-    console.log('Resized!');
+    // console.log('Resized!');
   }, 300);
 
   const toggleFullScreen = () => {
@@ -68,11 +68,11 @@ const FullScreen = () => {
   useEffect(() => {
     axios.get(`${config.apiUrl}/menus/header`) // Use apiUrl from the configuration file
       .then((response) => {
-        console.log('Data received:', response.data);
+        // console.log('Data received:', response.data);
         setLogoData(response.data.data.full_screen);
       })
       .catch((error) => {
-        console.error('Error fetching data:', error);
+        // console.error('Error fetching data:', error);
       });
   }, []);
 

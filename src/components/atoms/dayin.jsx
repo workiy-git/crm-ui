@@ -11,11 +11,11 @@ const Dayin = () => {
   useEffect(() => {
     axios.get(`${config.apiUrl}/menus/menu_bar`) // Use apiUrl from the configuration file
       .then((response) => {
-        console.log('dayData received:', response.data.data.menu_text);
+        // console.log('dayData received:', response.data.data.menu_text);
         setMenuData(response.data.data.menu_text);
       })
       .catch((error) => {
-        console.error('Error fetching data:', error);
+        // console.error('Error fetching data:', error);
       });
   }, []);
 

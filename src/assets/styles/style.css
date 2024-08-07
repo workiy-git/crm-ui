@@ -56,3 +56,6 @@
   .widget-main:hover .widget-hide-btn{
     visibility: visible;
   }
+  .overflow-a {
+    overflow: auto;
+  }

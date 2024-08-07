@@ -24,6 +24,7 @@ const DetailsPage = () => {
   const [isAdding, setIsAdding] = useState(!id && mode !== 'edit'); // Determine if adding new data
   const [isDialogOpen, setIsDialogOpen] = useState(false); // State to control the dialog visibility
 
+
   const initializeFormData = useCallback((data, schema) => {
     const initialData = {};
     schema.forEach((field) => {
@@ -208,7 +209,7 @@ const DetailsPage = () => {
               </div>
             </div>
             <div style={{ margin: '10px', display: 'flex', justifyContent: 'space-around', width: '50%', overflow: 'hidden' }}>
-              <Tab />
+              <Tab key={refreshTab} pageName={pageName}/>
             </div>
           </div>
         </div>

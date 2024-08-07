@@ -20,11 +20,11 @@ const Search = () => {
   useEffect(() => {
     axios.get(`${config.apiUrl}/menus/menu_bar`) // Use apiUrl from the configuration file
       .then((response) => {
-        console.log('Search Data received:', response.data.data.menu_images);
+        // console.log('Search Data received:', response.data.data.menu_images);
         setMenuData(response.data.data.menu_images || []);
       })
       .catch((error) => {
-        console.error('Error fetching data:', error);
+        // console.error('Error fetching data:', error);
         setMenuData([]); // Set an empty array in case of an error
       });
   }, []);

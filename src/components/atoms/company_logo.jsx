@@ -18,11 +18,11 @@ function Companylogo() {
     useEffect(() => {
         axios.get(`${config.apiUrl}/menus/header`) // Use apiUrl from the configuration file
             .then((response) => {
-                console.log('Data received:', response.data);
+                // console.log('Data received:', response.data);
                 setcompanylogoData(response.data.data.company_logo);
             })
             .catch((error) => {
-                console.error('Error fetching data:', error);
+                // console.error('Error fetching data:', error);
             });
     }, []);
 
