@@ -1,25 +1,28 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
-import { Box, Button, Alert, Stack } from '@mui/material';
+import { Box, Button, Stack, Alert } from '@mui/material';
 import axios from 'axios';
 import config from '../../config/config';
 import Tab from '../organism/details-tab';
 import EditComponent from '../organism/edit';
 import ViewComponent from '../organism/view';
-import DeleteComponent from '../organism/delete';
+import ConfirmationDialog from '../molecules/confirmation-dialog'; // Import the ConfirmationDialog component
+import AlertWrapper from '../organism/alert'; // Import the AlertWrapper component
 
 const DetailsPage = () => {
   const { id } = useParams();
   const location = useLocation();
   const navigate = useNavigate();
-  const { rowData, pageName } = location.state || {};
+  const { rowData, pageName, pageId, mode } = location.state || {};
 
   const [formData, setFormData] = useState({});
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [webformsData, setWebformsData] = useState([]);
   const [pageSchema, setPageSchema] = useState([]);
-  const [isEditing, setIsEditing] = useState(false);
+  const [isEditing, setIsEditing] = useState(mode === 'edit');
+  const [isAdding, setIsAdding] = useState(!id && mode !== 'edit'); // Determine if adding new data
+  const [isDialogOpen, setIsDialogOpen] = useState(false); // State to control the dialog visibility
 
   const initializeFormData = useCallback((data, schema) => {
     const initialData = {};
@@ -48,7 +51,7 @@ const DetailsPage = () => {
         if (rowData) {
           const initialFormData = initializeFormData(rowData, pageSchema);
           setFormData(initialFormData);
-        } else {
+        } else if (id) {
           const apiUrl = `${config.apiUrl.replace(/\/$/, '')}/appdata/${id}`;
           const response = await axios.get(apiUrl);
           const fetchedData = response.data;
@@ -64,19 +67,80 @@ const DetailsPage = () => {
     fetchWebformsData();
   }, [id, rowData, pageName, initializeFormData]);
 
-  const handleSaveSuccess = () => {
-    setSuccess('Data updated successfully');
+  const handleSaveSuccess = (message) => {
+    setSuccess(message);
+    setError('');
     setIsEditing(false);
+    setIsAdding(false);
     setTimeout(() => {
       setSuccess('');
+    }, 2000);
+  };
+
+  const handleSaveError = (message) => {
+    setError(message);
+    setSuccess('');
+    setTimeout(() => {
+      setError('');
     }, 2000);
   };
 
   const handleDeleteSuccess = () => {
     setSuccess('Data deleted successfully');
     setTimeout(() => {
-      navigate('/grid');
+      navigate('/grid'); // Ensure this is the correct path to navigate after deletion
     }, 2000);
+  };
+
+  const handleDeleteError = (message) => {
+    setError(message);
+    setTimeout(() => {
+      setError('');
+    }, 2000);
+  };
+
+  const handleAddNew = () => {
+    setIsAdding(true);
+    setFormData({});
+    setIsEditing(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    try {
+      const apiUrl = `${config.apiUrl.replace(/\/$/, '')}/appdata/${id}`;
+      await axios.delete(apiUrl);
+      handleDeleteSuccess();
+    } catch (error) {
+      handleDeleteError('Error deleting data');
+    } finally {
+      setIsDialogOpen(false);
+    }
+  };
+
+  const handleOpenDialog = () => {
+    setIsDialogOpen(true);
+  };
+
+  const handleCloseDialog = () => {
+    setIsDialogOpen(false);
+  };
+
+  const handleSave = async () => {
+    if (!formData) return;
+
+    try {
+      const dataToSend = { pageName, pageId, ...formData };
+      if (isAdding) {
+        await axios.post(`${config.apiUrl}/appdata/create`, dataToSend);
+      } else {
+        await axios.put(`${config.apiUrl}/appdata/${id}`, dataToSend);
+      }
+      handleSaveSuccess('Data saved successfully!');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } catch (error) {
+      handleSaveError('Error saving data.');
+      console.error('Error saving data:', error);
+    }
   };
 
   return (
@@ -86,15 +150,22 @@ const DetailsPage = () => {
           <div style={{ display: 'flex', justifyContent: 'space-between', background: '#212529', color: 'white', height: '65px' }}>
             <h2 style={{ margin: 'auto 20px' }}>{pageName} Details Page</h2>
             <Box style={{ display: 'flex', alignItems: 'center', marginRight: '5%' }}>
-              {!isEditing && (
-                <Button 
-                  variant="contained" 
-                  color="primary" 
-                  onClick={() => setIsEditing(true)}>
+              <Button variant="contained" color="primary" onClick={handleAddNew}>
+                Add
+              </Button>
+              {!isAdding && !isEditing && (
+                <Button variant="contained" color="primary" onClick={() => setIsEditing(true)}>
                   Edit
                 </Button>
               )}
-              <DeleteComponent id={id} onDeleteSuccess={handleDeleteSuccess} />
+              {(isEditing || isAdding) && (
+                <Button variant="contained" color="primary" onClick={handleSave}>
+                  Save
+                </Button>
+              )}
+              <Button variant="contained" color="error" onClick={handleOpenDialog}>
+                Delete
+              </Button>
             </Box>
           </div>
           <div style={{ display: 'flex', overflow: 'hidden', height: '90%' }}>
@@ -103,7 +174,7 @@ const DetailsPage = () => {
               <div>
                 <Box style={{ display: 'flex', justifyContent: 'end', alignItems: 'center', padding: '5px' }}>
                   <div style={{ margin: 'auto 20px' }}>
-                    CT : <span style={{ fontWeight: 'bold' }}>{formData.created_time || 'N/A'}</span>
+                    CT : <span style={{ fontWeight: 'bold' }}>{formData?.created_time || 'N/A'}</span>
                   </div>
                 </Box>
               </div>
@@ -111,25 +182,24 @@ const DetailsPage = () => {
                 <Box sx={{ m: 2 }}>
                   {error && (
                     <Stack sx={{ width: '100%' }} spacing={2}>
-                      <Alert severity="error" onClose={() => setError('')}>
-                        {error}
-                      </Alert>
+                      <AlertWrapper type="error" message={error} />
                     </Stack>
                   )}
                   {success && (
                     <Stack sx={{ width: '100%' }} spacing={2}>
-                      <Alert severity="success" onClose={() => setSuccess('')}>
-                        {success}
-                      </Alert>
+                      <AlertWrapper type="success" message={success} />
                     </Stack>
                   )}
                   {isEditing ? (
-                    <EditComponent 
-                      id={id}
+                    <EditComponent
+                      id={isAdding ? null : id} // Pass null if adding new
                       formData={formData}
                       setFormData={setFormData}
                       pageSchema={pageSchema}
                       onSaveSuccess={handleSaveSuccess}
+                      onSaveError={handleSaveError}
+                      pageName={pageName}
+                      pageId={pageId}
                     />
                   ) : (
                     <ViewComponent formData={formData} pageSchema={pageSchema} />
@@ -143,6 +213,13 @@ const DetailsPage = () => {
           </div>
         </div>
       </div>
+      <ConfirmationDialog
+        open={isDialogOpen}
+        title="Confirm Deletion"
+        content="Are you sure you want to delete this item?"
+        onConfirm={handleConfirmDelete}
+        onCancel={handleCloseDialog}
+      />
     </div>
   );
 };

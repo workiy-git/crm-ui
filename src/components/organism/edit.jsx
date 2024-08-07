@@ -1,12 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Button, TextField, Select, MenuItem, FormControl, Checkbox, FormControlLabel, InputLabel } from '@mui/material';
+import { Box, TextField, Select, MenuItem, FormControl, Checkbox, FormControlLabel, InputLabel } from '@mui/material';
 import axios from 'axios';
 import config from '../../config/config';
 
-const EditComponent = ({ id, pageSchema, formData, setFormData, onSaveSuccess }) => {
-  const [isAddingNew, setIsAddingNew] = useState(!id); // If there's no ID, it's adding mode
+const EditComponent = ({ id, pageSchema, formData, setFormData, onSaveSuccess, onSaveError, pageName, pageID }) => {
   const [validationError, setValidationError] = useState('');
   const [formErrors, setFormErrors] = useState({});
+
+  useEffect(() => {
+    if (!formData) {
+      setFormData({});
+    }
+  }, [formData, setFormData]);
 
   const handleInputChange = (event) => {
     const { name, value, type, checked } = event.target;
@@ -19,34 +24,51 @@ const EditComponent = ({ id, pageSchema, formData, setFormData, onSaveSuccess })
     const errors = {};
 
     pageSchema.forEach((field) => {
-      if (field.required && !formData[field.fieldName]) {
+      if (field.required && (!formData[field.fieldName] || formData[field.fieldName] === 'N/A')) {
         errors[field.fieldName] = `${field.label || field.fieldName} is mandatory`;
         hasErrors = true;
       }
     });
 
     setFormErrors(errors);
-    setValidationError(hasErrors ? 'Please fill all mandatory fields' : '');
+    if (hasErrors) {
+      setValidationError('Please fill all mandatory fields');
+    } else {
+      setValidationError('');
+    }
     return !hasErrors;
   };
 
   const handleSave = async () => {
-    if (!validateForm()) return;
+    if (!validateForm()) {
+      onSaveError('Please fill all mandatory fields');
+      for (const key in formErrors) {
+        const element = document.querySelector(`[name="${key}"]`);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          break;
+        }
+      }
+      return;
+    }
 
     try {
-      if (isAddingNew) {
-        await axios.post(`${config.apiUrl}/appdata/create`, formData);
+      const dataToSend = { pageName, pageID, ...formData };
+      if (!id) {
+        await axios.post(`${config.apiUrl}/appdata/create`, dataToSend);
       } else {
-        await axios.put(`${config.apiUrl}/appdata/${id}`, formData);
+        await axios.put(`${config.apiUrl}/appdata/${id}`, dataToSend);
       }
-      onSaveSuccess();
+      onSaveSuccess('Data saved successfully!');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     } catch (error) {
+      onSaveError('Error saving data.');
       console.error('Error saving data:', error);
     }
   };
 
   const renderInputField = (field) => {
-    const value = formData[field.fieldName] || 'N/A';
+    const value = formData[field.fieldName] === 'N/A' ? '' : formData[field.fieldName] || '';
     const isError = formErrors[field.fieldName];
     const label = `${field.label || field.fieldName}${field.required ? ' *' : ''}`;
 
@@ -114,9 +136,6 @@ const EditComponent = ({ id, pageSchema, formData, setFormData, onSaveSuccess })
     <Box>
       {pageSchema.map((field) => renderInputField(field))}
       {validationError && <div style={{ color: 'red' }}>{validationError}</div>}
-      <Button variant="contained" color="primary" onClick={handleSave}>
-        {isAddingNew ? 'Add' : 'Save'}
-      </Button>
     </Box>
   );
 };
