@@ -3,7 +3,8 @@ import axios from "axios";
 import { useLocation, useNavigate } from "react-router-dom";
 import config from "../../config/config";
 import { DataGrid } from "@mui/x-data-grid";
-import WidgetsOutlinedIcon from "@mui/icons-material/WidgetsOutlined";
+import DeleteComponent from '../organism/delete';
+import ConfirmationDialog from '../molecules/confirmation-dialog';
 import "../../assets/styles/callsgrid.css";
 
 import {
@@ -45,6 +46,9 @@ const GridComponent = ({ pageName }) => {
   const [tempVisibleColumns, setTempVisibleColumns] = useState([]);
   const [availableColumns, setAvailableColumns] = useState([]);
   const [filterText, setFilterText] = useState("");
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+const [rowToDelete, setRowToDelete] = useState(null);
+
   // const [filteredRows, setFilteredRows] = useState(gridData);
   //not confirmed
 
@@ -78,6 +82,30 @@ const GridComponent = ({ pageName }) => {
     setColumns(tempVisibleColumns);
     closeColumnModal();
   };
+  const handleDeleteClick = (row) => {
+    setRowToDelete(row); // Set the row to be deleted
+    setDeleteDialogOpen(true); // Open the confirmation dialog
+  };
+  
+  const handleConfirmDelete = async () => {
+    if (rowToDelete) {
+      const id = rowToDelete._id; // Assuming `_id` is the unique identifier for the row
+      try {
+        await axios.delete(`${config.apiUrl.replace(/\/$/, '')}/appdata/${id}`);
+        setGridData((prevData) => prevData.filter((row) => row._id !== id));
+        setDeleteDialogOpen(false); // Close the dialog
+        setRowToDelete(null); // Clear the selected row
+      } catch (error) {
+        console.error('Error deleting data:', error);
+      }
+    }
+  };
+  
+  const handleCancelDelete = () => {
+    setDeleteDialogOpen(false); // Close the dialog
+    setRowToDelete(null); // Clear the selected row
+  };
+  
 
   // Fetch select options
   useEffect(() => {
@@ -299,7 +327,8 @@ const fetchGridData = async (filter) => {
           >
             <MenuItem onClick={() => handleNavigate("/details", "details")}>Details</MenuItem>
             <MenuItem onClick={() => handleNavigate("/details", "edit")}>Edit</MenuItem>
-            <MenuItem onClick={() => handleNavigate("/details", "delete")}>Delete</MenuItem>
+            <MenuItem onClick={() => handleDeleteClick(selectedRow)}>Delete</MenuItem>
+
 
           </Menu>
         </div>
@@ -594,6 +623,14 @@ const fetchGridData = async (filter) => {
     </Box>
   </Box>
 </Modal>
+<ConfirmationDialog
+  open={deleteDialogOpen}
+  title="Confirm Delete"
+  content={`Are you sure you want to delete this row?`}
+  onConfirm={handleConfirmDelete}
+  onCancel={handleCancelDelete}
+/>
+
     </div>
   );
 };
