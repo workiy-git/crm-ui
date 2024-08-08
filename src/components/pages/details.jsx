@@ -94,7 +94,7 @@ const DetailsPage = () => {
   const handleDeleteSuccess = () => {
     setSuccess("Data deleted successfully");
     setTimeout(() => {
-      navigate("/grid"); // Ensure this is the correct path to navigate after deletion
+      navigate(`/container/${pageName}`); // Ensure this is the correct path to navigate after deletion
     }, 2000);
   };
 
@@ -180,36 +180,12 @@ const DetailsPage = () => {
               <Button
                 variant="contained"
                 color="primary"
-                onClick={handleAddNew}
+                style={{margin:'5px'}}
               >
-                Add
-              </Button>
-              {!isAdding && !isEditing && (
-                <Button
-                  variant="contained"
-                  color="primary"
-                  onClick={() => setIsEditing(true)}
-                >
-                  Edit
-                </Button>
-              )}
-              {(isEditing || isAdding) && (
-                <Button
-                  variant="contained"
-                  color="primary"
-                  onClick={handleSave}
-                >
-                  Save
-                </Button>
-              )}
-              <Button
-                variant="contained"
-                color="error"
-                onClick={handleOpenDialog}
-              >
-                Delete
+                Back
               </Button>
             </Box>
+            
           </div>
           <div style={{ display: "flex", overflow: "hidden", height: "90%" }}>
             <div
@@ -229,9 +205,56 @@ const DetailsPage = () => {
                   fontWeight: "bold",
                   fontSize: "20px",
                   textTransform: "capitalize",
+                  display: "flex",
+                  justifyContent: "space-between",
                 }}
               >
-                {pageName} information
+                <div>{pageName} information</div>
+                <Box
+              style={{
+                display: "flex",
+                alignItems: "center",
+                marginRight: "5%",
+              }}
+            >
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={handleAddNew}
+                style={{margin:'5px'}}
+              >
+                Add
+              </Button>
+              {!isAdding && !isEditing && (
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={() => setIsEditing(true)}
+                style={{margin:'5px'}}
+
+                >
+                  Edit
+                </Button>
+              )}
+              {(isEditing || isAdding) && (
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={handleSave}
+                style={{margin:'5px'}}
+
+                >
+                  Save
+                </Button>
+              )}
+              <Button
+                variant="contained"
+                color="error"
+                onClick={handleOpenDialog}
+              >
+                Delete
+              </Button>
+            </Box>
               </div>
               <div>
                 <Box
@@ -283,7 +306,7 @@ const DetailsPage = () => {
               </div>
             </div>
             <div style={{ margin: '10px', display: 'flex', justifyContent: 'space-around', width: '50%', overflow: 'hidden' }}>
-              <Tab key={refreshTab} />
+              <Tab mode={isAdding ? 'add' : 'view'} key={refreshTab} />
             </div>
           </div>
         </div>

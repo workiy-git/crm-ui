@@ -151,26 +151,30 @@
 
 // export default Updates;
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { Box, Typography, List, ListItem, Divider, Avatar } from '@mui/material';
 import axios from 'axios';
-import { useState, useEffect } from 'react';
 import config from '../../config/config';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 
-const Updates = () => {
+const Updates = ({ mode }) => {
   const { id } = useParams();
   const [history, setHistory] = useState([]);
   const [error, setError] = useState(null);
-  const [labels, setLabels] = useState({});
   const [fieldLabels, setFieldLabels] = useState({});
 
   useEffect(() => {
+    if (mode === 'add') {
+      // Skip fetching data if in 'add' mode
+      setHistory([]);
+      return;
+    }
+
     const fetchHistory = async () => {
       try {
         const response = await axios.get(`${config.apiUrl}/appdata/history/${id}`);
-        setHistory(response.data.data);
+        setHistory(response.data.data || []);
       } catch (error) {
         setError(error);
       }
@@ -215,10 +219,10 @@ const Updates = () => {
         setError(error);
       }
     };
-    
+
     fetchHistory();
     fetchData();
-  }, [id]);
+  }, [id, mode]);
 
   const parseHistoryItem = (item) => {
     const dateRegex = /^On (.*?), (.*?), (.*?)\s+(.+)$/;
@@ -234,11 +238,14 @@ const Updates = () => {
 
   return (
     <Box sx={{ margin: 'auto', padding: 2, maxWidth: 800, overflow: 'auto' }}>
-      {error ? (
-        <Typography color="error">Failed to load history: {error.message}</Typography>
+      {error && <Typography color="error">Failed to load history: {error.message}</Typography>}
+      {mode === 'add' ? (
+        <Typography>No history available for new record.</Typography>
+      ) : history.length === 0 ? (
+        <Typography>No history available.</Typography>
       ) : (
         <List>
-          {history && history.map((item, index) => {
+          {history.map((item, index) => {
             const { dateTime, details } = parseHistoryItem(item);
             const parts = details.split('made the following changes: ');
             const action = parts[0].trim();
@@ -281,7 +288,6 @@ const Updates = () => {
               </React.Fragment>
             );
           })}
-          {history.length === 0 && <Typography>No history available</Typography>}
         </List>
       )}
     </Box>
