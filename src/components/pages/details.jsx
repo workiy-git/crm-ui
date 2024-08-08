@@ -1,13 +1,13 @@
-import React, { useState, useEffect, useCallback } from "react";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
-import { Box, Button, Stack } from "@mui/material";
-import axios from "axios";
-import config from "../../config/config";
-import Tab from "../organism/details-tab";
-import EditComponent from "../organism/edit";
-import ViewComponent from "../organism/view";
-import ConfirmationDialog from "../molecules/confirmation-dialog";
-import AlertWrapper from "../organism/alert";
+import React, { useState, useEffect, useCallback } from 'react';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { Box, Button, Stack } from '@mui/material';
+import axios from 'axios';
+import config from '../../config/config';
+import EditComponent from '../organism/edit';
+import ViewComponent from '../organism/view';
+import ConfirmationDialog from '../molecules/confirmation-dialog'; 
+import AlertWrapper from '../organism/alert'; 
+import Tab from '../organism/details-tab';
 
 const DetailsPage = () => {
   const { id } = useParams();
@@ -20,9 +20,10 @@ const DetailsPage = () => {
   const [success, setSuccess] = useState("");
   const [webformsData, setWebformsData] = useState([]);
   const [pageSchema, setPageSchema] = useState([]);
-  const [isEditing, setIsEditing] = useState(mode === "edit");
-  const [isAdding, setIsAdding] = useState(!id && mode !== "edit");
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isEditing, setIsEditing] = useState(mode === 'edit');
+  const [isAdding, setIsAdding] = useState(!id && mode !== 'edit'); 
+  const [refreshTab, setRefreshTab] = useState(false);
+  const [isDialogOpen, setIsDialogOpen] = useState(false); 
 
   const initializeFormData = useCallback((data, schema) => {
     const initialData = {};
@@ -76,6 +77,7 @@ const DetailsPage = () => {
     setError("");
     setIsEditing(false);
     setIsAdding(false);
+    setRefreshTab(prev => !prev);
     setTimeout(() => {
       setSuccess("");
     }, 2000);
@@ -280,9 +282,9 @@ const DetailsPage = () => {
                 </Box>
               </div>
             </div>
-            {/* <div style={{ margin: '10px', display: 'flex', justifyContent: 'space-around', width: '50%', overflow: 'hidden' }}>
-              <Tab key={refreshTab} pageName={pageName}/>
-            </div> */}
+            <div style={{ margin: '10px', display: 'flex', justifyContent: 'space-around', width: '50%', overflow: 'hidden' }}>
+              <Tab key={refreshTab} />
+            </div>
           </div>
         </div>
       </div>
