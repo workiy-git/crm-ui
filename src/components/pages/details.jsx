@@ -16,8 +16,8 @@ const DetailsPage = () => {
   const { rowData, pageName, pageId, mode } = location.state || {};
 
   const [formData, setFormData] = useState({});
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
   const [webformsData, setWebformsData] = useState([]);
   const [pageSchema, setPageSchema] = useState([]);
   const [isEditing, setIsEditing] = useState(mode === 'edit');
@@ -25,11 +25,10 @@ const DetailsPage = () => {
   const [refreshTab, setRefreshTab] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false); 
 
-
   const initializeFormData = useCallback((data, schema) => {
     const initialData = {};
     schema.forEach((field) => {
-      initialData[field.fieldName] = data[field.fieldName] || '';
+      initialData[field.fieldName] = data[field.fieldName] || "";
     });
     return initialData;
   }, []);
@@ -37,11 +36,15 @@ const DetailsPage = () => {
   useEffect(() => {
     const fetchWebformsData = async () => {
       try {
-        const response = await axios.get(`${config.apiUrl.replace(/\/$/, '')}/webforms`);
+        const response = await axios.get(
+          `${config.apiUrl.replace(/\/$/, "")}/webforms`
+        );
         const fetchedWebformsData = response.data.data;
         setWebformsData(fetchedWebformsData || []);
 
-        const currentPage = fetchedWebformsData.find((page) => page.pageName === pageName);
+        const currentPage = fetchedWebformsData.find(
+          (page) => page.pageName === pageName
+        );
         if (!currentPage) {
           setError(`Page ${pageName} not found in webforms collection.`);
           return;
@@ -54,7 +57,7 @@ const DetailsPage = () => {
           const initialFormData = initializeFormData(rowData, pageSchema);
           setFormData(initialFormData);
         } else if (id) {
-          const apiUrl = `${config.apiUrl.replace(/\/$/, '')}/appdata/${id}`;
+          const apiUrl = `${config.apiUrl.replace(/\/$/, "")}/appdata/${id}`;
           const response = await axios.get(apiUrl);
           const fetchedData = response.data;
 
@@ -62,7 +65,7 @@ const DetailsPage = () => {
           setFormData(initialFormData);
         }
       } catch (error) {
-        setError('Error fetching webforms data');
+        setError("Error fetching webforms data");
       }
     };
 
@@ -71,34 +74,34 @@ const DetailsPage = () => {
 
   const handleSaveSuccess = (message) => {
     setSuccess(message);
-    setError('');
+    setError("");
     setIsEditing(false);
     setIsAdding(false);
     setRefreshTab(prev => !prev);
     setTimeout(() => {
-      setSuccess('');
+      setSuccess("");
     }, 2000);
   };
 
   const handleSaveError = (message) => {
     setError(message);
-    setSuccess('');
+    setSuccess("");
     setTimeout(() => {
-      setError('');
+      setError("");
     }, 2000);
   };
 
   const handleDeleteSuccess = () => {
-    setSuccess('Data deleted successfully');
+    setSuccess("Data deleted successfully");
     setTimeout(() => {
-      navigate('/grid'); // Ensure this is the correct path to navigate after deletion
+      navigate("/grid"); // Ensure this is the correct path to navigate after deletion
     }, 2000);
   };
 
   const handleDeleteError = (message) => {
     setError(message);
     setTimeout(() => {
-      setError('');
+      setError("");
     }, 2000);
   };
 
@@ -110,11 +113,11 @@ const DetailsPage = () => {
 
   const handleConfirmDelete = async () => {
     try {
-      const apiUrl = `${config.apiUrl.replace(/\/$/, '')}/appdata/${id}`;
+      const apiUrl = `${config.apiUrl.replace(/\/$/, "")}/appdata/${id}`;
       await axios.delete(apiUrl);
       handleDeleteSuccess();
     } catch (error) {
-      handleDeleteError('Error deleting data');
+      handleDeleteError("Error deleting data");
     } finally {
       setIsDialogOpen(false);
     }
@@ -138,58 +141,124 @@ const DetailsPage = () => {
       } else {
         await axios.put(`${config.apiUrl}/appdata/${id}`, dataToSend);
       }
-      handleSaveSuccess('Data saved successfully!');
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      handleSaveSuccess("Data saved successfully!");
+      window.scrollTo({ top: 0, behavior: "smooth" });
     } catch (error) {
-      handleSaveError('Error saving data.');
-      console.error('Error saving data:', error);
+      handleSaveError("Error saving data.");
+      console.error("Error saving data:", error);
     }
   };
 
   return (
-    <div style={{ height: '100vh', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-      <div style={{ display: 'flex', height: '100%', overflow: 'hidden' }}>
-        <div style={{ width: '100%', overflow: 'hidden' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', background: '#212529', color: 'white', height: '65px' }}>
-            <h2 style={{ margin: 'auto 20px' }}>{pageName} Details Page</h2>
-            <Box style={{ display: 'flex', alignItems: 'center', marginRight: '5%' }}>
-              <Button variant="contained" color="primary" onClick={handleAddNew}>
+    <div
+      style={{
+        height: "100vh",
+        display: "flex",
+        flexDirection: "column",
+        overflow: "hidden",
+      }}
+    >
+      <div style={{ display: "flex", height: "100%", overflow: "hidden" }}>
+        <div style={{ width: "100%", overflow: "hidden" }}>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              background: "#212529",
+              color: "white",
+              height: "65px",
+            }}
+          >
+            <h2 style={{ margin: "auto 20px" }}>{pageName} Details Page</h2>
+            <Box
+              style={{
+                display: "flex",
+                alignItems: "center",
+                marginRight: "5%",
+              }}
+            >
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={handleAddNew}
+              >
                 Add
               </Button>
               {!isAdding && !isEditing && (
-                <Button variant="contained" color="primary" onClick={() => setIsEditing(true)}>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={() => setIsEditing(true)}
+                >
                   Edit
                 </Button>
               )}
               {(isEditing || isAdding) && (
-                <Button variant="contained" color="primary" onClick={handleSave}>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={handleSave}
+                >
                   Save
                 </Button>
               )}
-              <Button variant="contained" color="error" onClick={handleOpenDialog}>
+              <Button
+                variant="contained"
+                color="error"
+                onClick={handleOpenDialog}
+              >
                 Delete
               </Button>
             </Box>
           </div>
-          <div style={{ display: 'flex', overflow: 'hidden', height: '90%' }}>
-            <div style={{ margin: '10px', width: '75%', border: '1px solid gray', borderRadius: '10px', position: 'relative', background: 'white' }}>
-              <div style={{ padding: '10px 20px', borderBottom: '1px solid gray', fontWeight: 'bold', fontSize: '20px', textTransform: 'capitalize' }}>{pageName} information</div>
+          <div style={{ display: "flex", overflow: "hidden", height: "90%" }}>
+            <div
+              style={{
+                margin: "10px",
+                width: "75%",
+                border: "1px solid gray",
+                borderRadius: "10px",
+                position: "relative",
+                background: "white",
+              }}
+            >
+              <div
+                style={{
+                  padding: "10px 20px",
+                  borderBottom: "1px solid gray",
+                  fontWeight: "bold",
+                  fontSize: "20px",
+                  textTransform: "capitalize",
+                }}
+              >
+                {pageName} information
+              </div>
               <div>
-                <Box style={{ display: 'flex', justifyContent: 'end', alignItems: 'center', padding: '5px' }}>
-                  <div style={{ margin: 'auto 20px' }}>
-                    CT : <span style={{ fontWeight: 'bold' }}>{formData?.created_time || 'N/A'}</span>
+                <Box
+                  style={{
+                    display: "flex",
+                    justifyContent: "end",
+                    alignItems: "center",
+                    padding: "5px",
+                  }}
+                >
+                  <div style={{ margin: "auto 20px" }}>
+                    CT :{" "}
+                    <span style={{ fontWeight: "bold" }}>
+                      {formData?.created_time || "N/A"}
+                    </span>
                   </div>
                 </Box>
               </div>
-              <div style={{ height: '75%', overflow: 'auto' }}>
+              <div style={{ height: "75%", overflow: "auto" }}>
                 <Box sx={{ m: 2 }}>
                   {error && (
-                    <Stack sx={{ width: '100%' }} spacing={2}>
+                    <Stack sx={{ width: "100%" }} spacing={2}>
                       <AlertWrapper type="error" message={error} />
                     </Stack>
                   )}
                   {success && (
-                    <Stack sx={{ width: '100%' }} spacing={2}>
+                    <Stack sx={{ width: "100%" }} spacing={2}>
                       <AlertWrapper type="success" message={success} />
                     </Stack>
                   )}
@@ -205,7 +274,10 @@ const DetailsPage = () => {
                       pageId={pageId}
                     />
                   ) : (
-                    <ViewComponent formData={formData} pageSchema={pageSchema} />
+                    <ViewComponent
+                      formData={formData}
+                      pageSchema={pageSchema}
+                    />
                   )}
                 </Box>
               </div>
