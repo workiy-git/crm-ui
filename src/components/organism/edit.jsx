@@ -85,16 +85,60 @@ const EditComponent = ({ id, pageSchema, formData, setFormData, onSaveSuccess, o
     switch (field.htmlControl) {
       case 'input':
         return (
-          <FormControl key={field.fieldName} style={{ width: '100%', marginBottom: '16px', display: 'flex', flexDirection: 'row' }} error={!!isError}>
-            <label style={{ width: '40%' }}>{label}</label>
-            <TextField {...commonProps} style={{ width: '40%' }} type={field.type || 'text'} />
+          <FormControl key={field.fieldName} style={{
+            display: 'flex',
+            flexDirection: 'row',
+            alignItems: 'center',
+            width: '50%',
+            borderBottom: '1px solid #e0e0e0',
+            paddingBottom: 1,
+            paddingTop: 1,
+            paddingLeft: 2,
+            paddingRight: 2,
+            boxSizing: 'border-box',
+          }} error={!!isError}>
+            <label style={{
+              width: '40%',
+              textAlign: 'left',
+              fontWeight: 'bold',
+              color: '#333',
+              fontSize: '12px',
+            }}>{label}</label>
+            <TextField {...commonProps} sx={{
+              width: '50%',
+              textAlign: 'left',
+              color: '#666',
+              fontSize: '12px',
+            }} type={field.type || 'text'} />
           </FormControl>
         );
       case 'select':
         return (
-          <FormControl key={field.fieldName} style={{ width: '100%', marginBottom: '16px', display: 'flex', flexDirection: 'row' }} error={!!isError}>
-            <label style={{ width: '40%' }}>{label}</label>
-            <Select {...commonProps} style={{ width: '40%' }} displayEmpty>
+          <FormControl key={field.fieldName} style={{
+            display: 'flex',
+            flexDirection: 'row',
+            alignItems: 'center',
+            width: '50%',
+            borderBottom: '1px solid #e0e0e0',
+            paddingBottom: 1,
+            paddingTop: 1,
+            paddingLeft: 2,
+            paddingRight: 2,
+            boxSizing: 'border-box',
+          }} error={!!isError}>
+            <label style={{
+              width: '40%',
+              textAlign: 'left',
+              fontWeight: 'bold',
+              color: '#333',
+              fontSize: '12px',
+            }}>{label}</label>
+            <Select {...commonProps} style={{
+              width: '50%',
+              textAlign: 'left',
+              color: '#666',
+              fontSize: '12px',
+            }} displayEmpty>
               <MenuItem value="">
                 <em>{field.placeholder || 'Select an option'}</em>
               </MenuItem>
@@ -119,21 +163,54 @@ const EditComponent = ({ id, pageSchema, formData, setFormData, onSaveSuccess, o
               />
             }
             label={label}
-            style={{ width: '100%', marginBottom: '16px' }}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              width: '50%',
+              borderBottom: '1px solid #e0e0e0',
+              paddingBottom: 1,
+              paddingTop: 1,
+              paddingLeft: 2,
+              paddingRight: 2,
+              boxSizing: 'border-box',
+              margin: 0,
+            }}
           />
         );
       default:
         return (
-          <FormControl key={field.fieldName} style={{ width: '100%', marginBottom: '16px', display: 'flex', flexDirection: 'row' }} error={!!isError}>
-            <label style={{ width: '40%' }}>{label}</label>
-            <TextField {...commonProps} style={{ width: '40%' }} />
+          <FormControl key={field.fieldName} style={{
+            display: 'flex',
+            flexDirection: 'row',
+            alignItems: 'center',
+            width: '50%',
+            borderBottom: '1px solid #e0e0e0',
+            paddingBottom: 1,
+            paddingTop: 1,
+            paddingLeft: 2,
+            paddingRight: 2,
+            boxSizing: 'border-box',
+          }} error={!!isError}>
+            <label style={{
+              width: '40%',
+              textAlign: 'left',
+              fontWeight: 'bold',
+              color: '#333',
+              fontSize: '12px',
+            }}>{label}</label>
+            <TextField {...commonProps} style={{
+              width: '50%',
+              textAlign: 'left',
+              color: '#666',
+              fontSize: '12px',
+            }} />
           </FormControl>
         );
     }
   };
 
   return (
-    <Box>
+    <Box style={{display:'flex', flexWrap: 'wrap' }}>
       {pageSchema.map((field) => renderInputField(field))}
       {validationError && <div style={{ color: 'red' }}>{validationError}</div>}
     </Box>

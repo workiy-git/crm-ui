@@ -7,7 +7,7 @@ import Tab from '@mui/material/Tab';
 import Updates from '../molecules/user-update';
 import Comments from '../molecules/user-comments';
 
-export default function TabComponent() {
+export default function TabComponent({ mode }) {
   const [value, setValue] = useState(0);
   const [companylogoData, setCompanylogoData] = useState({});
   const [pageName, setPageName] = useState('');
@@ -26,6 +26,7 @@ export default function TabComponent() {
         // console.error('Tab Error fetching data:', error);
       });
   }, []);
+  
 
   return (
     <div style={{ borderRadius: '10px', width: '100%' }}>
@@ -56,7 +57,7 @@ export default function TabComponent() {
               ))}
             </Tabs>
         </Box>
-        {value === 0 && <Box class="overflow-a" style={{background:'white', height:'84%', borderBottomLeftRadius:'5px', borderBottomRightRadius:'5px'}}><Updates /></Box>}
+        {value === 0 && <Box class="overflow-a" style={{background:'white', height:'84%', borderBottomLeftRadius:'5px', borderBottomRightRadius:'5px'}}><Updates mode= {mode}/></Box>}
         {value === 1 && <Box  style={{background:'white', height:'84%', borderBottomLeftRadius:'5px', borderBottomRightRadius:'5px'}}><Comments /></Box>}
         {/* Add similar conditional rendering for other tabs */}
       </Box>
