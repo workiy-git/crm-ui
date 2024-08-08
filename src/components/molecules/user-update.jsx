@@ -163,11 +163,12 @@ const Updates = ({ mode }) => {
   const [history, setHistory] = useState([]);
   const [error, setError] = useState(null);
   const [fieldLabels, setFieldLabels] = useState({});
+  const [loading, setLoading] = useState(true); // Track loading state
 
   useEffect(() => {
     if (mode === 'add') {
-      // Skip fetching data if in 'add' mode
       setHistory([]);
+      setLoading(false); // Data fetching is complete
       return;
     }
 
@@ -177,6 +178,8 @@ const Updates = ({ mode }) => {
         setHistory(response.data.data || []);
       } catch (error) {
         setError(error);
+      } finally {
+        setLoading(false); // Data fetching is complete
       }
     };
 
@@ -239,56 +242,62 @@ const Updates = ({ mode }) => {
   return (
     <Box sx={{ margin: 'auto', padding: 2, maxWidth: 800, overflow: 'auto' }}>
       {error && <Typography color="error">Failed to load history: {error.message}</Typography>}
-      {mode === 'add' ? (
+      {loading ? (
+        <Typography>Loading...</Typography> // Display loading indicator while data is being fetched
+      ) : mode === 'add' ? (
         <Typography>No history available for new record.</Typography>
-      ) : history.length === 0 ? (
-        <Typography>No history available.</Typography>
       ) : (
-        <List>
-          {history.map((item, index) => {
-            const { dateTime, details } = parseHistoryItem(item);
-            const parts = details.split('made the following changes: ');
-            const action = parts[0].trim();
-            const changesString = parts[1] ? parts[1].trim() : '';
-            const changeList = changesString ? changesString.split(', ').map(change => change.trim()) : [];
+        <>
+          {history.length === 0 ? (
+            <Typography>No history available.</Typography>
+          ) : (
+            <List>
+              {history.map((item, index) => {
+                const { dateTime, details } = parseHistoryItem(item);
+                const parts = details.split('made the following changes: ');
+                const action = parts[0].trim();
+                const changesString = parts[1] ? parts[1].trim() : '';
+                const changeList = changesString ? changesString.split(', ').map(change => change.trim()) : [];
 
-            return (
-              <React.Fragment key={index}>
-                <ListItem alignItems="flex-start" sx={{ padding: 0 }}>
-                  <Box sx={{ display: 'flex', alignItems: 'center', width: '100%' }}>
-                    <Typography variant="body2" color="text.primary" sx={{ marginRight: 1 }}>
-                      {dateTime}
-                    </Typography>
-                    <Avatar sx={{ marginRight: 1 }}>
-                      <AccountCircleIcon />
-                    </Avatar>
-                    <Typography variant="body2" color="text.primary" sx={{ marginRight: 1 }}>
-                      {action} made the following changes:
-                    </Typography>
-                  </Box>
-                </ListItem>
-                {changeList.length > 0 && (
-                  <ListItem sx={{ paddingLeft: 8, paddingTop: 1 }}>
-                    <Box component="ul" sx={{ pl: 0, m: 0 }}>
-                      {changeList.map((change, idx) => {
-                        const [fieldName, value] = change.split(': ');
-                        const label = fieldLabels[fieldName] || fieldName;
-                        return (
-                          <ListItem key={idx} sx={{ padding: 0 }}>
-                            <Typography component="li" variant="body2">
-                              <strong>{label}:</strong> {value}
-                            </Typography>
-                          </ListItem>
-                        );
-                      })}
-                    </Box>
-                  </ListItem>
-                )}
-                <Divider component="li" />
-              </React.Fragment>
-            );
-          })}
-        </List>
+                return (
+                  <React.Fragment key={index}>
+                    <ListItem alignItems="flex-start" sx={{ padding: 0 }}>
+                      <Box sx={{ display: 'flex', alignItems: 'center', width: '100%' }}>
+                        <Typography variant="body2" color="text.primary" sx={{ marginRight: 1 }}>
+                          {dateTime}
+                        </Typography>
+                        <Avatar sx={{ marginRight: 1 }}>
+                          <AccountCircleIcon />
+                        </Avatar>
+                        <Typography variant="body2" color="text.primary" sx={{ marginRight: 1 }}>
+                          {action} made the following changes:
+                        </Typography>
+                      </Box>
+                    </ListItem>
+                    {changeList.length > 0 && (
+                      <ListItem sx={{ paddingLeft: 8, paddingTop: 1 }}>
+                        <Box component="ul" sx={{ pl: 0, m: 0 }}>
+                          {changeList.map((change, idx) => {
+                            const [fieldName, value] = change.split(': ');
+                            const label = fieldLabels[fieldName] || fieldName;
+                            return (
+                              <ListItem key={idx} sx={{ padding: 0 }}>
+                                <Typography component="li" variant="body2">
+                                  <strong>{label}:</strong> {value}
+                                </Typography>
+                              </ListItem>
+                            );
+                          })}
+                        </Box>
+                      </ListItem>
+                    )}
+                    <Divider component="li" />
+                  </React.Fragment>
+                );
+              })}
+            </List>
+          )}
+        </>
       )}
     </Box>
   );

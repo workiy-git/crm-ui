@@ -58,7 +58,7 @@ export default function TabComponent({ mode }) {
             </Tabs>
         </Box>
         {value === 0 && <Box class="overflow-a" style={{background:'white', height:'84%', borderBottomLeftRadius:'5px', borderBottomRightRadius:'5px'}}><Updates mode= {mode}/></Box>}
-        {value === 1 && <Box  style={{background:'white', height:'84%', borderBottomLeftRadius:'5px', borderBottomRightRadius:'5px'}}><Comments /></Box>}
+        {value === 1 && <Box class="overflow-a" style={{background:'white', height:'84%', borderBottomLeftRadius:'5px', borderBottomRightRadius:'5px'}}><Comments /></Box>}
         {/* Add similar conditional rendering for other tabs */}
       </Box>
     </div>
