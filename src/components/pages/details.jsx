@@ -181,6 +181,7 @@ const DetailsPage = () => {
                 variant="contained"
                 color="primary"
                 style={{margin:'5px'}}
+                onClick={() => navigate(`/container/${pageName}`)}
               >
                 Back
               </Button>
