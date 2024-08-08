@@ -3,11 +3,11 @@ import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { Box, Button, Stack } from '@mui/material';
 import axios from 'axios';
 import config from '../../config/config';
-import Tab from '../organism/details-tab';
 import EditComponent from '../organism/edit';
 import ViewComponent from '../organism/view';
 import ConfirmationDialog from '../molecules/confirmation-dialog'; 
 import AlertWrapper from '../organism/alert'; 
+import Tab from '../organism/details-tab';
 
 const DetailsPage = () => {
   const { id } = useParams();
@@ -22,6 +22,7 @@ const DetailsPage = () => {
   const [pageSchema, setPageSchema] = useState([]);
   const [isEditing, setIsEditing] = useState(mode === 'edit');
   const [isAdding, setIsAdding] = useState(!id && mode !== 'edit'); 
+  const [refreshTab, setRefreshTab] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false); 
 
 
@@ -73,6 +74,7 @@ const DetailsPage = () => {
     setError('');
     setIsEditing(false);
     setIsAdding(false);
+    setRefreshTab(prev => !prev);
     setTimeout(() => {
       setSuccess('');
     }, 2000);
@@ -209,7 +211,7 @@ const DetailsPage = () => {
               </div>
             </div>
             <div style={{ margin: '10px', display: 'flex', justifyContent: 'space-around', width: '50%', overflow: 'hidden' }}>
-              <Tab key={refreshTab} pageName={pageName}/>
+              <Tab key={refreshTab} />
             </div>
           </div>
         </div>
