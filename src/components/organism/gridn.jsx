@@ -460,6 +460,9 @@ const fetchGridData = async (filter) => {
         <Button onClick={openMenu} className='Action-btn' sx={{ color:'white', background:'#212529' }} >
           Actions
         </Button>
+        <Button onClick={() => navigate("/details", { state: { pageName, mode: "add" } })}  className='Action-btn' sx={{ color:'white', background:'#212529' }} >
+          Add
+        </Button>
         <Menu
         anchorEl={menuAnchor}
         open={Boolean(menuAnchor)}
