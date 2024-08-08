@@ -7,6 +7,7 @@ import {
   Grid,
   InputAdornment,
   FormControl,
+  CircularProgress,
 } from "@mui/material";
 import config from "../../config/config";
 import "../../assets/styles/loginpage.css";
@@ -24,7 +25,8 @@ function Loginpage() {
   const [errorMessage, setErrorMessage] = useState("");
   const [companylogoData, setcompanylogoData] = useState({});
   const [allFieldsFilled, setAllFieldsFilled] = useState(false);
-  const [showPassword, setShowPassword] = React.useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false); 
 
   const handleClickShowPassword = () => setShowPassword((show) => !show);
 
@@ -32,7 +34,8 @@ function Loginpage() {
     event.preventDefault();
   };
 
-  // Define your Cognito User Pool Data
+   // Define your Cognito User Pool Data
+  // Cognito User Pool Data
   const poolData = {
     UserPoolId: "us-east-1_AEdwzu9Xx", // Your user pool id here
     ClientId: "6258t5vdisgcu7rjkuc5c94ba9", // Your client id here
@@ -42,14 +45,15 @@ function Loginpage() {
   const handleLogin = (event) => {
     event.preventDefault();
 
+    if (isSubmitting) return;
+    setIsSubmitting(true); 
+
     if (!companyName.trim() || !username.trim() || !password.trim()) {
       setErrorMessage("Please fill in all required fields.");
+      setIsSubmitting(false);
     } else {
       setErrorMessage("");
-      // Navigate to the home page
-      // You can add your navigation logic here
-
-      // Assuming you have the username and password from your form fields
+      
       const usernameVal = username.trim();
       const passwordVal = password.trim();
 
@@ -71,59 +75,47 @@ function Loginpage() {
 
       cognitoUser.authenticateUser(authenticationDetails, {
         onSuccess: async (result) => {
-          console.log("Authentication successful", result);
-
           try {
             const response = await fetch(`${config.apiUrl}users/${username}`, {
-              method: 'GET',
+              method: "GET",
               headers: {
-                'Content-Type': 'application/json',
-                'Authorization': result.getAccessToken().getJwtToken(),
+                "Content-Type": "application/json",
+                Authorization: result.getAccessToken().getJwtToken(),
               },
             });
-      
+
             if (!response.ok) {
-              throw new Error('User verification failed');
+              throw new Error("User verification failed");
             }
-      
+
             const userData = await response.json();
 
-            // Add logging to check the values
-            // console.log("Fetched user data:", userData);
-            // console.log("Fetched company name:", userData.data.company);
-            // console.log("Entered company name:", companyName);
-
             if (userData && userData.data.company === companyName) {
-
-              localStorage.setItem("isLoggedIn", "true");
-              localStorage.setItem(
+              sessionStorage.setItem("isLoggedIn", "true");
+              sessionStorage.setItem(
                 "accessToken",
                 result.getAccessToken().getJwtToken()
               );
 
-              // Redirect to home or another page
               window.location.href = "/home";
             } else {
-              throw new Error('User not found in the database or company mismatch');
+              throw new Error(
+                "User not found in the database or company mismatch"
+              );
             }
-            } catch (error) {
-              console.error("User verification failed", error);
-              setErrorMessage("Entered Company Name does not match with the user. Please try again.");
-            }
-          },
+          } catch (error) {
+            console.error("User verification failed", error);
+            setErrorMessage("Invalid username or password. Please try again.");
+            setIsSubmitting(false);
+          }
+        },
         onFailure: (err) => {
           console.error("Authentication failed", err);
           setErrorMessage("Invalid username or password. Please try again.");
-
-          // Handle login failure
+          setIsSubmitting(false);
         },
         newPasswordRequired: (userAttributes, requiredAttributes) => {
-          console.log("New password required");
-          // delete userAttributes.email_verified; // We don't need this
-          // Prompt the user for their new password
-
           const newPassword = prompt("Please enter your new password:");
-          // You might also need to collect any required attributes here
           cognitoUser.completeNewPasswordChallenge(
             newPassword,
             {},
@@ -133,13 +125,12 @@ function Loginpage() {
                 setErrorMessage(
                   "Password changed successfully. Please login with your new password."
                 );
-
-                // Navigate to the home page or another page
+                setIsSubmitting(false);
               },
               onFailure: (err) => {
                 console.error("Failed to change password", err);
                 setErrorMessage(err.message || JSON.stringify(err));
-                // Handle failure to change password, show error message to user
+                setIsSubmitting(false);
               },
             }
           );
@@ -161,7 +152,6 @@ function Loginpage() {
   }, []);
 
   useEffect(() => {
-    // Check if all required fields are filled
     setAllFieldsFilled(
       companyName.trim() && username.trim() && password.trim()
     );
@@ -281,8 +271,8 @@ function Loginpage() {
                   </Grid>
                 </Grid>
                 <div className="login-center login-submit-block">
-                  <a 
-                    className="login-forgot-password" 
+                  <a
+                    className="login-forgot-password"
                     href={companylogoData.forget?.url || "/"}
                   >
                     {companylogoData.forget?.title}
@@ -296,29 +286,27 @@ function Loginpage() {
                   )}
                 </div>
                 <div className="login-center">
-                  {allFieldsFilled ? (
-                    <Link to="/home" className="login-link">
-                      <Button
-                        variant="contained"
-                        color="primary"
-                        className="login-button"
-                        id="login-button"
-                        onClick={handleLogin}
-                      >
-                        {companylogoData.button?.title}
-                      </Button>
-                    </Link>
-                  ) : (
-                    <Button
-                      variant="contained"
-                      color="primary"
-                      className="login-button-disabled"
-                      id="login-button"
-                      onClick={handleLogin}
-                    >
-                      {companylogoData.button?.title}
-                    </Button>
-                  )}
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    className={
+                      allFieldsFilled ? "login-button" : "login-button-disabled"
+                    }
+                    id="login-button"
+                    onClick={handleLogin}
+                    disabled={!allFieldsFilled || isSubmitting} 
+                    style={{
+                      cursor: allFieldsFilled ? "pointer" : "not-allowed",
+                      opacity: isSubmitting ? 0.7 : 1,
+                      pointerEvents: isSubmitting ? "none" : "auto",
+                    }}
+                  >
+                    {isSubmitting ? (
+                      <CircularProgress size={24} color="inherit" />
+                    ) : (
+                      companylogoData.button?.title
+                    )}
+                  </Button>
                 </div>
               </div>
             </div>

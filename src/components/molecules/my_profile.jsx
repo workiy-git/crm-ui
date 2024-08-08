@@ -8,7 +8,7 @@ import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import Avatar from "@mui/material/Avatar";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
-import config from "../../config/config"; // Import the configuration file
+import config from "../../config/config";
 import "../../assets/styles/header.css";
 import { jwtDecode } from "jwt-decode";
 
@@ -27,71 +27,39 @@ export default function Myprofile({ backgroundColor, value }) {
   const [open, setOpen] = useState(false);
   const menuRef = useRef(null);
   const [myprofileData, setMyprofileData] = useState({});
-  const [userData, setuserData] = useState({});
+  const [userData, setUserData] = useState({});
 
   const [jwtToken, setJwtToken] = useState("");
   const [userName, setUserName] = useState("");
 
   useEffect(() => {
-    const token = localStorage.getItem("accessToken");
+    const token = sessionStorage.getItem("accessToken"); // Use sessionStorage instead of localStorage
     if (token) {
       setJwtToken(token);
       const decodedToken = jwtDecode(token);
-      console.log("decodedToken", decodedToken);
       const user = decodedToken.username; // Assuming the username is stored in the token
       axios
         .get(`${config.apiUrl}/users/${user}`)
         .then((response) => {
-          setuserData(response.data.data);
-          // console.log("User Data received:", response.data.data);
-
-          // Handle the response
+          setUserData(response.data.data); // Update with the fetched user data
         })
         .catch((error) => {
-          // Handle the error
           console.error("Error fetching user data:", error);
         });
       setUserName(user);
-      // console.log("username", userName);
     }
-    // const user = localStorage.getItem("username"); // Assuming the username is stored in localStorage
-    // setJwtToken(token);
-    // setUserName(user);
   }, []);
 
   useEffect(() => {
     axios
       .get(`${config.apiUrl}/menus/header`)
       .then((response) => {
-        // console.log('myprofile Data received:', response.data);
         setMyprofileData(response.data.data.myprofile);
       })
       .catch((error) => {
-        // console.error('Error fetching data:', error);
+        console.error("Error fetching data:", error);
       });
   }, []);
-
-  // useEffect(() => {
-  //   // console.log("username no", userName); // This will log the updated username
-  //   // console.log("User Data userName:", userData.username);
-
-  //   if (userName) {
-  //     console.log("username inside use effect", userName);
-  //     // axios
-  //     //   .get(`${config.apiUrl}/users/${userName}`)
-  //     //   .then((response) => {
-  //     //     setuserData(response.data.data);
-  //     //     console.log("User Data received:", response.data);
-
-  //     //     // Handle the response
-  //     //     console.log("User Data received:", response.data);
-  //     //   })
-  //     //   .catch((error) => {
-  //     //     // Handle the error
-  //     //     console.error("Error fetching user data:", error);
-  //     //   });
-  //   }
-  // }, [userName]);
 
   useEffect(() => {
     function handleClickOutside(event) {
@@ -113,6 +81,7 @@ export default function Myprofile({ backgroundColor, value }) {
     const url = `${path}`;
     window.location.href = url;
   };
+
   const handleProfileClick = () => {
     const url = `/underconstruction`;
     window.location.href = url;

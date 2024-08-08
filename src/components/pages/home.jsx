@@ -110,9 +110,9 @@ function Home() {
 
   useEffect(() => {
     document.title = "Home";
-    const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
-    const accessToken = localStorage.getItem("accessToken");
-
+    const isLoggedIn = sessionStorage.getItem("isLoggedIn") === "true";
+    const accessToken = sessionStorage.getItem("accessToken");
+  
     if (!isLoggedIn) {
       // Redirect to login page
       window.location.href = "/";
@@ -121,6 +121,7 @@ function Home() {
       console.log("User is logged in with accessToken:", accessToken);
       // Fetch home data or perform other operations that require authentication here
     }
+  
     axios
       .get(`${config.apiUrl}/pages`)
       .then((response) => {
@@ -134,42 +135,18 @@ function Home() {
       .catch((error) => {
         console.error("Error fetching data:", error);
       });
-
+  
     return () => {
       document.title = "Default Title";
     };
   }, []);
-
+    
   const handleSaveSelectedText = (texts) => {
     setSelectedWidgets(texts);
   };
 
-  const handleColorChange = (color) => {
-    setBackgroundColor(color);
-    localStorage.setItem("backgroundColor", color);
-  };
-
-  const randomGradientColors = [];
-  function generateRandomLightColor() {
-    const r = Math.floor(Math.random() * 128) + 128;
-    const g = Math.floor(Math.random() * 128) + 128;
-    const b = Math.floor(Math.random() * 128) + 128;
-    return (
-      "#" +
-      r.toString(16).padStart(2, "0") +
-      g.toString(16).padStart(2, "0") +
-      b.toString(16).padStart(2, "0")
-    );
-  }
-  for (let i = 0; i < 30; i++) {
-    const color1 = generateRandomLightColor();
-    const color2 = generateRandomLightColor();
-    const linearGradient = `linear-gradient(145deg, ${color1}, ${color2})`;
-    randomGradientColors.push(linearGradient);
-  }
-
   if (!homeData) {
-    return;
+    return; 
   }
 
   return (
