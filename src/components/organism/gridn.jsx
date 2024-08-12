@@ -3,7 +3,6 @@ import axios from "axios";
 import { useLocation, useNavigate } from "react-router-dom";
 import config from "../../config/config";
 import { DataGrid } from "@mui/x-data-grid";
-import DeleteComponent from '../organism/delete';
 import ConfirmationDialog from '../molecules/confirmation-dialog';
 import "../../assets/styles/callsgrid.css";
 
