@@ -10,11 +10,10 @@ import AlertWrapper from '../organism/alert';
 import Tab from '../organism/details-tab';
 
 const DetailsPage = () => {
-  const { id, pageNameParam } = useParams();
+  const { id } = useParams();
   const location = useLocation();
   const navigate = useNavigate();
-  const { rowData, pageId, mode } = location.state || {};
-  const pageName = pageNameParam || location.state?.pageName;
+  const { rowData, pageName, pageId, mode } = location.state || {};
 
   const [formData, setFormData] = useState({});
   const [error, setError] = useState("");
@@ -35,32 +34,25 @@ const DetailsPage = () => {
   }, []);
 
   useEffect(() => {
-    console.log('Location State:', location.state);
-    console.log('Page Name:', pageName);
-  
-    if (!pageName) {
-      setError("No page name found. Please ensure that pageName is passed.");
-      navigate(`/container/default`);
-      return;
-    }
-  
     const fetchWebformsData = async () => {
       try {
-        const response = await axios.get(`${config.apiUrl.replace(/\/$/, "")}/webforms`);
+        const response = await axios.get(
+          `${config.apiUrl.replace(/\/$/, "")}/webforms`
+        );
         const fetchedWebformsData = response.data.data;
-        console.log('Fetched Webforms Data:', fetchedWebformsData);
-  
         setWebformsData(fetchedWebformsData || []);
-  
-        const currentPage = fetchedWebformsData.find((page) => page.pageName === pageName);
+
+        const currentPage = fetchedWebformsData.find(
+          (page) => page.pageName === pageName
+        );
         if (!currentPage) {
           setError(`Page ${pageName} not found in webforms collection.`);
           return;
         }
-  
+
         const pageSchema = currentPage.fields;
         setPageSchema(pageSchema);
-  
+
         if (rowData) {
           const initialFormData = initializeFormData(rowData, pageSchema);
           setFormData(initialFormData);
@@ -68,33 +60,24 @@ const DetailsPage = () => {
           const apiUrl = `${config.apiUrl.replace(/\/$/, "")}/appdata/${id}`;
           const response = await axios.get(apiUrl);
           const fetchedData = response.data;
-  
+
           const initialFormData = initializeFormData(fetchedData, pageSchema);
           setFormData(initialFormData);
         }
-  
-        // Navigate based on mode
-        if (isEditing || isAdding) {
-          navigate(`/${pageName}/edit/${id || pageId}`, { state: { pageName, pageId, mode: 'edit' } });
-        } else {
-          navigate(`/${pageName}/view/${id}`, { state: { pageName, pageId, mode: 'view' } });
-        }
-  
       } catch (error) {
         setError("Error fetching webforms data");
       }
     };
-  
+
     fetchWebformsData();
-  }, [id, rowData, pageName, initializeFormData, isEditing, isAdding, pageId, navigate]);
-  
+  }, [id, rowData, pageName, initializeFormData]);
+
   const handleSaveSuccess = (message) => {
     setSuccess(message);
     setError("");
     setIsEditing(false);
     setIsAdding(false);
-    setRefreshTab((prev) => !prev);
-    navigate(`/${pageName}/view/${id || pageId}`); // Redirect to view mode
+    setRefreshTab(prev => !prev);
     setTimeout(() => {
       setSuccess("");
     }, 2000);
@@ -111,7 +94,7 @@ const DetailsPage = () => {
   const handleDeleteSuccess = () => {
     setSuccess("Data deleted successfully");
     setTimeout(() => {
-      navigate(`/container/${pageName}`); // Ensure this is the correct path to navigate after deletion
+      navigate(`/container/${pageName}`); 
     }, 2000);
   };
 
@@ -123,12 +106,10 @@ const DetailsPage = () => {
   };
 
   const handleAddNew = () => {
-  setIsAdding(true);
-  setIsEditing(true);
-  setFormData({}); // Clear the form data
-  navigate(`/${pageName}/edit`, { state: { pageName, pageId: null, mode: 'add' } });
-};
-
+    setIsAdding(true);
+    setFormData({});
+    setIsEditing(true);
+  };
 
   const handleConfirmDelete = async () => {
     try {
@@ -153,6 +134,8 @@ const DetailsPage = () => {
   const handleSave = async () => {
     if (!formData) return;
 
+    if (!validateForm()) return; 
+
     try {
       const dataToSend = { pageName, pageId, ...formData };
       if (isAdding) {
@@ -164,8 +147,22 @@ const DetailsPage = () => {
       window.scrollTo({ top: 0, behavior: "smooth" });
     } catch (error) {
       handleSaveError("Error saving data.");
-      console.error("Error saving data:", error);
+      console.log("Error saving data:", error);
     }
+  };
+
+  const handleValidationError = (errors) => {
+    if (errors) {
+      setError('Please fix the errors before saving.');
+    } else {
+      setError('');
+    }
+  };
+
+  const validateForm = () => {
+    return pageSchema.every(field => {
+      return !field.required || (formData[field.fieldName] && formData[field.fieldName].trim() !== '');
+    });
   };
 
   return (
@@ -188,7 +185,7 @@ const DetailsPage = () => {
               height: "65px",
             }}
           >
-            <h2 style={{ margin: "auto 20px" }}>{pageName}  Page</h2>
+            <h2 style={{ margin: "auto 20px" }}>{pageName} Details Page</h2>
             <Box
               style={{
                 display: "flex",
@@ -205,7 +202,6 @@ const DetailsPage = () => {
                 Back
               </Button>
             </Box>
-            
           </div>
           <div style={{ display: "flex", overflow: "hidden", height: "90%" }}>
             <div
@@ -251,7 +247,6 @@ const DetailsPage = () => {
                   color="primary"
                   onClick={() => setIsEditing(true)}
                 style={{margin:'5px'}}
-
                 >
                   Edit
                 </Button>
@@ -262,7 +257,6 @@ const DetailsPage = () => {
                   color="primary"
                   onClick={handleSave}
                 style={{margin:'5px'}}
-
                 >
                   Save
                 </Button>
@@ -307,12 +301,11 @@ const DetailsPage = () => {
                   )}
                   {isEditing ? (
                     <EditComponent
-                      id={isAdding ? null : id} // Pass null if adding new
+                      id={isAdding ? null : id}
                       formData={formData}
                       setFormData={setFormData}
                       pageSchema={pageSchema}
-                      onSaveSuccess={handleSaveSuccess}
-                      onSaveError={handleSaveError}
+                      onValidationError={handleValidationError}
                       pageName={pageName}
                       pageId={pageId}
                     />

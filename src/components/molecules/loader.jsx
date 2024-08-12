@@ -1,7 +1,9 @@
+import React from 'react';
+import CircularProgress from '@mui/material/CircularProgress';
 
-import React from "react";
 
 const Loader = () => {
+
   return (
     <div
       style={{
@@ -11,7 +13,10 @@ const Loader = () => {
         height: "100vh",
       }}
     >
+      <div style={{display:'block', textAlign:'center'}}>
+      <CircularProgress />
       <div>Loading...</div>
+      </div>
     </div>
   );
 };
