@@ -10,10 +10,11 @@ import AlertWrapper from '../organism/alert';
 import Tab from '../organism/details-tab';
 
 const DetailsPage = () => {
-  const { id } = useParams();
+  const { id, pageNameParam } = useParams();
   const location = useLocation();
   const navigate = useNavigate();
-  const { rowData, pageName, pageId, mode } = location.state || {};
+  const { rowData, pageId, mode } = location.state || {};
+  const pageName = pageNameParam || location.state?.pageName;
 
   const [formData, setFormData] = useState({});
   const [error, setError] = useState("");
@@ -34,25 +35,32 @@ const DetailsPage = () => {
   }, []);
 
   useEffect(() => {
+    console.log('Location State:', location.state);
+    console.log('Page Name:', pageName);
+  
+    if (!pageName) {
+      setError("No page name found. Please ensure that pageName is passed.");
+      navigate(`/container/default`);
+      return;
+    }
+  
     const fetchWebformsData = async () => {
       try {
-        const response = await axios.get(
-          `${config.apiUrl.replace(/\/$/, "")}/webforms`
-        );
+        const response = await axios.get(`${config.apiUrl.replace(/\/$/, "")}/webforms`);
         const fetchedWebformsData = response.data.data;
+        console.log('Fetched Webforms Data:', fetchedWebformsData);
+  
         setWebformsData(fetchedWebformsData || []);
-
-        const currentPage = fetchedWebformsData.find(
-          (page) => page.pageName === pageName
-        );
+  
+        const currentPage = fetchedWebformsData.find((page) => page.pageName === pageName);
         if (!currentPage) {
           setError(`Page ${pageName} not found in webforms collection.`);
           return;
         }
-
+  
         const pageSchema = currentPage.fields;
         setPageSchema(pageSchema);
-
+  
         if (rowData) {
           const initialFormData = initializeFormData(rowData, pageSchema);
           setFormData(initialFormData);
@@ -60,24 +68,33 @@ const DetailsPage = () => {
           const apiUrl = `${config.apiUrl.replace(/\/$/, "")}/appdata/${id}`;
           const response = await axios.get(apiUrl);
           const fetchedData = response.data;
-
+  
           const initialFormData = initializeFormData(fetchedData, pageSchema);
           setFormData(initialFormData);
         }
+  
+        // Navigate based on mode
+        if (isEditing || isAdding) {
+          navigate(`/${pageName}/edit/${id || pageId}`, { state: { pageName, pageId, mode: 'edit' } });
+        } else {
+          navigate(`/${pageName}/view/${id}`, { state: { pageName, pageId, mode: 'view' } });
+        }
+  
       } catch (error) {
         setError("Error fetching webforms data");
       }
     };
-
+  
     fetchWebformsData();
-  }, [id, rowData, pageName, initializeFormData]);
-
+  }, [id, rowData, pageName, initializeFormData, isEditing, isAdding, pageId, navigate]);
+  
   const handleSaveSuccess = (message) => {
     setSuccess(message);
     setError("");
     setIsEditing(false);
     setIsAdding(false);
-    setRefreshTab(prev => !prev);
+    setRefreshTab((prev) => !prev);
+    navigate(`/${pageName}/view/${id || pageId}`); // Redirect to view mode
     setTimeout(() => {
       setSuccess("");
     }, 2000);
@@ -106,10 +123,12 @@ const DetailsPage = () => {
   };
 
   const handleAddNew = () => {
-    setIsAdding(true);
-    setFormData({});
-    setIsEditing(true);
-  };
+  setIsAdding(true);
+  setIsEditing(true);
+  setFormData({}); // Clear the form data
+  navigate(`/${pageName}/edit`, { state: { pageName, pageId: null, mode: 'add' } });
+};
+
 
   const handleConfirmDelete = async () => {
     try {
@@ -169,7 +188,7 @@ const DetailsPage = () => {
               height: "65px",
             }}
           >
-            <h2 style={{ margin: "auto 20px" }}>{pageName} Details Page</h2>
+            <h2 style={{ margin: "auto 20px" }}>{pageName}  Page</h2>
             <Box
               style={{
                 display: "flex",
