@@ -45,6 +45,7 @@ const App = () => {
           <Route path="/container/:pageName" element={<Container />} />
           <Route path="/:pageName/view/:id" element={<DetailsPage mode="view" />} />
           <Route path="/:pageName/edit/:id" element={<DetailsPage mode="edit" />} />
+          <Route path="/:pageName/add" element={<DetailsPage mode="add" />} />
           <Route path="/users" element={<Users />} />
           <Route path="/adduser" element={<UserForm />} />
           <Route path="/underconstruction" element={<Underconstruction />} />
