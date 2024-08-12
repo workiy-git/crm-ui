@@ -262,16 +262,14 @@ const fetchGridData = async (filter) => {
     setSelectedRow(null);
   };
 
-  const handleNavigate = (path, mode) => {
+  const handleNavigate = (mode) => {
     if (selectedRow) {
-      navigate(`${path}/${selectedRow._id}`, {
-        state: { rowData: selectedRow, pageName, mode },
-      });
-      handleMenuClose();
+        navigate(`/${pageName}/${mode}/${selectedRow._id}`, {
+            state: { rowData: selectedRow, pageName, mode },
+        });
+        handleMenuClose();
     }
   };
-  
-
   const [selectedRows, setSelectedRows] = useState([]);  
   const isAllSelected = selectedRows.length === filteredRows.length && filteredRows.length > 0;
 
@@ -329,11 +327,9 @@ const fetchGridData = async (filter) => {
             open={Boolean(anchorEl)}
             onClose={handleMenuClose}
           >
-            <MenuItem onClick={() => handleNavigate("/details", "details")}>Details</MenuItem>
-            <MenuItem onClick={() => handleNavigate("/details", "edit")}>Edit</MenuItem>
+            <MenuItem onClick={() => handleNavigate("view")}>Details</MenuItem>
+            <MenuItem onClick={() => handleNavigate("edit")}>Edit</MenuItem> 
             <MenuItem onClick={() => handleDeleteClick(selectedRow)}>Delete</MenuItem>
-
-
           </Menu>
         </div>
       ),
@@ -500,9 +496,9 @@ const fetchGridData = async (filter) => {
         <Button onClick={openMenu} className='Action-btn' sx={{ color:'white', background:'#212529' }} >
           Actions
         </Button>
-        <Button onClick={() => navigate("/details", { state: { pageName, mode: "add" } })}  className='Action-btn' sx={{ color:'white', background:'#212529' }} >
+        {/* <Button onClick={() => navigate("/details", { state: { pageName, mode: "add" } })}  className='Action-btn' sx={{ color:'white', background:'#212529' }} >
           Add
-        </Button>
+        </Button> */}
         <Menu
         anchorEl={menuAnchor}
         open={Boolean(menuAnchor)}
