@@ -89,7 +89,6 @@
 // }
 
 // export default Home;
-
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import Header from "../organism/header";
@@ -99,6 +98,7 @@ import Submenu from "../organism/submenu";
 import BackgroundColorChanger from "../atoms/BackgroundColorChanger";
 import Footer from "../atoms/Footer";
 import config from "../../config/config";
+import Loader from "../molecules/loader";
 
 function Home() {
   const [backgroundColor, setBackgroundColor] = useState(() => {
@@ -107,21 +107,20 @@ function Home() {
 
   const [selectedWidgets, setSelectedWidgets] = useState([]);
   const [homeData, setHomeData] = useState(null);
+  const [isLoading, setIsLoading] = useState(true); // Add loading state
 
   useEffect(() => {
     document.title = "Home";
     const isLoggedIn = sessionStorage.getItem("isLoggedIn") === "true";
     const accessToken = sessionStorage.getItem("accessToken");
-  
+
     if (!isLoggedIn) {
       // Redirect to login page
       window.location.href = "/";
     } else {
-      // Use accessToken for API calls or other authentication-dependent operations
       console.log("User is logged in with accessToken:", accessToken);
-      // Fetch home data or perform other operations that require authentication here
     }
-  
+
     axios
       .get(`${config.apiUrl}/pages`)
       .then((response) => {
@@ -131,22 +130,26 @@ function Home() {
         if (homeDoc) {
           setHomeData(homeDoc);
         }
+        setIsLoading(false); // Stop loading when data is fetched
       })
       .catch((error) => {
         console.error("Error fetching data:", error);
+        setIsLoading(false); // Stop loading even if there's an error
       });
-  
+
     return () => {
       document.title = "Default Title";
     };
   }, []);
-    
+
   const handleSaveSelectedText = (texts) => {
     setSelectedWidgets(texts);
   };
 
-  if (!homeData) {
-    return; 
+  if (isLoading) {
+    return (
+      <Loader />
+    );
   }
 
   return (

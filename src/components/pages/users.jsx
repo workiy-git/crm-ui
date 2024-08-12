@@ -3,18 +3,21 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { Typography, Button, Paper, TextField } from '@mui/material'; // Import TextField for editing
 import config from '../../config/config';
+import Loader from '../molecules/loader';
 
 const Users = () => {
     const [users, setUsers] = useState([]);
     const [selectedUser, setSelectedUser] = useState(null);
     const [error, setError] = useState(null);
     const [editing, setEditing] = useState(false); // State to toggle editing mode
+    const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
         axios.get(`${config.apiUrl}/users`)
           .then((response) => {
             setUsers(response.data.data);
             console.log('Users:', response.data.data);
+            setIsLoading(false);
           })
           .catch((error) => {
             setError('Error fetching user data');
@@ -67,6 +70,10 @@ const Users = () => {
         });
     }
 
+    if (isLoading) {
+        return <Loader />; // Use the Loader component here
+      }
+      
     return (
         <div style={{ height: '100vh', display: "flex", flexDirection: "column", overflow: 'hidden', backgroundColor: "gray", paddingLeft: 0 }}>
             <div style={{ display: 'flex', height: '100%', overflow: 'hidden' }}>

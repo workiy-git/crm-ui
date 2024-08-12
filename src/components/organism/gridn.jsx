@@ -25,7 +25,7 @@ import {
   Alert
 } from "@mui/material";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
-
+import Loader from "../molecules/loader";
 import Pagination from "@mui/material/Pagination";
 
 const endpoint = "/controls/retrive";
@@ -106,6 +106,8 @@ const [rowToDelete, setRowToDelete] = useState(null);
     setRowToDelete(null); // Clear the selected row
   };
   
+
+
 
   // Fetch select options
   useEffect(() => {
@@ -190,6 +192,7 @@ const fetchGridData = async (filter) => {
           .replace(/\b\w/g, (char) => char.toUpperCase()),
         width: 150,
       }));
+      setIsLoading(false);
       setColumns(dynamicColumns);
       setAvailableColumns(dynamicColumns); // Set available columns here
     }
@@ -267,6 +270,7 @@ const fetchGridData = async (filter) => {
       handleMenuClose();
     }
   };
+  
 
   const [selectedRows, setSelectedRows] = useState([]);  
   const isAllSelected = selectedRows.length === filteredRows.length && filteredRows.length > 0;
@@ -472,6 +476,12 @@ const fetchGridData = async (filter) => {
   
   // Add some CSS to increase the header height
 
+  //Loader
+  const [isLoading, setIsLoading] = useState(true); 
+
+  if (isLoading) {
+    return <Loader />; // Use the Loader component here
+  }
   return (
     <div className="CallsGrid">
       {(error || success) && (
