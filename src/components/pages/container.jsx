@@ -1,16 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { Typography } from "@mui/material";
-import axios from "axios";
-import Grid from "../organism/grid";
 import Gridn from "../organism/gridn";
-import config from "../../config/config";
-import Loader from "../molecules/loader";
-import filteredData from "../atoms/dropdown";
 
 const Container = () => {
   const { pageName } = useParams();
-  // const endpoint = "/appdata/retrieve";
 
   const [backgroundColor] = useState(() => {
     return localStorage.getItem("backgroundColor") || "#d9d9d9";
