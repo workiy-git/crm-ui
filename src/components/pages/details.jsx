@@ -21,8 +21,8 @@ const DetailsPage = () => {
   const [success, setSuccess] = useState("");
   const [webformsData, setWebformsData] = useState([]);
   const [pageSchema, setPageSchema] = useState([]);
-  const [isEditing, setIsEditing] = useState(mode === 'edit');
-  const [isAdding, setIsAdding] = useState(!id && mode === 'add'); 
+  const [isEditing, setIsEditing] = useState(false); // Initialize as false
+  const [isAdding, setIsAdding] = useState(false); 
   const [refreshTab, setRefreshTab] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false); 
 
@@ -72,6 +72,21 @@ const DetailsPage = () => {
 
     fetchWebformsData();
   }, [id, rowData, pageName, initializeFormData]);
+
+    // Update isEditing and isAdding states based on location changes
+    useEffect(() => {
+      if (mode === 'edit') {
+        setIsEditing(true);
+        setIsAdding(false);
+      } else if (mode === 'add') {
+        setIsAdding(true);
+        setFormData({});
+        setIsEditing(false);
+      } else {
+        setIsEditing(false);
+        setIsAdding(false);
+      }
+    }, [location]);
 
   const handleSaveSuccess = (message) => {
     setSuccess(message);
@@ -157,6 +172,19 @@ const DetailsPage = () => {
       console.error("Error saving data:", error);
     }
   };  
+  const handleNavigate = (mode) => {
+    if (rowData) {
+        navigate(`/${pageName}/${mode}/${rowData._id}`, {
+            state: { rowData, pageName, mode },
+        });
+
+    }
+  };
+  const handleadd = (mode) => {
+        navigate(`/${pageName}/${mode}`, {
+            state: { pageName, mode },
+        });
+  };
 
   return (
     <div
@@ -227,19 +255,23 @@ const DetailsPage = () => {
                 marginRight: "5%",
               }}
             >
+              {(!isAdding)  && (
               <Button
                 variant="contained"
                 color="primary"
-                onClick={handleAddNew}
+                // onClick={handleAddNew}
+                onClick={() => handleadd("add")}
                 style={{margin:'5px'}}
               >
                 Add
               </Button>
+              )}
               {!isAdding && !isEditing && (
                 <Button
                   variant="contained"
                   color="primary"
-                  onClick={() => setIsEditing(true)}
+                  // onClick={() => setIsEditing(true)}
+                  onClick={() => handleNavigate("edit")}
                 style={{margin:'5px'}}
 
                 >
@@ -257,6 +289,7 @@ const DetailsPage = () => {
                   Save
                 </Button>
               )}
+              {(!isAdding)  && (
               <Button
                 variant="contained"
                 color="error"
@@ -264,6 +297,16 @@ const DetailsPage = () => {
               >
                 Delete
               </Button>
+              )}
+              {(isAdding)  && (
+              <Button
+                variant="contained"
+                color="error"
+                onClick={() => navigate(`/container/${pageName}`)}
+              >
+                Cancel
+              </Button>
+              )}
             </Box>
               </div>
               <div>
