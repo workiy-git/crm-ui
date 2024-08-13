@@ -125,6 +125,7 @@ const [rowToDelete, setRowToDelete] = useState(null);
         }));
         setSelectOptions(options); // Assuming the API returns an object with an 'options' array
         console.log("widget", widget);
+      setKey(prevKey => prevKey + 1);
         if (options.length > 0) {
           if (widget) {
             const selectedOption = options.find(
@@ -271,6 +272,11 @@ const fetchGridData = async (filter) => {
         handleMenuClose();
     }
   };
+  const handleadd = (mode) => {
+    navigate(`/${pageName}/${mode}`, {
+        state: { pageName, mode },
+    });
+};
   const [selectedRows, setSelectedRows] = useState([]);  
   const isAllSelected = selectedRows.length === filteredRows.length && filteredRows.length > 0;
 
@@ -497,9 +503,9 @@ const fetchGridData = async (filter) => {
         <Button onClick={openMenu} className='Action-btn' sx={{ color:'white', background:'#212529' }} >
           Actions
         </Button>
-        {/* <Button onClick={() => navigate("/details", { state: { pageName, mode: "add" } })}  className='Action-btn' sx={{ color:'white', background:'#212529' }} >
+        <Button onClick={() => handleadd("add")}  className='Action-btn' sx={{ color:'white', background:'#212529' }} >
           Add
-        </Button> */}
+        </Button>
         <Menu
         anchorEl={menuAnchor}
         open={Boolean(menuAnchor)}
