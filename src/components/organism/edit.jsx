@@ -54,12 +54,10 @@ const EditComponent = ({ id, pageSchema, formData, setFormData, onSaveSuccess, o
 
     try {
       const dataToSend = { pageName, pageID, ...formData };
-      if (!id) {
-        await axios.post(`${config.apiUrl}/appdata/create`, dataToSend);
-      } else {
+      if (id) {
         await axios.put(`${config.apiUrl}/appdata/${id}`, dataToSend);
+        onSaveSuccess('Data updated successfully!');
       }
-      onSaveSuccess('Data saved successfully!');
       window.scrollTo({ top: 0, behavior: 'smooth' });
     } catch (error) {
       onSaveError('Error saving data.');
