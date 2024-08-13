@@ -233,11 +233,16 @@ const Updates = ({ mode }) => {
   
     if (matches) {
       const [, date, time, , details] = matches;
-      return { dateTime: `${date}, ${time}`, details };
+      return { dateTime: `${date}, ${time}`, details, date: `${date}`, time: `${time}` };
     }
   
-    return { dateTime: '', details: item };
+    return { dateTime: '', details: item, date: '', time: '' };
   };
+
+
+
+
+  
 
   return (
     <Box sx={{ margin: 'auto', padding: 2, maxWidth: 800, overflow: 'auto' }}>
@@ -253,22 +258,52 @@ const Updates = ({ mode }) => {
           ) : (
             <List>
               {history.map((item, index) => {
-                const { dateTime, details } = parseHistoryItem(item);
+                const { dateTime, details, date, time } = parseHistoryItem(item);
                 const parts = details.split('made the following changes: ');
                 const action = parts[0].trim();
                 const changesString = parts[1] ? parts[1].trim() : '';
-                const changeList = changesString ? changesString.split(', ').map(change => change.trim()) : [];
+                const changeList = changesString ? changesString.split(', ').map(change => change.trim()) : [];        
+                
+                const currentDate = new Date();
+                const day = String(currentDate.getDate()).padStart(2, '0');
+                const month = String(currentDate.getMonth() + 1).padStart(2, '0'); // January is 0
+                const year = currentDate.getFullYear();
+                const customFormattedDate = `${month}/${day}/${year}`;
+                console.log('Current Date:', customFormattedDate);
+
+                const parseDate = (dateString) => {
+                  const [month, day, year] = dateString.split('/');
+                  return new Date(year, month - 1, day); // Month is 0-indexed
+                };
+                const startDate = parseDate(customFormattedDate);
+                const endDate = parseDate(date);
+              
+                // Calculate the difference in time (in milliseconds)
+                const differenceInTime = startDate - endDate;
+              
+                // Convert the time difference into days
+                const totalDays = differenceInTime / (1000 * 3600 * 24);
 
                 return (
                   <React.Fragment key={index}>
                     <ListItem alignItems="flex-start" sx={{ padding: 0 }}>
                       <Box sx={{ display: 'flex', alignItems: 'center', width: '100%' }}>
-                        <Typography variant="body2" color="text.primary" sx={{ marginRight: 1 }}>
-                          {dateTime}
+                        <div style={{display:'block', textAlign:'center'}}>
+                        <div>
+                        <Typography sx={{ marginRight: 1 }} variant="body2" color="text.primary" >
+                          {date} {totalDays > 1 ? `(${totalDays} days ago)` : totalDays === 1 ? '(1 day ago)' : '(today)'}
                         </Typography>
-                        <Avatar sx={{ marginRight: 1 }}>
+                        <div>
+
+                        </div>
+                        <Typography sx={{ marginRight: 1 }} variant="body2" color="text.primary" >
+                          {time}
+                        </Typography>
+                        </div>
+                        <Avatar sx={{ margin: 'auto' }}>
                           <AccountCircleIcon />
                         </Avatar>
+                        </div>
                         <Typography variant="body2" color="text.primary" sx={{ marginRight: 1 }}>
                           {action} made the following changes:
                         </Typography>
@@ -281,7 +316,7 @@ const Updates = ({ mode }) => {
                             const [fieldName, value] = change.split(': ');
                             const label = fieldLabels[fieldName] || fieldName;
                             return (
-                              <ListItem key={idx} sx={{ padding: 0 }}>
+                              <ListItem key={idx} style={{ padding: "10px 30px" }}>
                                 <Typography component="li" variant="body2">
                                   <strong>{label}:</strong> {value}
                                 </Typography>
@@ -291,7 +326,7 @@ const Updates = ({ mode }) => {
                         </Box>
                       </ListItem>
                     )}
-                    <Divider component="li" />
+                    <Divider style={{margin:'5px'}} component="li" />
                   </React.Fragment>
                 );
               })}

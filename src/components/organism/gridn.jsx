@@ -151,7 +151,9 @@ const [rowToDelete, setRowToDelete] = useState(null);
   }, [pageName]);
 
   // Handle page change
+  const [key, setKey] = useState(0);
   const handlePageChange = (event, value) => {
+    setKey(prevKey => prevKey + 1);
     setPage(value);
   };
 
@@ -566,6 +568,7 @@ const fetchGridData = async (filter) => {
       ) : (
         <div style={{height:'calc(100vh - 180px)'}}>
           <DataGrid
+            key={key}
             rows={filteredRows.slice((page - 1) * pageSize, page * pageSize)}
             columns={columnsWithFilter}
             pageSize={pageSize}
