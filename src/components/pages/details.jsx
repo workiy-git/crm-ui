@@ -5,6 +5,7 @@ import axios from 'axios';
 import config from '../../config/config';
 import EditComponent from '../organism/edit';
 import ViewComponent from '../organism/view';
+import AddComponent from '../organism/add'; 
 import ConfirmationDialog from '../molecules/confirmation-dialog'; 
 import AlertWrapper from '../organism/alert'; 
 import Tab from '../organism/details-tab';
@@ -21,7 +22,7 @@ const DetailsPage = () => {
   const [webformsData, setWebformsData] = useState([]);
   const [pageSchema, setPageSchema] = useState([]);
   const [isEditing, setIsEditing] = useState(mode === 'edit');
-  const [isAdding, setIsAdding] = useState(!id && mode !== 'edit'); 
+  const [isAdding, setIsAdding] = useState(!id && mode === 'add'); 
   const [refreshTab, setRefreshTab] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false); 
 
@@ -32,7 +33,7 @@ const DetailsPage = () => {
     });
     return initialData;
   }, []);
-
+  
   useEffect(() => {
     const fetchWebformsData = async () => {
       try {
@@ -107,9 +108,9 @@ const DetailsPage = () => {
 
   const handleAddNew = () => {
     setIsAdding(true);
-    setFormData({});
+    setFormData({});  // Clear all form data
     setIsEditing(true);
-  };
+  };  
 
   const handleConfirmDelete = async () => {
     try {
@@ -133,21 +134,29 @@ const DetailsPage = () => {
 
   const handleSave = async () => {
     if (!formData) return;
-
+  
     try {
       const dataToSend = { pageName, pageId, ...formData };
+      pageSchema.forEach((field) => {
+        if (!dataToSend.hasOwnProperty(field.fieldName)) {
+          dataToSend[field.fieldName] = "";  // Set default empty value
+        }
+      });
+  
       if (isAdding) {
         await axios.post(`${config.apiUrl}/appdata/create`, dataToSend);
+        navigate(`/container/${pageName}`);
       } else {
         await axios.put(`${config.apiUrl}/appdata/${id}`, dataToSend);
       }
+  
       handleSaveSuccess("Data saved successfully!");
       window.scrollTo({ top: 0, behavior: "smooth" });
     } catch (error) {
       handleSaveError("Error saving data.");
       console.error("Error saving data:", error);
     }
-  };
+  };  
 
   return (
     <div
@@ -286,9 +295,19 @@ const DetailsPage = () => {
                       <AlertWrapper type="success" message={success} />
                     </Stack>
                   )}
-                  {isEditing ? (
+                  {isAdding ? (
+                    <AddComponent
+                      formData={formData}
+                      setFormData={setFormData}
+                      pageSchema={pageSchema}
+                      onSaveSuccess={handleSaveSuccess}
+                      onSaveError={handleSaveError}
+                      pageName={pageName}
+                      pageId={pageId}
+                    />
+                  ) : isEditing ? (
                     <EditComponent
-                      id={isAdding ? null : id} // Pass null if adding new
+                      id={id}
                       formData={formData}
                       setFormData={setFormData}
                       pageSchema={pageSchema}
@@ -307,7 +326,7 @@ const DetailsPage = () => {
               </div>
             </div>
             <div style={{ margin: '10px', display: 'flex', justifyContent: 'space-around', width: '50%', overflow: 'hidden' }}>
-              <Tab mode={isAdding ? 'add' : 'view'} key={refreshTab} />
+              <Tab mode={isAdding ? 'add' : isEditing ? 'edit' : 'view'} key={refreshTab} />
             </div>
           </div>
         </div>
