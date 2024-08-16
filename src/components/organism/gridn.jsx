@@ -478,7 +478,13 @@ const fetchGridData = async (filter) => {
   };
   
   // Add some CSS to increase the header height
+  const [isBoxVisible, setIsBoxVisible] = useState(true);
 
+  // Step 4: Handle the "Close" button click
+  const handleBoxClose = () => {
+    setIsBoxVisible(!isBoxVisible);
+  };
+  
   //Loader
   const [isLoading, setIsLoading] = useState(true); 
 
@@ -495,10 +501,19 @@ const fetchGridData = async (filter) => {
           </div>
         </Stack>
       )}
-      
+      <div className="box-visible" onClick={handleBoxClose}>{isBoxVisible ? "Close" : "Open"}</div>
+      {isBoxVisible && (
       <Box
         className="Appbar"
-        sx={{ display: "flex", justifyContent: "space-around" }}
+        sx={{  
+          display: {
+          xs: "block",
+          sm: "flex", 
+          }, 
+          justifyContent: "space-around",
+          textAlign: {
+            xs: "center",
+          },}}
       >
         <Button onClick={openMenu} className='Action-btn' sx={{ color:'white', background:'#212529' }} >
           Actions
@@ -559,9 +574,9 @@ const fetchGridData = async (filter) => {
           <MenuItem value={25}>25</MenuItem>
           <MenuItem value={50}>50</MenuItem>
         </Select>
+        </Box>
       </Box>
-      
-      </Box>
+      )}
       {loading ? (
         <Box
           display="flex"

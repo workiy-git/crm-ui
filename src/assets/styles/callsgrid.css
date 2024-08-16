@@ -330,13 +330,26 @@
 
 }
 
-/* @media (max-width: 600px) {
-  .Appbar {
+@media (max-width: 600px) {
+  /* .Appbar {
     display: block !important;
     column-count: 2;
-}
-  
 } */
+ .dropdown{
+  margin: 10px auto !important;
+  width: fit-content !important;
+ }
+ .Action-btn, .add_btn{
+  margin: 10px !important;
+ }
+ 
+  
+}
+@media (min-width: 600px){
+  .box-visible{
+    display: none;
+   }
+}
 
 /* pagination.css */
 
