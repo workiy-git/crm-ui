@@ -11,6 +11,9 @@ import { ThemeProvider, createTheme } from "@mui/material/styles";
 import config from "../../config/config";
 import "../../assets/styles/header.css";
 import { jwtDecode } from "jwt-decode";
+import { useLocation, useNavigate } from "react-router-dom";
+import { useParams } from "react-router-dom";
+
 
 const theme = createTheme({
   components: {
@@ -28,7 +31,7 @@ export default function Myprofile({ backgroundColor, value }) {
   const menuRef = useRef(null);
   const [myprofileData, setMyprofileData] = useState({});
   const [userData, setUserData] = useState({});
-
+  const navigate = useNavigate();
   const [jwtToken, setJwtToken] = useState("");
   const [userName, setUserName] = useState("");
 
@@ -87,6 +90,17 @@ export default function Myprofile({ backgroundColor, value }) {
     window.location.href = url;
   };
 
+  const handleNavigate = (mode) => {
+    if (userData) {
+        navigate(`/users/${mode}/${userData._id}`, {
+            state: { rowData: userData, mode },
+        });
+        console.log("userData", userData);
+        console.log("userData ID", userData._id);
+
+    }
+  };
+
   return (
     <Box sx={{ display: "flex", justifyContent: "left" }}>
       <ThemeProvider theme={theme}>
@@ -138,7 +152,8 @@ export default function Myprofile({ backgroundColor, value }) {
               >
                 <Box style={{ display: "grid", padding: "15px" }}>
                   <ListItemButton
-                    onClick={() => handleProfileClick()}
+                    // onClick={() => handleProfileClick()}
+                    onClick={() => handleNavigate("profile")}
                     style={{
                       borderBottom: "1px dashed black",
                       paddingBottom: "10px",

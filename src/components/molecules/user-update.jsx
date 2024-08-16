@@ -157,6 +157,10 @@ import { Box, Typography, List, ListItem, Divider, Avatar } from '@mui/material'
 import axios from 'axios';
 import config from '../../config/config';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import { useNavigate } from "react-router-dom";
+
+import { jwtDecode } from "jwt-decode";
+
 
 const Updates = ({ mode }) => {
   const { id } = useParams();
@@ -164,6 +168,29 @@ const Updates = ({ mode }) => {
   const [error, setError] = useState(null);
   const [fieldLabels, setFieldLabels] = useState({});
   const [loading, setLoading] = useState(true); // Track loading state
+  const [userData, setUserData] = useState({});
+  const navigate = useNavigate();
+  const [jwtToken, setJwtToken] = useState("");
+  const [userName, setUserName] = useState("");
+  
+
+  useEffect(() => {
+    const token = sessionStorage.getItem("accessToken"); // Use sessionStorage instead of localStorage
+    if (token) {
+      setJwtToken(token);
+      const decodedToken = jwtDecode(token);
+      const user = decodedToken.username; // Assuming the username is stored in the token
+      axios
+        .get(`${config.apiUrl}/users/${user}`)
+        .then((response) => {
+          setUserData(response.data.data); // Update with the fetched user data
+        })
+        .catch((error) => {
+          console.error("Error fetching user data:", error);
+        });
+      setUserName(user);
+    }
+  }, []);
 
   useEffect(() => {
     if (mode === 'add') {
@@ -300,12 +327,14 @@ const Updates = ({ mode }) => {
                           {time}
                         </Typography>
                         </div>
-                        <Avatar sx={{ margin: 'auto' }}>
-                          <AccountCircleIcon />
-                        </Avatar>
+                        <Avatar
+                          alt="Profile"
+                          src={userData.profile_img}
+                          sx={{ margin: 'auto' }}
+                        />
                         </div>
                         <Typography variant="body2" color="text.primary" sx={{ marginRight: 1 }}>
-                          {action} made the following changes:
+                          {action} {userData.username} : made the following changes:
                         </Typography>
                       </Box>
                     </ListItem>

@@ -9,6 +9,9 @@ import AddComponent from '../organism/add';
 import ConfirmationDialog from '../molecules/confirmation-dialog'; 
 import AlertWrapper from '../organism/alert'; 
 import Tab from '../organism/details-tab';
+import Whatsapp from '../molecules/whatsapp';
+import Email from '../molecules/email';
+import Sms from '../molecules/sms';
 
 const DetailsPage = () => {
   const { id } = useParams();
@@ -177,6 +180,7 @@ const DetailsPage = () => {
         navigate(`/${pageName}/${mode}/${rowData._id}`, {
             state: { rowData, pageName, mode },
         });
+      
 
     }
   };
@@ -185,7 +189,6 @@ const DetailsPage = () => {
             state: { pageName, mode },
         });
   };
-
   return (
     <div
       style={{
@@ -214,6 +217,15 @@ const DetailsPage = () => {
                 marginRight: "5%",
               }}
             >
+              <Button>
+              <Whatsapp formData={formData}/>
+              </Button>
+              <Button>
+              <Email formData={formData}/>
+              </Button>
+              <Button>
+              <Sms formData={formData}/>
+              </Button>
               <Button
                 variant="contained"
                 color="primary"
