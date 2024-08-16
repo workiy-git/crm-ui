@@ -31,6 +31,9 @@
 import React, { useState } from "react";
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, MenuItem, Select, FormControl, InputLabel } from "@material-ui/core";
 import MailOutlineIcon from '@mui/icons-material/MailOutline';
+import Typography from '@mui/material/Typography';
+import '../../assets/styles/style.css';
+
 
 const Email = ({ formData }) => {
     const [open, setOpen] = useState(false);
@@ -80,8 +83,8 @@ const Email = ({ formData }) => {
 
     return (
         <>
-            <Button onClick={handleClickOpen} style={{ display: 'flex', alignItems: 'center' }}>
-                <MailOutlineIcon style={{ color: 'white' }} />
+            <Button className="Details_hover_btn" onClick={handleClickOpen} style={{ display: 'flex', alignItems: 'center', color:'white' }}>
+                <MailOutlineIcon style={{ color: 'white', marginRight:'10px' }} /><Typography className="Details_btn_txt">Email</Typography>   
             </Button>
             <Dialog open={open} onClose={handleClose}>
                 <DialogTitle>Select Email Template</DialogTitle>

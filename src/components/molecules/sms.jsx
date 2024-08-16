@@ -1,6 +1,9 @@
 import React from "react";
 import { Button } from "@material-ui/core";
 import SmsOutlinedIcon from '@mui/icons-material/SmsOutlined';
+import Typography from '@mui/material/Typography';
+import '../../assets/styles/style.css';
+
 
 const Sms = ({ formData }) => {
     const handleSmsClick = () => {
@@ -18,8 +21,8 @@ const Sms = ({ formData }) => {
     };
 
     return (
-        <Button onClick={handleSmsClick} style={{ display: 'flex', alignItems: 'center' }}>
-            <SmsOutlinedIcon style={{ color: 'white' }} />
+        <Button className="Details_hover_btn" onClick={handleSmsClick} style={{ display: 'flex', alignItems: 'center',color: 'white' }}>
+            <SmsOutlinedIcon style={{ color: 'white', marginRight:'10px' }} /><Typography className="Details_btn_txt">SMS</Typography>
         </Button>
     );
 };

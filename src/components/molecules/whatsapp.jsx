@@ -1,6 +1,8 @@
 import React from "react";
 import { Button } from "@material-ui/core";
 import WhatsAppIcon from '@mui/icons-material/WhatsApp';
+import Typography from '@mui/material/Typography';
+import '../../assets/styles/style.css';
 
 const Whatsapp = ({ formData }) => {
     const handleWhatsappClick = () => {
@@ -24,8 +26,8 @@ const Whatsapp = ({ formData }) => {
     };
 
     return (
-        <Button onClick={handleWhatsappClick} style={{ display: 'flex', alignItems: 'center' }}>
-            <WhatsAppIcon style={{ color: 'white' }} />
+        <Button className="Details_hover_btn" onClick={handleWhatsappClick} style={{ display: 'flex', alignItems: 'center', color:'white' }}>
+            <WhatsAppIcon style={{ color: 'white', marginRight:'10px' }} /> <Typography className="Details_btn_txt">Whatsapp</Typography>
         </Button>
     );
 };
