@@ -59,3 +59,9 @@
   .overflow-a {
     overflow: auto;
   }
+  .Details_btn_txt{
+    display: none;
+  }
+  .Details_hover_btn:hover .Details_btn_txt {
+    display: block;
+  }
