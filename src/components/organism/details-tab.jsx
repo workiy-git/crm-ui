@@ -30,7 +30,7 @@ export default function TabComponent({ mode }) {
 
   return (
     <div style={{ borderRadius: '10px', width: '100%' }}>
-      <Box sx={{ background: '#FFC03D', borderRadius: '10px', padding:'10px', height:'66%' }}>
+      <Box sx={{ background: '#FFC03D', borderRadius: '10px', padding:'10px', height:'70vh' }}>
         <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
             <Tabs
               value={value}
@@ -57,8 +57,8 @@ export default function TabComponent({ mode }) {
               ))}
             </Tabs>
         </Box>
-        {value === 0 && <Box class="overflow-a" style={{background:'white', height:'84%', borderBottomLeftRadius:'5px', borderBottomRightRadius:'5px'}}><Updates mode= {mode}/></Box>}
-        {value === 1 && <Box class="overflow-a" style={{background:'white', height:'84%', borderBottomLeftRadius:'5px', borderBottomRightRadius:'5px'}}><Comments /></Box>}
+        {value === 0 && <Box class="overflow-a" style={{background:'white', height:'63vh', borderBottomLeftRadius:'5px', borderBottomRightRadius:'5px'}}><Updates mode= {mode}/></Box>}
+        {value === 1 && <Box class="overflow-a" style={{background:'white', height:'63vh', borderBottomLeftRadius:'5px', borderBottomRightRadius:'5px'}}><Comments /></Box>}
         {/* Add similar conditional rendering for other tabs */}
       </Box>
     </div>

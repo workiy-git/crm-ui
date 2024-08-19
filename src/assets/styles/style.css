@@ -65,3 +65,7 @@
   .Details_hover_btn:hover .Details_btn_txt {
     display: block;
   }
+
+  .edit-field-input input, .edit-field-input .css-11u53oe-MuiSelect-select-MuiInputBase-input-MuiOutlinedInput-input{
+    padding: 8px 10px;
+  }

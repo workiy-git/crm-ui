@@ -123,7 +123,7 @@ export default function Myprofile({ backgroundColor, value }) {
               <Avatar
                 alt="Profile"
                 src={userData.profile_img}
-                sx={{ width: 40, height: 40, outline: "white 2px solid" }}
+                sx={{ width: 30, height: 30, outline: "white 2px solid" }}
               />
               <div className="myprofile-username-main">
                 <Text className={`myprofile-username  ${value}`}>
