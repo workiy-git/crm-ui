@@ -69,3 +69,8 @@
   .edit-field-input input, .edit-field-input .css-11u53oe-MuiSelect-select-MuiInputBase-input-MuiOutlinedInput-input{
     padding: 8px 10px;
   }
+  .edit-field-input-select{
+    display: flex !important;
+    flex-direction: column !important;
+    padding: 7px !important;
+  }
