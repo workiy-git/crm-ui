@@ -153,14 +153,12 @@
 
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { Box, Typography, List, ListItem, Divider, Avatar } from '@mui/material';
+import { Box, Typography, List, ListItem, Divider, Avatar, Button } from '@mui/material';
 import axios from 'axios';
 import config from '../../config/config';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import { useNavigate } from "react-router-dom";
-
 import { jwtDecode } from "jwt-decode";
-
 
 const Updates = ({ mode }) => {
   const { id } = useParams();
@@ -172,7 +170,7 @@ const Updates = ({ mode }) => {
   const navigate = useNavigate();
   const [jwtToken, setJwtToken] = useState("");
   const [userName, setUserName] = useState("");
-  
+  const [showAll, setShowAll] = useState(false); // State to control "Show More"
 
   useEffect(() => {
     const token = sessionStorage.getItem("accessToken"); // Use sessionStorage instead of localStorage
@@ -266,10 +264,8 @@ const Updates = ({ mode }) => {
     return { dateTime: '', details: item, date: '', time: '' };
   };
 
-
-
-
-  
+  // Determine the number of items to display initially
+  const itemsToShow = showAll ? history.length : 3;
 
   return (
     <Box sx={{ margin: 'auto', padding: 2, maxWidth: 800, overflow: 'auto' }}>
@@ -284,7 +280,7 @@ const Updates = ({ mode }) => {
             <Typography>No history available.</Typography>
           ) : (
             <List>
-              {history.map((item, index) => {
+              {history.slice(0, itemsToShow).map((item, index) => {
                 const { dateTime, details, date, time } = parseHistoryItem(item);
                 const parts = details.split('made the following changes: ');
                 const action = parts[0].trim();
@@ -316,24 +312,21 @@ const Updates = ({ mode }) => {
                     <ListItem alignItems="flex-start" sx={{ padding: 0 }}>
                       <Box sx={{ display: 'flex', alignItems: 'center', width: '100%' }}>
                         <div style={{display:'block', textAlign:'center'}}>
-                        <div>
-                        <Typography sx={{ marginRight: 1 }} variant="body2" color="text.primary" >
-                          {date} {totalDays > 1 ? `(${totalDays} days ago)` : totalDays === 1 ? '(1 day ago)' : '(today)'}
-                        </Typography>
-                        <div>
-
+                          <div>
+                            <Typography sx={{ marginRight: 1, fontSize:'10px' }} variant="body2" color="text.primary">
+                              {date} {totalDays > 1 ? `(${totalDays} days ago)` : totalDays === 1 ? '(1 day ago)' : '(today)'}
+                            </Typography>
+                            <Typography sx={{ marginRight: 1, fontSize:'12px' }} variant="body2" color="text.primary">
+                              {time}
+                            </Typography>
+                          </div>
+                          <Avatar
+                            alt="Profile"
+                            src={userData.profile_img}
+                            sx={{ margin: 'auto' }}
+                          />
                         </div>
-                        <Typography sx={{ marginRight: 1 }} variant="body2" color="text.primary" >
-                          {time}
-                        </Typography>
-                        </div>
-                        <Avatar
-                          alt="Profile"
-                          src={userData.profile_img}
-                          sx={{ margin: 'auto' }}
-                        />
-                        </div>
-                        <Typography variant="body2" color="text.primary" sx={{ marginRight: 1 }}>
+                        <Typography variant="body2" color="text.primary" sx={{ marginRight: 1,fontSize:'13px' }}>
                           {action} {userData.username} : made the following changes:
                         </Typography>
                       </Box>
@@ -345,8 +338,8 @@ const Updates = ({ mode }) => {
                             const [fieldName, value] = change.split(': ');
                             const label = fieldLabels[fieldName] || fieldName;
                             return (
-                              <ListItem key={idx} style={{ padding: "10px 30px" }}>
-                                <Typography component="li" variant="body2">
+                              <ListItem key={idx} style={{ padding: "0px 30px" }}>
+                                <Typography sx={{fontSize:'13px'}} component="li" variant="body2">
                                   <strong>{label}:</strong> {value}
                                 </Typography>
                               </ListItem>
@@ -359,6 +352,13 @@ const Updates = ({ mode }) => {
                   </React.Fragment>
                 );
               })}
+              {history.length > 3 && (
+                <Box textAlign="center" marginTop={2}>
+                  <Button variant="outlined" onClick={() => setShowAll(!showAll)}>
+                    {showAll ? "Show Less" : "Show More"}
+                  </Button>
+                </Box>
+              )}
             </List>
           )}
         </>

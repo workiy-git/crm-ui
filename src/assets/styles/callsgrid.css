@@ -497,3 +497,17 @@
 .grid_search input{
   padding: 0;
 }
+
+.custom-data-grid .MuiDataGrid-row {
+  height: 40px !important;
+  min-height: 40px !important;
+  max-height: 40px !important;
+}
+
+.custom-data-grid .MuiDataGrid-row .MuiDataGrid-cell{
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  height: 40px !important;
+
+}

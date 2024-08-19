@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Box, TextField, Select, MenuItem, FormControl, Checkbox, FormControlLabel, InputLabel } from '@mui/material';
 import axios from 'axios';
 import config from '../../config/config';
+import '../../assets/styles/style.css';
 
 const EditComponent = ({ id, pageSchema, formData, setFormData, onSaveSuccess, onSaveError, pageName, pageID }) => {
   const [validationError, setValidationError] = useState('');
@@ -102,7 +103,7 @@ const EditComponent = ({ id, pageSchema, formData, setFormData, onSaveSuccess, o
               color: '#333',
               fontSize: '12px',
             }}>{label}</label>
-            <TextField {...commonProps} sx={{
+            <TextField className='edit-field-input' {...commonProps} sx={{
               width: '50%',
               textAlign: 'left',
               color: '#666',
@@ -131,7 +132,7 @@ const EditComponent = ({ id, pageSchema, formData, setFormData, onSaveSuccess, o
               color: '#333',
               fontSize: '12px',
             }}>{label}</label>
-            <Select {...commonProps} style={{
+            <Select className='edit-field-input' {...commonProps} style={{
               width: '50%',
               textAlign: 'left',
               color: '#666',
@@ -155,6 +156,7 @@ const EditComponent = ({ id, pageSchema, formData, setFormData, onSaveSuccess, o
             key={field.fieldName}
             control={
               <Checkbox
+                className='edit-field-input'
                 name={field.fieldName}
                 checked={formData[field.fieldName] || false}
                 onChange={handleInputChange}
@@ -196,7 +198,7 @@ const EditComponent = ({ id, pageSchema, formData, setFormData, onSaveSuccess, o
               color: '#333',
               fontSize: '12px',
             }}>{label}</label>
-            <TextField {...commonProps} style={{
+            <TextField  className='edit-field-input' {...commonProps} style={{
               width: '50%',
               textAlign: 'left',
               color: '#666',

@@ -18,7 +18,8 @@ background-color: blue;
   
   .header-toolbar {
     flex-grow: 1;
-    height: auto !important;
+    height: 55px !important;
+    min-height: 55px !important;
     padding: 0 !important;
   }
   
@@ -114,7 +115,7 @@ background-color: blue;
   
   .hamburger-list-item-button {
     padding: 0 !important;
-    margin: 15px !important;
+    margin: 5px 15px !important;
 }
   
   .hamburger-list-item-button-md {

@@ -550,6 +550,25 @@ const fetchGridData = async (filter) => {
             ))}
           </select>
         </div>
+        <div>
+        <span style={{ marginLeft: "16px" }}>
+          Page {page} of {Math.ceil(totalRows / pageSize)}
+        </span>
+        <span style={{ marginLeft: "16px" }}>
+          Total Rows: {totalRows}
+        </span>
+        
+        <Select
+          value={pageSize}
+          onChange={handlePageSizeChange}
+          displayEmpty
+          style={{ marginLeft: "16px", height:'35px'}}
+        >
+          <MenuItem value={10}>10</MenuItem>
+          <MenuItem value={25}>25</MenuItem>
+          <MenuItem value={50}>50</MenuItem>
+        </Select>
+        </div>
         <Box mt={2} mb={2}>
         <Pagination
           count={Math.ceil(totalRows / pageSize)}
@@ -558,22 +577,7 @@ const fetchGridData = async (filter) => {
           style={{justifyContent:'center', display:'flex'}}
           onChange={handlePageChange}
         />
-        <span style={{ marginLeft: "16px" }}>
-          Page {page} of {Math.ceil(totalRows / pageSize)}
-        </span>
-        <span style={{ marginLeft: "16px" }}>
-          Total Rows: {totalRows}
-        </span>
-        <Select
-          value={pageSize}
-          onChange={handlePageSizeChange}
-          displayEmpty
-          style={{ marginLeft: "16px" }}
-        >
-          <MenuItem value={10}>10</MenuItem>
-          <MenuItem value={25}>25</MenuItem>
-          <MenuItem value={50}>50</MenuItem>
-        </Select>
+        
         </Box>
       </Box>
       )}

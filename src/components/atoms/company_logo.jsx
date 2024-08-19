@@ -39,7 +39,7 @@ function Companylogo() {
         <div>
                 <div>
                     <Box sx={{ display: 'flex'  }}>
-                    <IconButton size="large" color="inherit" style={dashedBorderStyle} sx={{  marginLeft:'25px',height:{xs : '50px', md :'70px'}, background:'white' }}>
+                    <IconButton size="large" color="inherit" style={dashedBorderStyle} sx={{  marginLeft:'25px',height:'50px', background:'white' }}>
                     <img alt="" src={companylogoData.business_logo}  style={logoHeightStyle}/>
                     </IconButton>
                     {/* <IconButton size="large" color="inherit" sx={{  height:{xs : '50px', md :'70px'} }}> 

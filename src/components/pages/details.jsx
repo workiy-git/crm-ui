@@ -259,7 +259,26 @@ const DetailsPage = () => {
                   justifyContent: "space-between",
                 }}
               >
-                <div>{pageName} information</div>
+                <div>
+                  <div>{pageName} information</div>
+                  <div>
+                  <Box
+                    style={{
+                      display: "flex",
+                      justifyContent: "end",
+                      alignItems: "center",
+                    }}
+                  >
+                    <div style={{ fontSize:'15px', fontWeight:'100'}}>
+                      CT :{" "}
+                      <span style={{ fontWeight:'300' }}>
+                        {formData?.created_time || "N/A"}
+                      </span>
+                    </div>
+                  </Box>
+                  </div>
+                </div>
+                
                 <Box
               style={{
                 display: "flex",
@@ -321,25 +340,9 @@ const DetailsPage = () => {
               )}
             </Box>
               </div>
-              <div>
-                <Box
-                  style={{
-                    display: "flex",
-                    justifyContent: "end",
-                    alignItems: "center",
-                    padding: "5px",
-                  }}
-                >
-                  <div style={{ margin: "auto 20px" }}>
-                    CT :{" "}
-                    <span style={{ fontWeight: "bold" }}>
-                      {formData?.created_time || "N/A"}
-                    </span>
-                  </div>
-                </Box>
-              </div>
-              <div style={{ height: "75%", overflow: "auto" }}>
-                <Box sx={{ m: 2 }}>
+             
+              <div style={{ height: "75%", overflow: "auto", padding: isEditing ? "10px" : "0" }}>
+                <Box sx={{ m: 0 }}>
                   {error && (
                     <Stack sx={{ width: "100%" }} spacing={2}>
                       <AlertWrapper type="error" message={error} />
