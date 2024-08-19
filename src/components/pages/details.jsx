@@ -325,15 +325,16 @@ const DetailsPage = () => {
                 variant="contained"
                 color="error"
                 onClick={handleOpenDialog}
+                style={{margin:'5px'}}
               >
                 Delete
               </Button>
               )}
-              {(isAdding)  && (
+              {(isAdding || isEditing)  && (
               <Button
                 variant="contained"
                 color="error"
-                onClick={() => navigate(`/container/${pageName}`)}
+                onClick={() => navigate(-1)}
               >
                 Cancel
               </Button>

@@ -142,7 +142,7 @@ const EditComponent = ({ id, pageSchema, formData, setFormData, onSaveSuccess, o
                 <em>{field.placeholder || 'Select an option'}</em>
               </MenuItem>
               {field.options.map((option, index) => (
-                <MenuItem key={index} value={option}>
+                <MenuItem className='edit-field-input-select' key={index} value={option}>
                   {option}
                 </MenuItem>
               ))}
