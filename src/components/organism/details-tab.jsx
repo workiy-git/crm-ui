@@ -45,7 +45,9 @@ export default function TabComponent({ mode }) {
                     background: value === index ? '#ffffff' : '',
                     borderRadius: '5px 5px 0 0',
                     flexDirection: 'row',
-                    gap: '10px'
+                    gap: '10px',
+                    padding:'10px', 
+                    marginRight:'5px'
                   }}
                   label={
                     <>

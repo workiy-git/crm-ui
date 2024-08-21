@@ -12,6 +12,7 @@ import Tab from '../organism/details-tab';
 import Whatsapp from '../molecules/whatsapp';
 import Email from '../molecules/email';
 import Sms from '../molecules/sms';
+import '../../assets/styles/style.css';
 
 const DetailsPage = () => {
   const { id } = useParams();
@@ -342,7 +343,7 @@ const DetailsPage = () => {
             </Box>
               </div>
              
-              <div style={{ height: "75%", overflow: "auto", padding: isEditing ? "10px" : "0" }}>
+              <div style={{ height: "75%", overflow: "auto", padding: isEditing || isAdding ? "10px" : "0" }}>
                 <Box sx={{ m: 0 }}>
                   {error && (
                     <Stack sx={{ width: "100%" }} spacing={2}>
