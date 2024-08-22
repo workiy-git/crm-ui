@@ -648,7 +648,6 @@ const fetchGridData = async (filter) => {
       ) : (
         <div style={{height:'calc(100vh - 180px)'}}>
           <DataGrid
-            key={key}
             rows={filteredRows.slice((page - 1) * pageSize, page * pageSize)}
             columns={columnsWithFilter}
             pageSize={pageSize}
@@ -658,9 +657,10 @@ const fetchGridData = async (filter) => {
             page={page - 1}
             disableSelectionOnClick
             columnHeaderHeight={120}
-            className="custom-data-grid"
+            className="custom-data-grid-main"
           />
         </div>
+        // <div> </div>
       )}
       <Modal open={showColumnModal} onClose={closeColumnModal} aria-labelledby="modal-title" aria-describedby="modal-description">
   <Box sx={{ ...modalStyle, width: 500 }}>
