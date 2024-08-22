@@ -6,6 +6,7 @@ import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 import Updates from '../molecules/user-update';
 import Comments from '../molecules/user-comments';
+import SiteVisits from '../molecules/user-sitevisits';
 
 export default function TabComponent({ mode }) {
   const [value, setValue] = useState(0);
@@ -61,6 +62,7 @@ export default function TabComponent({ mode }) {
         </Box>
         {value === 0 && <Box class="overflow-a" style={{background:'white', height:'63vh', borderBottomLeftRadius:'5px', borderBottomRightRadius:'5px'}}><Updates mode= {mode}/></Box>}
         {value === 1 && <Box class="overflow-a" style={{background:'white', height:'63vh', borderBottomLeftRadius:'5px', borderBottomRightRadius:'5px'}}><Comments /></Box>}
+        {value === 2 && <Box class="overflow-a" style={{background:'white', height:'63vh', borderBottomLeftRadius:'5px', borderBottomRightRadius:'5px'}}><SiteVisits /></Box>}
         {/* Add similar conditional rendering for other tabs */}
       </Box>
     </div>

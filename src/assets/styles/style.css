@@ -78,3 +78,11 @@
   .valuefield{
     width: 50% !important;
   }
+  .wedgets-main {
+    display: none; /* Hide all children */
+  }
+  
+  .wedgets-main:first-child {
+    display: block !important; /* Show only the first child */
+  }
+  
