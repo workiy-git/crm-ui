@@ -26,7 +26,7 @@ function Loginpage() {
   const [companylogoData, setcompanylogoData] = useState({});
   const [allFieldsFilled, setAllFieldsFilled] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false); 
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleClickShowPassword = () => setShowPassword((show) => !show);
 
@@ -34,7 +34,7 @@ function Loginpage() {
     event.preventDefault();
   };
 
-   // Define your Cognito User Pool Data
+  // Define your Cognito User Pool Data
   // Cognito User Pool Data
   const poolData = {
     UserPoolId: "us-east-1_AEdwzu9Xx", // Your user pool id here
@@ -46,14 +46,14 @@ function Loginpage() {
     event.preventDefault();
 
     if (isSubmitting) return;
-    setIsSubmitting(true); 
+    setIsSubmitting(true);
 
     if (!companyName.trim() || !username.trim() || !password.trim()) {
       setErrorMessage("Please fill in all required fields.");
       setIsSubmitting(false);
     } else {
       setErrorMessage("");
-      
+
       const usernameVal = username.trim();
       const passwordVal = password.trim();
 
@@ -166,36 +166,34 @@ function Loginpage() {
   return (
     <div>
       {companylogoData && companylogoData.background ? (
-        <div
-          className="login-container"
-          style={{ backgroundImage: `url(${companylogoData.background.BG})` }}
-          onKeyPress={handleKeyPress}
-        >
+        <div className="login-container" onKeyPress={handleKeyPress}>
           <div className="login-main">
             <div className="login-left-section">
               <img
-                src={companylogoData.background.bot}
+                src={companylogoData.login?.icon}
                 alt="background"
                 className="login-background-image"
               />
             </div>
             <div className="login-right-section">
               <div className="login-right-section-main">
-                <div className="login-title-block">
+                {/* <div className="login-title-block">
                   <img src={companylogoData.login?.icon} alt="" />
                   <Typography variant="h6" className="login-title">
                     {companylogoData.login?.title}
                   </Typography>
-                </div>
+                </div> */}
                 <Grid>
                   <Grid item xs={12} sm={6} className="login-form-group">
-                    <div className="login-align-items">
+                    {/* <div className="login-align-items">
                       <img
                         src={companylogoData.company?.logo}
                         alt="logo"
                         className="login-logo"
                       />
                     </div>
+                    
+                    */}
                     <input
                       type="text"
                       className="login-text-field"
@@ -207,11 +205,11 @@ function Loginpage() {
                   </Grid>
                   <Grid item xs={12} sm={6} className="login-form-group">
                     <div className="login-align-items">
-                      <img
+                      {/* <img
                         src={companylogoData.username.logo}
                         alt="logo"
                         className="login-logo"
-                      />
+                      /> */}
                     </div>
                     <input
                       type="text"
@@ -224,11 +222,11 @@ function Loginpage() {
                   </Grid>
                   <Grid item xs={12} className="login-form-group">
                     <div className="login-align-items">
-                      <img
+                      {/* <img
                         src={companylogoData.password?.logo}
                         alt="logo"
                         className="login-logo"
-                      />
+                      /> */}
                     </div>
                     <FormControl type={inputType} required>
                       <div style={{ display: "flex" }}>
@@ -294,7 +292,7 @@ function Loginpage() {
                     }
                     id="login-button"
                     onClick={handleLogin}
-                    disabled={!allFieldsFilled || isSubmitting} 
+                    disabled={!allFieldsFilled || isSubmitting}
                     style={{
                       cursor: allFieldsFilled ? "pointer" : "not-allowed",
                       opacity: isSubmitting ? 0.7 : 1,
