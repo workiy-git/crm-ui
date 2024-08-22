@@ -293,12 +293,12 @@ input {
 }
 
 .login-title {
-  color: #ffba08;
+  color: #3A3838 !important;
   padding: 6px 0 0 0;
   font-family: "Nunito" !important;
   font-weight: 500;
   margin: auto 0px !important;
-  font-size: 35px !important;
+  font-size: 25px !important;
   font-weight: bolder !important;
 }
 .login-title-block {
@@ -313,9 +313,11 @@ input {
   font-size: 40px;
 }
 
+
 .login-form-group {
-  margin-top: 25px !important;
+  margin-top: 55px !important;
   display: flex;
+
 }
 
 .login-logo {
@@ -365,15 +367,28 @@ input {
 .login-link {
   text-decoration: none;
 }
+.login-footer{
+  font-weight: 600 !important;
+  color:#808080!important;
+  margin-top:20px !important;
+  font-size: 18px !important;
+  
+}
 
 #login-button {
   background: #f2a742 !important;
   color: #000;
   /* border:2px solid #fc921b; */
   font-weight: 700;
-  padding: 5px 50px;
-  margin-top: 10px;
+  padding: 10px 50px;
+  margin-top: 30px;
   border-radius: 5px;
+}
+.login-lable{
+color: #3A3838;
+font-weight: 700 !important;
+position:absolute;
+padding-bottom: 100px;
 }
 
 .login-button-disabled {
@@ -392,7 +407,7 @@ input {
 
 .login-forgot-password {
   color: #000;
-  margin-top: 30px;
+  margin-top: 10px;
   text-align: center;
   padding: 10px;
   font-weight: 700;
@@ -442,7 +457,7 @@ input {
   }
 
   .login-title {
-    color: #fc921b;
+    color: #3A3838 !important;
     margin-top: 0px !important;
     font-size: 32px !important;
     font-weight: bolder !important;
@@ -456,9 +471,7 @@ input {
     padding: 0px !important;
   }
 
-  .login-form-group {
-    margin: 10px !important;
-  }
+ 
 
   .login-submit-block {
     margin-top: 30px;
