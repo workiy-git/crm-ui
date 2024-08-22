@@ -12,6 +12,7 @@ import Tab from '../organism/details-tab';
 import Whatsapp from '../molecules/whatsapp';
 import Email from '../molecules/email';
 import Sms from '../molecules/sms';
+import '../../assets/styles/style.css';
 
 const DetailsPage = () => {
   const { id } = useParams();
@@ -163,13 +164,19 @@ const DetailsPage = () => {
   
       if (isAdding) {
         await axios.post(`${config.apiUrl}/appdata/create`, dataToSend);
-        navigate(`/container/${pageName}`);
+        handleSaveSuccess("Data Added successfully!");
+      
+        // Use setTimeout with a callback function to navigate after 2000ms
+        setTimeout(() => {
+          navigate(`/container/${pageName}`);
+        }, 2000); // 2000ms delay
       } else {
         await axios.put(`${config.apiUrl}/appdata/${id}`, dataToSend);
+        handleSaveSuccess("Data saved successfully!");
+        window.scrollTo({ top: 0, behavior: "smooth" });
       }
   
-      handleSaveSuccess("Data saved successfully!");
-      window.scrollTo({ top: 0, behavior: "smooth" });
+      
     } catch (error) {
       handleSaveError("Error saving data.");
       console.error("Error saving data:", error);
@@ -342,7 +349,7 @@ const DetailsPage = () => {
             </Box>
               </div>
              
-              <div style={{ height: "75%", overflow: "auto", padding: isEditing ? "10px" : "0" }}>
+              <div style={{ height: "75%", overflow: "auto", padding: isEditing || isAdding ? "10px" : "0" }}>
                 <Box sx={{ m: 0 }}>
                   {error && (
                     <Stack sx={{ width: "100%" }} spacing={2}>

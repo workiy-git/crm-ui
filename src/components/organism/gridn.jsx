@@ -5,6 +5,7 @@ import config from "../../config/config";
 import { DataGrid } from "@mui/x-data-grid";
 import ConfirmationDialog from '../molecules/confirmation-dialog';
 import "../../assets/styles/callsgrid.css";
+import Papa from 'papaparse';
 
 import {
   Select,
@@ -450,6 +451,58 @@ const fetchGridData = async (filter) => {
     exportSelectedRows();
   };
 
+
+  // const handleCSVImport = (file) => {
+  //   Papa.parse(file, {
+  //     header: true,
+  //     complete: async (results) => {
+  //       const importedData = results.data;
+  //       console.log(importedData);
+  
+  //       try {
+  //         const response = await axios.post(`${config.apiUrl}/appdata/create`, { data: importedData }, {
+  //           headers: {
+  //             'Content-Type': 'application/json',
+  //           },
+  //         });
+  //         console.log('Success:', response.data);
+  //       } catch (error) {
+  //         if (error.response) {
+  //           // The request was made and the server responded with a status code
+  //           // that falls out of the range of 2xx
+  //           console.error('Error response:', error.response.data);
+  //           console.error('Error status:', error.response.status);
+  //           console.error('Error headers:', error.response.headers);
+  //         } else if (error.request) {
+  //           // The request was made but no response was received
+  //           console.error('Error request:', error.request);
+  //         } else {
+  //           // Something happened in setting up the request that triggered an Error
+  //           console.error('Error message:', error.message);
+  //         }
+  //         console.error('Error config:', error.config);
+  //       }
+  //     },
+  //     error: (error) => {
+  //       console.error("Error parsing CSV:", error);
+  //     }
+  //   });
+  // };
+
+
+  // const handleImportClick = () => {
+  //   const fileInput = document.createElement('input');
+  //   fileInput.type = 'file';
+  //   fileInput.accept = '.csv';
+  //   fileInput.onchange = (event) => {
+  //     const file = event.target.files[0];
+  //     if (file) {
+  //       handleCSVImport(file);
+  //     }
+  //   };
+  //   fileInput.click();
+  // };
+
   const handleSelectAllRows = (isChecked) => {
     if (isChecked) {
       const allRowIds = filteredRows.map((row) => row.id);
@@ -526,6 +579,8 @@ const fetchGridData = async (filter) => {
         open={Boolean(menuAnchor)}
         onClose={closeMenu}>
             <MenuItem onClick={handleExportClick}>Export Data</MenuItem>
+            {/* <MenuItem onClick={handleImportClick}>Import Data</MenuItem> */}
+
         </Menu>
         
         <div className="dropdown" style={{ margin: "8px", width: "300px" }}>
