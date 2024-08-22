@@ -159,7 +159,7 @@ const MenuComponent = ({ backgroundColor, onSaveSelectedText }) => {
         </Toolbar>
       </AppBar>
       {dashboardName && (
-        <WidgetsList backgroundColor={backgroundColor} dashboardName={dashboardName} />
+        <WidgetsList dashboardName={dashboardName} />
       )}
     </>
   );

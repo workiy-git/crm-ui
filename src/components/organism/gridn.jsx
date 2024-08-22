@@ -394,6 +394,31 @@ const fetchGridData = async (filter) => {
     setMenuAnchor(null);
   };
 
+  const emailSelectedRows = () => {
+    // Filter the gridData to get the selected rows
+    const selectedData = gridData.filter((row) =>
+      selectedRows.includes(row.id)
+    );
+    // if (selectedData.length === 0) {
+    //   setError('No rows selected');
+    //   setTimeout(() => setError(''), 3000);
+    //   return;
+    // }
+    // console.log("Selected Data:", selectedData);
+  
+    // Extract the caller_email from the selected rows and filter out invalid emails
+    const emailAddresses = selectedData
+      .map((row) => row.caller_email || row.email)  // Extract email addresses
+      .filter((email) => typeof email === 'string' && email.trim() !== ""); // Remove undefined and empty emails
+  
+    // Log or store the email addresses as needed
+    console.log("Filtered Emails:", emailAddresses);
+  
+    // Return the filtered email addresses
+    return emailAddresses;
+  };
+  
+
   const exportSelectedRows = () => {
     const selectedData = gridData.filter((row) =>
       selectedRows.includes(row.id)
@@ -450,6 +475,10 @@ const fetchGridData = async (filter) => {
   const handleExportClick = () => {
     exportSelectedRows();
   };
+  const handleEmailClick = () => {
+    emailSelectedRows();
+  };
+
 
 
   // const handleCSVImport = (file) => {
@@ -579,6 +608,7 @@ const fetchGridData = async (filter) => {
         open={Boolean(menuAnchor)}
         onClose={closeMenu}>
             <MenuItem onClick={handleExportClick}>Export Data</MenuItem>
+            <MenuItem onClick={handleEmailClick}>Send Email</MenuItem>
             {/* <MenuItem onClick={handleImportClick}>Import Data</MenuItem> */}
 
         </Menu>
