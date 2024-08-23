@@ -6,6 +6,8 @@ import { DataGrid } from "@mui/x-data-grid";
 import ConfirmationDialog from '../molecules/confirmation-dialog';
 import "../../assets/styles/callsgrid.css";
 import GridMenu from "../molecules/gridmenu";
+import Papa from 'papaparse';
+
 
 import {
   Select,
@@ -385,6 +387,31 @@ const fetchGridData = async (filter) => {
     setMenuAnchor(null);
   };
 
+  const emailSelectedRows = () => {
+    // Filter the gridData to get the selected rows
+    const selectedData = gridData.filter((row) =>
+      selectedRows.includes(row.id)
+    );
+    // if (selectedData.length === 0) {
+    //   setError('No rows selected');
+    //   setTimeout(() => setError(''), 3000);
+    //   return;
+    // }
+    // console.log("Selected Data:", selectedData);
+  
+    // Extract the caller_email from the selected rows and filter out invalid emails
+    const emailAddresses = selectedData
+      .map((row) => row.caller_email || row.email)  // Extract email addresses
+      .filter((email) => typeof email === 'string' && email.trim() !== ""); // Remove undefined and empty emails
+  
+    // Log or store the email addresses as needed
+    console.log("Filtered Emails:", emailAddresses);
+  
+    // Return the filtered email addresses
+    return emailAddresses;
+  };
+  
+
   const exportSelectedRows = () => {
     const selectedData = gridData.filter((row) =>
       selectedRows.includes(row.id)
@@ -441,6 +468,62 @@ const fetchGridData = async (filter) => {
   const handleExportClick = () => {
     exportSelectedRows();
   };
+  const handleEmailClick = () => {
+    emailSelectedRows();
+  };
+
+
+
+  // const handleCSVImport = (file) => {
+  //   Papa.parse(file, {
+  //     header: true,
+  //     complete: async (results) => {
+  //       const importedData = results.data;
+  //       console.log(importedData);
+  
+  //       try {
+  //         const response = await axios.post(`${config.apiUrl}/appdata/create`, { data: importedData }, {
+  //           headers: {
+  //             'Content-Type': 'application/json',
+  //           },
+  //         });
+  //         console.log('Success:', response.data);
+  //       } catch (error) {
+  //         if (error.response) {
+  //           // The request was made and the server responded with a status code
+  //           // that falls out of the range of 2xx
+  //           console.error('Error response:', error.response.data);
+  //           console.error('Error status:', error.response.status);
+  //           console.error('Error headers:', error.response.headers);
+  //         } else if (error.request) {
+  //           // The request was made but no response was received
+  //           console.error('Error request:', error.request);
+  //         } else {
+  //           // Something happened in setting up the request that triggered an Error
+  //           console.error('Error message:', error.message);
+  //         }
+  //         console.error('Error config:', error.config);
+  //       }
+  //     },
+  //     error: (error) => {
+  //       console.error("Error parsing CSV:", error);
+  //     }
+  //   });
+  // };
+
+
+  // const handleImportClick = () => {
+  //   const fileInput = document.createElement('input');
+  //   fileInput.type = 'file';
+  //   fileInput.accept = '.csv';
+  //   fileInput.onchange = (event) => {
+  //     const file = event.target.files[0];
+  //     if (file) {
+  //       handleCSVImport(file);
+  //     }
+  //   };
+  //   fileInput.click();
+  // };
 
   const handleSelectAllRows = (isChecked) => {
     if (isChecked) {
@@ -518,6 +601,9 @@ const fetchGridData = async (filter) => {
         open={Boolean(menuAnchor)}
         onClose={closeMenu}>
             <MenuItem onClick={handleExportClick}>Export Data</MenuItem>
+            <MenuItem onClick={handleEmailClick}>Send Email</MenuItem>
+            {/* <MenuItem onClick={handleImportClick}>Import Data</MenuItem> */}
+
         </Menu>
         
         <div className="dropdown" style={{ margin: "8px", width: "300px" }}>
@@ -585,7 +671,6 @@ const fetchGridData = async (filter) => {
       ) : (
         <div style={{height:'calc(100vh - 180px)'}}>
           <DataGrid
-            key={key}
             rows={filteredRows.slice((page - 1) * pageSize, page * pageSize)}
             columns={columnsWithFilter}
             pageSize={pageSize}
@@ -595,9 +680,10 @@ const fetchGridData = async (filter) => {
             page={page - 1}
             disableSelectionOnClick
             columnHeaderHeight={120}
-            className="custom-data-grid"
+            className="custom-data-grid-main"
           />
         </div>
+        // <div> </div>
       )}
       <Modal open={showColumnModal} onClose={closeColumnModal} aria-labelledby="modal-title" aria-describedby="modal-description">
   <Box sx={{ ...modalStyle, width: 500 }}>

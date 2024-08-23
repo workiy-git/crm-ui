@@ -60,19 +60,19 @@ const AddComponent = ({ formData, setFormData, pageSchema, onSaveSuccess, onSave
         return (
           <FormControl key={field.fieldName} style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', width: '50%' }}>
             <label style={{ width: '40%', textAlign: 'left' }}>{label}</label>
-            <TextField {...commonProps} type={field.type || 'text'} />
+            <TextField className='valuefield' {...commonProps} type={field.type || 'text'} />
           </FormControl>
         );
       case 'select':
         return (
           <FormControl key={field.fieldName} style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', width: '50%' }}>
             <label style={{ width: '40%', textAlign: 'left' }}>{label}</label>
-            <Select {...commonProps} displayEmpty>
+            <Select className='valuefield' {...commonProps} displayEmpty>
               <MenuItem value="">
                 <em>{field.placeholder || 'Select an option'}</em>
               </MenuItem>
               {field.options.map((option, index) => (
-                <MenuItem key={index} value={option}>
+                <MenuItem className='edit-field-input-select' key={index} value={option}>
                   {option}
                 </MenuItem>
               ))}
@@ -94,7 +94,7 @@ const AddComponent = ({ formData, setFormData, pageSchema, onSaveSuccess, onSave
         return (
           <FormControl key={field.fieldName} style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', width: '50%' }}>
             <label style={{ width: '40%', textAlign: 'left' }}>{label}</label>
-            <TextField {...commonProps} />
+            <TextField className='valuefield' {...commonProps} />
           </FormControl>
         );
     }

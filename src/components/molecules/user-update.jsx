@@ -170,7 +170,8 @@ const Updates = ({ mode }) => {
   const navigate = useNavigate();
   const [jwtToken, setJwtToken] = useState("");
   const [userName, setUserName] = useState("");
-  const [showAll, setShowAll] = useState(false); // State to control "Show More"
+  const [showAllHistory, setShowAllHistory] = useState(false); // State to control "Show More" for history
+  const [expandedHistoryItems, setExpandedHistoryItems] = useState({}); // Track expanded history items
 
   useEffect(() => {
     const token = sessionStorage.getItem("accessToken"); // Use sessionStorage instead of localStorage
@@ -265,11 +266,11 @@ const Updates = ({ mode }) => {
   };
 
   // Determine the number of items to display initially
-  const itemsToShow = showAll ? history.length : 3;
+  const itemsToShow = showAllHistory ? history.length : 3;
 
   return (
     <Box sx={{ margin: 'auto', padding: 2, maxWidth: 800, overflow: 'auto' }}>
-      {error && <Typography color="error">Failed to load history: {error.message}</Typography>}
+      {/* {error && <Typography color="error">Failed to load history: {error.message}</Typography>} */}
       {loading ? (
         <Typography>Loading...</Typography> // Display loading indicator while data is being fetched
       ) : mode === 'add' ? (
@@ -307,6 +308,9 @@ const Updates = ({ mode }) => {
                 // Convert the time difference into days
                 const totalDays = differenceInTime / (1000 * 3600 * 24);
 
+                const expanded = expandedHistoryItems[index];
+                const changeItemsToShow = expanded ? changeList.length : 3;
+
                 return (
                   <React.Fragment key={index}>
                     <ListItem alignItems="flex-start" sx={{ padding: 0 }}>
@@ -332,21 +336,35 @@ const Updates = ({ mode }) => {
                       </Box>
                     </ListItem>
                     {changeList.length > 0 && (
-                      <ListItem sx={{ paddingLeft: 8, paddingTop: 1 }}>
-                        <Box component="ul" sx={{ pl: 0, m: 0 }}>
-                          {changeList.map((change, idx) => {
-                            const [fieldName, value] = change.split(': ');
-                            const label = fieldLabels[fieldName] || fieldName;
-                            return (
-                              <ListItem key={idx} style={{ padding: "0px 30px" }}>
-                                <Typography sx={{fontSize:'13px'}} component="li" variant="body2">
-                                  <strong>{label}:</strong> {value}
-                                </Typography>
-                              </ListItem>
-                            );
-                          })}
-                        </Box>
-                      </ListItem>
+                      <>
+                        <ListItem sx={{ paddingLeft: 8, paddingTop: 1 }}>
+                          <Box component="ul" sx={{ pl: 0, m: 0 }}>
+                            {changeList.slice(0, changeItemsToShow).map((change, idx) => {
+                              const [fieldName, value] = change.split(': ');
+                              const label = fieldLabels[fieldName] || fieldName;
+                              return (
+                                <ListItem key={idx} style={{ padding: "0px 30px" }}>
+                                  <Typography sx={{fontSize:'13px'}} component="li" variant="body2">
+                                    <strong>{label}:</strong> {value}
+                                  </Typography>
+                                </ListItem>
+                              );
+                            })}
+                          </Box>
+                        </ListItem>
+                        {changeList.length > 3 && (
+                          <Box textAlign="center" marginTop={1}>
+                            <Button variant="text" onClick={() => 
+                              setExpandedHistoryItems(prevState => ({
+                                ...prevState,
+                                [index]: !expanded
+                              }))
+                            }>
+                              {expanded ? "Show Less" : "Show More"}
+                            </Button>
+                          </Box>
+                        )}
+                      </>
                     )}
                     <Divider style={{margin:'5px'}} component="li" />
                   </React.Fragment>
@@ -354,8 +372,8 @@ const Updates = ({ mode }) => {
               })}
               {history.length > 3 && (
                 <Box textAlign="center" marginTop={2}>
-                  <Button variant="outlined" onClick={() => setShowAll(!showAll)}>
-                    {showAll ? "Show Less" : "Show More"}
+                  <Button variant="outlined" onClick={() => setShowAllHistory(!showAllHistory)}>
+                    {showAllHistory ? "Show Less History" : "Show More History"}
                   </Button>
                 </Box>
               )}
@@ -368,3 +386,4 @@ const Updates = ({ mode }) => {
 };
 
 export default Updates;
+
