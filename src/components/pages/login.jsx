@@ -76,21 +76,37 @@ function Loginpage() {
       cognitoUser.authenticateUser(authenticationDetails, {
         onSuccess: async (result) => {
           try {
-            const response = await fetch(`${config.apiUrl}users/${username}`, {
-              method: "GET",
+            const response = await fetch(`${config.apiUrl}appdata/retrieve`, {
+              method: "POST",
               headers: {
                 "Content-Type": "application/json",
                 Authorization: result.getAccessToken().getJwtToken(),
               },
+              body: JSON.stringify([
+                {
+                  "$match": {
+                    "pageName": "users",
+                    "username": username, // dynamically include the username
+                  }
+                }
+              ]),
             });
 
             if (!response.ok) {
+              const errorText = await response.text();
+              console.error("API response error:", errorText);
               throw new Error("User verification failed");
             }
 
             const userData = await response.json();
+            console.log("API response data:", userData);
+            console.log("Expected company name:", companyName); // Log the expected company name
 
-            if (userData && userData.data.company === companyName) {
+            // Ensure both company names are trimmed and compared as strings
+      const apiCompanyName = userData.data[0].company.trim();
+      const expectedCompanyName = companyName.trim();
+
+           if (userData && apiCompanyName === expectedCompanyName) {
               sessionStorage.setItem("isLoggedIn", "true");
               sessionStorage.setItem(
                 "accessToken",
@@ -99,6 +115,7 @@ function Loginpage() {
 
               window.location.href = "/home";
             } else {
+              console.error("Company mismatch or user not found:", userData);
               throw new Error(
                 "User not found in the database or company mismatch"
               );

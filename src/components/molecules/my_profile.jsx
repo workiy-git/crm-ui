@@ -42,13 +42,20 @@ export default function Myprofile({ backgroundColor, value }) {
       const decodedToken = jwtDecode(token);
       const user = decodedToken.username; // Assuming the username is stored in the token
       axios
-        .get(`${config.apiUrl}/users/${user}`)
-        .then((response) => {
-          setUserData(response.data.data); // Update with the fetched user data
-        })
-        .catch((error) => {
-          console.error("Error fetching user data:", error);
-        });
+  .post(`${config.apiUrl}appdata/retrieve`, [
+    {
+      "$match": {
+        "pageName": "users",
+        "username": user
+      }
+    }
+  ])
+  .then((response) => {
+    setUserData(response.data.data[0]); // Update with the fetched user data
+  })
+  .catch((error) => {
+    console.error("Error fetching user data:", error);
+  });
       setUserName(user);
     }
   }, []);
@@ -89,12 +96,19 @@ export default function Myprofile({ backgroundColor, value }) {
     const url = `/underconstruction`;
     window.location.href = url;
   };
+  const pageName = "users";
 
   const handleNavigate = (mode) => {
     if (userData) {
-        navigate(`/users/${mode}/${userData._id}`, {
-            state: { rowData: userData, mode },
+      console.log("userData", userData);
+      console.log("userData ID", userData._id);
+
+        navigate(`/${pageName}/${mode}/${userData._id}`, {
+          state: { rowData: userData, pageName, mode },
         });
+        // navigate(`/users/${mode}/${userData._id}`, {
+        //     state: { rowData: userData, mode },
+        // });
         console.log("userData", userData);
         console.log("userData ID", userData._id);
 
