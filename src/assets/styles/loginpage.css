@@ -247,9 +247,14 @@ input {
   background-repeat: no-repeat;
   background-size: cover;
 }
+.login-background-image-block{
+  margin: auto;
+  text-align: center;
+}
 
 .login-background-image {
   width: 250px;
+  margin: auto;
   /* width: 17em; */
   /* position: absolute; */
   /* z-index: 2; */
@@ -271,8 +276,19 @@ input {
   /* height: 100vh; */
   position: relative;
   display: flex;
-  justify-content: center;
+  /* justify-content: space-around; */
   align-items: center;
+  flex-direction: column;
+}
+.login-welcome-text {
+  color: #fff;
+  font-size: 20px !important;
+  font-weight: bold !important;
+  margin-top: 25px !important;
+}
+.login-quotes-text{
+  color: #fff;
+  font-size: 12px;
 }
 .login-main {
   height: 90%;

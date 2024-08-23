@@ -526,7 +526,7 @@ const CreateWidget = ({ backgroundColor, dashboardName }) => {
               onDragStart={() => handleDragStart(index)}
               onDragEnter={() => handleDragEnter(index)}
               onDragEnd={() => handleDragEnd(index)}
-              style={{ width: '250px', height: 'auto', margin:'20px', float: 'left' }}
+              style={{ width: '250px', height: 'auto', margin:'20px 10px', float: 'left' }}
             >
               <div style={{ textAlign: 'end', marginBottom:'-20px', marginRight:'5px' }}>
                 <button className='widget-hide-btn' style={{position:'relative', border:'none', background:'wihite', borderRadius:'100px', cursor:'pointer'}} onClick={() => handleHideWidget(index)}>-</button>

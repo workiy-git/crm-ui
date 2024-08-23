@@ -169,11 +169,20 @@ function Loginpage() {
         <div className="login-container" onKeyPress={handleKeyPress}>
           <div className="login-main">
             <div className="login-left-section">
+              <Typography className="login-welcome-text">
+              {companylogoData.welcome.log}
+              </Typography>
+              <div className="login-background-image-block">
               <img
                 src={companylogoData.login?.icon}
                 alt="background"
                 className="login-background-image"
               />
+              <Typography className="login-quotes-text">
+              {companylogoData.welcome.quotes}
+              </Typography>
+              </div>
+              
             </div>
             <div className="login-right-section">
               <div className="login-right-section-main">
