@@ -250,6 +250,7 @@ input {
 
 .login-background-image {
   width: 250px;
+  /* width: 17em; */
   /* position: absolute; */
   /* z-index: 2; */
   opacity: 100%;
@@ -315,8 +316,9 @@ input {
 
 
 .login-form-group {
-  margin-top: 55px !important;
-  display: flex;
+  /* margin-top: 40px !important; */
+  margin-top: 4% !important;
+  /* display: flex; */
 
 }
 
@@ -327,10 +329,18 @@ input {
   padding: 10px;
 }
 
-.login-text-field {
+/* .login-text-field {
   height: 35px;
   width: 500px;
   padding: 10px;
+  border: 2px solid #c2c2cc;
+  border-radius: 10px;
+  margin-left: 1px;
+} */
+.login-text-field {
+  height: 45px;
+  width: 500px;
+  padding: 0 10px;
   border: 2px solid #c2c2cc;
   border-radius: 10px;
   margin-left: 1px;
@@ -374,21 +384,24 @@ input {
   font-size: 18px !important;
   
 }
-
+.login-error{
+  margin: 2vh 0;
+}
 #login-button {
   background: #f2a742 !important;
   color: #000;
   /* border:2px solid #fc921b; */
   font-weight: 700;
   padding: 10px 50px;
-  margin-top: 30px;
+  /* margin-top: 30px; */
+  /* margin-top: 4vh; */
   border-radius: 5px;
 }
 .login-lable{
 color: #3A3838;
 font-weight: 700 !important;
-position:absolute;
-padding-bottom: 100px;
+/* position:absolute; */
+/* padding-bottom: 100px; */
 }
 
 .login-button-disabled {
@@ -414,8 +427,8 @@ padding-bottom: 100px;
 }
 
 .login-align-items {
-  align-items: center;
-  display: flex;
+  /* align-items: center; */
+  /* display: flex; */
   background: white;
   border-top-left-radius: 10px;
   border-bottom-left-radius: 10px;
@@ -426,6 +439,7 @@ padding-bottom: 100px;
   width: auto;
   position: relative;
   margin-left: -35px;
+  cursor: pointer;
 }
 .imgdiv {
   margin: auto;
@@ -446,9 +460,9 @@ padding-bottom: 100px;
   .login-right-section {
     right: 0px;
     width: 100%;
-    padding: 0px;
+    padding: 15px;
     text-align: center;
-    height: 60vh;
+    /* height: 60vh; */
     margin-right: 8px;
   }
 
@@ -474,9 +488,12 @@ padding-bottom: 100px;
  
 
   .login-submit-block {
-    margin-top: 30px;
+    margin-top: 15px;
   }
   .login-background-image {
     opacity: 0;
+  }
+  .login-text-field{
+    width: auto !important;
   }
 }

@@ -192,11 +192,7 @@ function Loginpage() {
                         alt="logo"
                         className="login-logo"
                       /> */}
-                    </div>
-                    
-                   
-                 
-                    <input
+                      <input
                       type="text"
                       className="login-text-field"
                       value={companyName}
@@ -204,6 +200,11 @@ function Loginpage() {
                       required
                       placeholder={companylogoData.company.placeholder}
                     />
+                    </div>
+                    
+                   
+                 
+                    
                   </Grid>
                   <Grid item xs={12} sm={6} className="login-form-group">
                     <div className="login-align-items">
@@ -213,8 +214,7 @@ function Loginpage() {
                         alt="logo"
                         className="login-logo"
                       /> */}
-                    </div>
-                    <input
+                      <input
                       type="text"
                       className="login-text-field"
                       value={username}
@@ -222,6 +222,8 @@ function Loginpage() {
                       required
                       placeholder={companylogoData.username?.placeholder}
                     />
+                    </div>
+                    
                   </Grid>
                   <Grid item xs={12} className="login-form-group">
                     <div className="login-align-items">
@@ -231,8 +233,7 @@ function Loginpage() {
                         alt="logo"
                         className="login-logo"
                       /> */}
-                    </div>
-                    <FormControl type={inputType} required>
+                      <FormControl type={inputType} required>
                       <div style={{ display: "flex" }}>
                         <input
                           placeholder={companylogoData.password.placeholder}
@@ -270,10 +271,12 @@ function Loginpage() {
                         </InputAdornment>
                       </div>
                     </FormControl>
+                    </div>
+                    
                   </Grid>
                 </Grid>
                
-                <div className="login-center">
+                <div className="login-center login-error">
                   {errorMessage && (
                     <Typography variant="body2" className="login-error-message">
                       {errorMessage}
