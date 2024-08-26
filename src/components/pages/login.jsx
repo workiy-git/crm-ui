@@ -103,10 +103,7 @@ function Loginpage() {
             console.log("Expected company name:", companyName); // Log the expected company name
 
             // Ensure both company names are trimmed and compared as strings
-      const apiCompanyName = userData.data[0].company.trim();
-      const expectedCompanyName = companyName.trim();
-
-           if (userData && apiCompanyName === expectedCompanyName) {
+            if (userData && userData.data[0].company === companyName) {
               sessionStorage.setItem("isLoggedIn", "true");
               sessionStorage.setItem(
                 "accessToken",
