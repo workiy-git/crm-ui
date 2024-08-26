@@ -36,10 +36,10 @@ const SideMenu = () => {
   
   useEffect(() => {
     const initializeState = async () => {
-      const savedIsHorizontal = localStorage.getItem('isHorizontal') === 'true';
+      const savedIsHorizontal = sessionStorage.getItem('isHorizontal') === 'true';
       setIsHorizontal(savedIsHorizontal !== null ? savedIsHorizontal : false);
 
-      const savedSelectedMenuItems = JSON.parse(localStorage.getItem('selectedMenuItems') || '[]');
+      const savedSelectedMenuItems = JSON.parse(sessionStorage.getItem('selectedMenuItems') || '[]');
       
       const fetchMenuData = async () => {
         try {
@@ -104,7 +104,7 @@ const SideMenu = () => {
   const handleButtonClick = () => {
     setIsHorizontal((prevState) => {
       const newState = !prevState;
-      localStorage.setItem('isHorizontal', newState);
+      sessionStorage.setItem('isHorizontal', newState);
       setSelectedMenuItems(menuItems.slice(0, newState ? maxHorizontalItems : maxVerticalItems));
       return newState;
     });
@@ -128,7 +128,7 @@ const SideMenu = () => {
     }
 
     setSelectedMenuItems(newSelectedMenuItems);
-    localStorage.setItem('selectedMenuItems', JSON.stringify(newSelectedMenuItems));
+    sessionStorage.setItem('selectedMenuItems', JSON.stringify(newSelectedMenuItems));
     
     if (item.path) {
       navigate(item.path);

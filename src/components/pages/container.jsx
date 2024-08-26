@@ -7,7 +7,7 @@ const Container = () => {
   const { pageName } = useParams();
 
   const [backgroundColor] = useState(() => {
-    return localStorage.getItem("backgroundColor") || "#d9d9d9";
+    return sessionStorage.getItem("backgroundColor") || "#d9d9d9";
   });
 
   // const [rows, setRows] = useState([]);

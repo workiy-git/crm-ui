@@ -38,7 +38,7 @@ const SiteVisits = () => {
   const handlePost = async () => {
     if (sitevisit.trim()) {
       try {
-        const user = localStorage.getItem('CognitoIdentityServiceProvider.6258t5vdisgcu7rjkuc5c94ba9.LastAuthUser');
+        const user = sessionStorage.getItem('CognitoIdentityServiceProvider.6258t5vdisgcu7rjkuc5c94ba9.LastAuthUser');
         console.log('ID', id);
         const response = await fetch(`${config.apiUrl.replace(/\/$/, "")}/appdata/sitevisits/${id}`, {
           method: 'PUT',

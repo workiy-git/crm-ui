@@ -11,7 +11,7 @@ const AddFeature = ({ onSaveSelectedText, storedSelectedTexts }) => {
   const [selectedOptions, setSelectedOptions] = useState([]);
 
   useEffect(() => {
-    const savedOptions = JSON.parse(localStorage.getItem('selectedTexts')) || storedSelectedTexts;
+    const savedOptions = JSON.parse(sessionStorage.getItem('selectedTexts')) || storedSelectedTexts;
     setSelectedOptions(savedOptions);
   }, [storedSelectedTexts]);
 
@@ -36,11 +36,11 @@ const AddFeature = ({ onSaveSelectedText, storedSelectedTexts }) => {
       console.log("Flattened options:", flattenedOptions); // Debugging log
       setOptions(flattenedOptions);
 
-      if (storedSelectedTexts.length === 0 && !localStorage.getItem('selectedTexts')) {
+      if (storedSelectedTexts.length === 0 && !sessionStorage.getItem('selectedTexts')) {
         const defaultSelectedOptions = flattenedOptions.slice(0, 4);
         setSelectedOptions(defaultSelectedOptions);
         onSaveSelectedText(defaultSelectedOptions);
-        localStorage.setItem('selectedTexts', JSON.stringify(defaultSelectedOptions));
+        sessionStorage.setItem('selectedTexts', JSON.stringify(defaultSelectedOptions));
       }
     } catch (error) {
       console.error('Error fetching menu data:', error);
@@ -65,7 +65,7 @@ const AddFeature = ({ onSaveSelectedText, storedSelectedTexts }) => {
 
   const handleSave = () => {
     onSaveSelectedText(selectedOptions);
-    localStorage.setItem('selectedTexts', JSON.stringify(selectedOptions));
+    sessionStorage.setItem('selectedTexts', JSON.stringify(selectedOptions));
     handleCloseDialog();
   };
 
