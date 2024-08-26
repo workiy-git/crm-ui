@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Box, TextField, Select, MenuItem, FormControl, Checkbox, FormControlLabel, InputLabel } from '@mui/material';
+import { Box, TextField, Select, MenuItem, FormControl, Checkbox, FormControlLabel } from '@mui/material';
 import axios from 'axios';
 import config from '../../config/config';
 import '../../assets/styles/style.css';
@@ -69,19 +69,23 @@ const EditComponent = ({ id, pageSchema, formData, setFormData, onSaveSuccess, o
   };
 
   const renderInputField = (field) => {
-    const value = formData[field.fieldName] === 'N/A' ? '' : formData[field.fieldName] || '';
+    const isFileInput = field.type === 'file';
+    const value = !isFileInput && (formData[field.fieldName] === 'N/A' ? '' : formData[field.fieldName] || '');
     const isError = formErrors[field.fieldName];
     const label = `${field.label || field.fieldName}${field.required ? ' *' : ''}`;
 
     const commonProps = {
       name: field.fieldName,
-      value: value,
       placeholder: field.placeholder || 'Not Specified',
       fullWidth: true,
       onChange: handleInputChange,
       error: !!isError,
       helperText: isError && formErrors[field.fieldName],
     };
+
+    if (!isFileInput) {
+      commonProps.value = value;
+    }
 
     switch (field.htmlControl) {
       case 'input':
@@ -105,12 +109,18 @@ const EditComponent = ({ id, pageSchema, formData, setFormData, onSaveSuccess, o
               color: '#333',
               fontSize: '12px',
             }}>{label}</label>
-            <TextField className='edit-field-input' {...commonProps} sx={{
-              width: '50%',
-              textAlign: 'left',
-              color: '#666',
-              fontSize: '12px',
-            }} type={field.type || 'text'} />
+            <TextField
+              className='edit-field-input'
+              {...commonProps}
+              sx={{
+                width: '50%',
+                textAlign: 'left',
+                color: '#666',
+                fontSize: '12px',
+              }}
+              type={field.type || 'text'}
+              inputProps={isFileInput ? {} : undefined} // Ensure no 'value' prop on file input
+            />
           </FormControl>
         );
       case 'select':
@@ -200,7 +210,7 @@ const EditComponent = ({ id, pageSchema, formData, setFormData, onSaveSuccess, o
               color: '#333',
               fontSize: '12px',
             }}>{label}</label>
-            <TextField  className='edit-field-input' {...commonProps} style={{
+            <TextField className='edit-field-input' {...commonProps} style={{
               width: '50%',
               textAlign: 'left',
               color: '#666',

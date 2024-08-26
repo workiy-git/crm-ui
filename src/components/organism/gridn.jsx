@@ -5,7 +5,9 @@ import config from "../../config/config";
 import { DataGrid } from "@mui/x-data-grid";
 import ConfirmationDialog from '../molecules/confirmation-dialog';
 import "../../assets/styles/callsgrid.css";
+import GridMenu from "../molecules/gridmenu";
 import Papa from 'papaparse';
+
 
 import {
   Select,
@@ -47,17 +49,13 @@ const GridComponent = ({ pageName }) => {
   const [availableColumns, setAvailableColumns] = useState([]);
   const [filterText, setFilterText] = useState("");
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-const [rowToDelete, setRowToDelete] = useState(null);
+  const [rowToDelete, setRowToDelete] = useState(null);
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [selectedRow, setSelectedRow] = useState(null);
 
   // const [filteredRows, setFilteredRows] = useState(gridData);
   //not confirmed
-
-  const [anchorEl, setAnchorEl] = useState(null);
-  const [selectedRow, setSelectedRow] = useState(null);
   const navigate = useNavigate();
-
-  // const widget = location.state;
-
   const closeColumnModal = () => setShowColumnModal(false);
   const modalStyle = {
     position: "absolute",
@@ -106,9 +104,6 @@ const [rowToDelete, setRowToDelete] = useState(null);
     setRowToDelete(null); // Clear the selected row
   };
   
-
-
-
   // Fetch select options
   useEffect(() => {
     const fetchSelectOptions = async () => {
@@ -330,15 +325,13 @@ const fetchGridData = async (filter) => {
           >
             <MoreVertIcon />
           </IconButton>
-          <Menu
-            anchorEl={anchorEl}
-            open={Boolean(anchorEl)}
-            onClose={handleMenuClose}
-          >
-            <MenuItem onClick={() => handleNavigate("view")}>Details</MenuItem>
-            <MenuItem onClick={() => handleNavigate("edit")}>Edit</MenuItem> 
-            <MenuItem onClick={() => handleDeleteClick(selectedRow)}>Delete</MenuItem>
-          </Menu>
+          <GridMenu 
+        anchorEl={anchorEl} 
+        handleMenuClose={handleMenuClose} 
+        handleNavigate={handleNavigate} 
+        handleDeleteClick={handleDeleteClick} 
+        selectedRow={selectedRow} 
+      />
         </div>
       ),
     },

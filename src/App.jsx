@@ -5,8 +5,6 @@ import Container from "./components/pages/container";  // Ensure this path is co
 import Home from "./components/pages/home";
 import Loginpage from "./components/pages/login"; 
 import DetailsPage from "./components/pages/details";
-import Users from "./components/pages/users";
-import UserForm from "./components/organism/usersForm";
 import Underconstruction from "./components/pages/underconstruction";
 import Header from "./components/organism/header";
 import SideMenu from "./components/organism/sidemenu";
@@ -47,8 +45,6 @@ const App = () => {
           <Route path="/:pageName/edit/:id" element={<DetailsPage mode="edit" />} />
           <Route path="/:pageName/add" element={<DetailsPage mode="add" />} />
           <Route path="/users/profile/:id" element={<DetailsPage mode="profile" />} />
-          <Route path="/users" element={<Users />} />
-          <Route path="/adduser" element={<UserForm />} />
           <Route path="/underconstruction" element={<Underconstruction />} />
         </Routes>
       </Layout>

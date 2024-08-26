@@ -5,10 +5,19 @@ const ViewComponent = ({ formData, pageSchema }) => {
   // Debugging log for formData
   console.log('View Component Form Data:', formData);
 
+  // Function to format field data
+  const formatFieldData = (fieldName, value) => {
+    if (typeof value === 'object' && value !== null) {
+      // Handle object fields like "address" by joining their properties
+      return Object.values(value).join(', ');
+    }
+    return value || 'N/A';
+  };
+
   return (
     <Box sx={{ padding: 2, backgroundColor: '#fff', borderRadius: 2, boxShadow: 1 }}>
       <Box sx={{ display: 'flex', flexWrap: 'wrap' }}>
-        {pageSchema.map((field, index) => (
+        {pageSchema.map((field) => (
           <Box
             key={field.fieldName}
             sx={{
@@ -42,7 +51,7 @@ const ViewComponent = ({ formData, pageSchema }) => {
                 fontSize: '12px',
               }}
             >
-              {formData[field.fieldName] || 'N/A'}
+              {formatFieldData(field.fieldName, formData[field.fieldName])}
             </Typography>
           </Box>
         ))}
@@ -50,6 +59,5 @@ const ViewComponent = ({ formData, pageSchema }) => {
     </Box>
   );
 };
-
 
 export default ViewComponent;

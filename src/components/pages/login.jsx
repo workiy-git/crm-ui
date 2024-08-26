@@ -76,21 +76,24 @@ function Loginpage() {
       cognitoUser.authenticateUser(authenticationDetails, {
         onSuccess: async (result) => {
           try {
-            const response = await fetch(`${config.apiUrl}users/${username}`, {
-              method: "GET",
+            const response = await fetch(`${config.apiUrl}appdata/retrieve`, {
+              method: "POST",
               headers: {
                 "Content-Type": "application/json",
                 Authorization: result.getAccessToken().getJwtToken(),
               },
+              body: JSON.stringify([
+                {
+                  "$match": {
+                    "pageName": "users",
+                    "username": username, // dynamically include the username
+                  }
+                }
+              ]),
             });
 
-            if (!response.ok) {
-              throw new Error("User verification failed");
-            }
-
             const userData = await response.json();
-
-            if (userData && userData.data.company === companyName) {
+            if (userData && userData.data[0].company === companyName) {
               sessionStorage.setItem("isLoggedIn", "true");
               sessionStorage.setItem(
                 "accessToken",
@@ -99,6 +102,7 @@ function Loginpage() {
 
               window.location.href = "/home";
             } else {
+              console.error("Company mismatch or user not found:", userData);
               throw new Error(
                 "User not found in the database or company mismatch"
               );
