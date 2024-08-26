@@ -92,17 +92,7 @@ function Loginpage() {
               ]),
             });
 
-            if (!response.ok) {
-              const errorText = await response.text();
-              console.error("API response error:", errorText);
-              throw new Error("User verification failed");
-            }
-
             const userData = await response.json();
-            console.log("API response data:", userData);
-            console.log("Expected company name:", companyName); // Log the expected company name
-
-            // Ensure both company names are trimmed and compared as strings
             if (userData && userData.data[0].company === companyName) {
               sessionStorage.setItem("isLoggedIn", "true");
               sessionStorage.setItem(
