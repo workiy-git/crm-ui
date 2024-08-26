@@ -102,18 +102,9 @@ export default function Myprofile({ backgroundColor, value }) {
 
   const handleNavigate = (mode) => {
     if (userData) {
-      console.log("userData", userData);
-      console.log("userData ID", userData._id);
-
         navigate(`/${pageName}/${mode}/${userData._id}`, {
           state: { rowData: userData, pageName, mode },
         });
-        // navigate(`/users/${mode}/${userData._id}`, {
-        //     state: { rowData: userData, mode },
-        // });
-        console.log("userData", userData);
-        console.log("userData ID", userData._id);
-
     }
   };
 
