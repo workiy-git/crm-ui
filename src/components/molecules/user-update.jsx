@@ -174,7 +174,7 @@ const Updates = ({ mode }) => {
   const [expandedHistoryItems, setExpandedHistoryItems] = useState({}); // Track expanded history items
 
   useEffect(() => {
-    const token = sessionStorage.getItem("accessToken"); // Use sessionStorage instead of localStorage
+    const token = sessionStorage.getItem("accessToken"); // Use sessionStorage instead of sessionStorage
     if (token) {
       setJwtToken(token);
       const decodedToken = jwtDecode(token);

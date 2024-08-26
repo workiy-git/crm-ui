@@ -8,7 +8,7 @@ import ParentChartComponent from '../../molecules/ParentChartComponent';
 
 function Dashboard() {
   const [backgroundColor, setBackgroundColor] = useState(() => {
-    return localStorage.getItem('backgroundColor') || '#d9d9d9';
+    return sessionStorage.getItem('backgroundColor') || '#d9d9d9';
   });
 
   const [selectedWidgets, setSelectedWidgets] = useState([]);
@@ -29,7 +29,7 @@ function Dashboard() {
 
   const handleColorChange = (color) => {
     setBackgroundColor(color);
-    localStorage.setItem('backgroundColor', color);
+    sessionStorage.setItem('backgroundColor', color);
   };
 
   const randomGradientColors = [];
@@ -42,7 +42,7 @@ function Dashboard() {
   for (let i = 0; i < 30; i++) {
     const color1 = generateRandomLightColor();
     const color2 = generateRandomLightColor();
-    const linearGradient = linear-gradient(145deg, ${color1}, ${color2});
+    const linearGradient = `linear-gradient(145deg, ${color1}, ${color2})`;
     randomGradientColors.push(linearGradient);
   }
 

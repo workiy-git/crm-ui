@@ -38,7 +38,7 @@ export default function Myprofile({ backgroundColor, value }) {
   // console.log("userData ID", userData._id);
 
   useEffect(() => {
-    const token = sessionStorage.getItem("accessToken"); // Use sessionStorage instead of localStorage
+    const token = sessionStorage.getItem("accessToken"); // Use sessionStorage instead of sessionStorage
     if (token) {
       setJwtToken(token);
       const decodedToken = jwtDecode(token);

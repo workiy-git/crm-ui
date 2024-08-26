@@ -142,18 +142,18 @@
 //           // console.log('pageName:', pageNameFilter);
 //           // console.log('Filter value:', filterValue);
 
-//           // Check if filterValue is not empty before storing it in localStorage
+//           // Check if filterValue is not empty before storing it in sessionStorage
 //           if (filterValue) {
-//             // Store the filter value in localStorage with the appropriate key
-//             localStorage.setItem(
+//             // Store the filter value in sessionStorage with the appropriate key
+//             sessionStorage.setItem(
 //               "widgetFilter",
 //               JSON.stringify({ [filterKey]: filterValue })
 //             );
-//             localStorage.setItem(
+//             sessionStorage.setItem(
 //               "pageNameFilter",
 //               JSON.stringify({ pageName: pageNameFilter })
 //             );
-//             // console.log('Stored filter value in localStorage:', { [filterKey]: filterValue });
+//             // console.log('Stored filter value in sessionStorage:', { [filterKey]: filterValue });
 //           } else {
 //             console.warn("No relevant filter value found in filter");
 //           }
@@ -443,18 +443,18 @@ const CreateWidget = ({ backgroundColor, dashboardName }) => {
             // console.log('pageName:', pageNameFilter);
             // console.log('Filter value:', filterValue);
 
-            // Check if filterValue is not empty before storing it in localStorage
+            // Check if filterValue is not empty before storing it in sessionStorage
             if (filterValue) {
-              // Store the filter value in localStorage with the appropriate key
-              localStorage.setItem(
+              // Store the filter value in sessionStorage with the appropriate key
+              sessionStorage.setItem(
                 "widgetFilter",
                 JSON.stringify({ [filterKey]: filterValue })
               );
-              localStorage.setItem(
+              sessionStorage.setItem(
                 "pageNameFilter",
                 JSON.stringify({ pageName: pageNameFilter })
               );
-              // console.log('Stored filter value in localStorage:', { [filterKey]: filterValue });
+              // console.log('Stored filter value in sessionStorage:', { [filterKey]: filterValue });
             } else {
               console.warn("No relevant filter value found in filter");
             }

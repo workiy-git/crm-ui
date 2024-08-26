@@ -42,7 +42,7 @@ function Dropdown({ onOptionSelected, pageName, filter, storedFilterKey }) {
   }, [filter]);
 
   // useEffect(() => {
-  //   const storedFilter = localStorage.getItem('widgetFilter');
+  //   const storedFilter = sessionStorage.getItem('widgetFilter');
   //   if (storedFilter) {
   //     const cleanedFilterString = storedFilter.replace(/\\/g, '').replace(/^"|"$/g, '');
   //     let parsedFilter;
@@ -83,8 +83,8 @@ function Dropdown({ onOptionSelected, pageName, filter, storedFilterKey }) {
   };
 
   useEffect(() => {
-    // Retrieve the stored filter value from localStorage
-    const storedFilter = JSON.parse(localStorage.getItem('widgetFilter'));
+    // Retrieve the stored filter value from sessionStorage
+    const storedFilter = JSON.parse(sessionStorage.getItem('widgetFilter'));
     if (storedFilter) {
       // Find the matching option in the dropdown options
       const matchingOption = options.find(option => 
@@ -96,8 +96,8 @@ function Dropdown({ onOptionSelected, pageName, filter, storedFilterKey }) {
         console.warn('No matching option found for the stored filter:', storedFilter);
       }
     }
-    // Remove the widgetFilter from localStorage after applying the filter
-    // localStorage.removeItem('widgetFilter');
+    // Remove the widgetFilter from sessionStorage after applying the filter
+    // sessionStorage.removeItem('widgetFilter');
   }, [options]);
   
   // const handleChange = (event) => {
@@ -105,8 +105,8 @@ function Dropdown({ onOptionSelected, pageName, filter, storedFilterKey }) {
   //   const selectedOption = options.find(option => option.name === selectedValue);
   //   if (selectedOption) {
   //     setSelectedOption(selectedOption.name); // Ensure we set the name of the selected option
-  //     // Store the selected filter value in localStorage
-  //     localStorage.setItem('widgetFilter', JSON.stringify(selectedOption.filter));
+  //     // Store the selected filter value in sessionStorage
+  //     sessionStorage.setItem('widgetFilter', JSON.stringify(selectedOption.filter));
   //   } else {
   //     console.warn('No matching option found for the selected value:', selectedValue);
   //   }
