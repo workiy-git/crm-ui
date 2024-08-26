@@ -26,7 +26,7 @@ function Loginpage() {
   const [companylogoData, setcompanylogoData] = useState({});
   const [allFieldsFilled, setAllFieldsFilled] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false); 
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleClickShowPassword = () => setShowPassword((show) => !show);
 
@@ -34,7 +34,7 @@ function Loginpage() {
     event.preventDefault();
   };
 
-   // Define your Cognito User Pool Data
+  // Define your Cognito User Pool Data
   // Cognito User Pool Data
   const poolData = {
     UserPoolId: "us-east-1_AEdwzu9Xx", // Your user pool id here
@@ -46,14 +46,14 @@ function Loginpage() {
     event.preventDefault();
 
     if (isSubmitting) return;
-    setIsSubmitting(true); 
+    setIsSubmitting(true);
 
     if (!companyName.trim() || !username.trim() || !password.trim()) {
       setErrorMessage("Please fill in all required fields.");
       setIsSubmitting(false);
     } else {
       setErrorMessage("");
-      
+
       const usernameVal = username.trim();
       const passwordVal = password.trim();
 
@@ -180,37 +180,42 @@ function Loginpage() {
   return (
     <div>
       {companylogoData && companylogoData.background ? (
-        <div
-          className="login-container"
-          style={{ backgroundImage: `url(${companylogoData.background.BG})` }}
-          onKeyPress={handleKeyPress}
-        >
+        <div className="login-container" onKeyPress={handleKeyPress}>
           <div className="login-main">
             <div className="login-left-section">
+              <Typography className="login-welcome-text">
+              {companylogoData.welcome.log}
+              </Typography>
+              <div className="login-background-image-block">
               <img
-                src={companylogoData.background.bot}
+                src={companylogoData.login?.icon}
                 alt="background"
                 className="login-background-image"
               />
+              <Typography className="login-quotes-text">
+              {companylogoData.welcome.quotes}
+              </Typography>
+              </div>
+              
             </div>
             <div className="login-right-section">
               <div className="login-right-section-main">
                 <div className="login-title-block">
-                  <img src={companylogoData.login?.icon} alt="" />
+                  {/* <img src={companylogoData.login?.icon} alt="" /> */}
                   <Typography variant="h6" className="login-title">
-                    {companylogoData.login?.title}
+                    {companylogoData.login.title}
                   </Typography>
                 </div>
-                <Grid>
+                <Grid className="Login-input"> 
                   <Grid item xs={12} sm={6} className="login-form-group">
                     <div className="login-align-items">
-                      <img
+                    <Typography  className="login-lable"> {companylogoData.company.lable}</Typography>
+                      {/* <img
                         src={companylogoData.company?.logo}
                         alt="logo"
                         className="login-logo"
-                      />
-                    </div>
-                    <input
+                      /> */}
+                      <input
                       type="text"
                       className="login-text-field"
                       value={companyName}
@@ -218,16 +223,21 @@ function Loginpage() {
                       required
                       placeholder={companylogoData.company.placeholder}
                     />
+                    </div>
+                    
+                   
+                 
+                    
                   </Grid>
                   <Grid item xs={12} sm={6} className="login-form-group">
                     <div className="login-align-items">
-                      <img
+                    <Typography  className="login-lable">{companylogoData.username.lable}</Typography>
+                      {/* <img
                         src={companylogoData.username.logo}
                         alt="logo"
                         className="login-logo"
-                      />
-                    </div>
-                    <input
+                      /> */}
+                      <input
                       type="text"
                       className="login-text-field"
                       value={username}
@@ -235,19 +245,21 @@ function Loginpage() {
                       required
                       placeholder={companylogoData.username?.placeholder}
                     />
+                    </div>
+                    
                   </Grid>
                   <Grid item xs={12} className="login-form-group">
                     <div className="login-align-items">
-                      <img
+                    <Typography  className="login-lable"> {companylogoData.password.lable}</Typography>
+                      {/* <img
                         src={companylogoData.password?.logo}
                         alt="logo"
                         className="login-logo"
-                      />
-                    </div>
-                    <FormControl type={inputType} required>
+                      /> */}
+                      <FormControl type={inputType} required>
                       <div style={{ display: "flex" }}>
                         <input
-                          placeholder="Password"
+                          placeholder={companylogoData.password.placeholder}
                           className=" login-text-field"
                           id="outlined-adornment-password"
                           type={showPassword ? "text" : "password"}
@@ -282,17 +294,12 @@ function Loginpage() {
                         </InputAdornment>
                       </div>
                     </FormControl>
+                    </div>
+                    
                   </Grid>
                 </Grid>
-                <div className="login-center login-submit-block">
-                  <a
-                    className="login-forgot-password"
-                    href={companylogoData.forget?.url || "/"}
-                  >
-                    {companylogoData.forget?.title}
-                  </a>
-                </div>
-                <div className="login-center">
+               
+                <div className="login-center login-error">
                   {errorMessage && (
                     <Typography variant="body2" className="login-error-message">
                       {errorMessage}
@@ -308,7 +315,7 @@ function Loginpage() {
                     }
                     id="login-button"
                     onClick={handleLogin}
-                    disabled={!allFieldsFilled || isSubmitting} 
+                    disabled={!allFieldsFilled || isSubmitting}
                     style={{
                       cursor: allFieldsFilled ? "pointer" : "not-allowed",
                       opacity: isSubmitting ? 0.7 : 1,
@@ -321,6 +328,22 @@ function Loginpage() {
                       companylogoData.button?.title
                     )}
                   </Button>
+                  
+                </div>
+                <div className="login-center login-submit-block">
+                  <a
+                    className="login-forgot-password"
+                    href={companylogoData.forget?.url || "/"}
+                  >
+                    {companylogoData.forget?.title}
+                  </a>
+                </div>
+                <div className="login-center login-submit-block">
+                  <Typography
+                   className="login-footer" 
+                  >
+                    {companylogoData.footer.title} 
+                  </Typography>
                 </div>
               </div>
             </div>
