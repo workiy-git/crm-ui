@@ -6,7 +6,7 @@ import Icon from '../../assets/underconstruction.png';
 
 function Underconstruction() {
   const [backgroundColor] = useState(() => {
-    return localStorage.getItem('backgroundColor') || '#d9d9d9';
+    return sessionStorage.getItem('backgroundColor') || '#d9d9d9';
   });
   const [homeData, setHomeData] = useState(null);
 

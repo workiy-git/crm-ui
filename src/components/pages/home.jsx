@@ -10,7 +10,7 @@
 
 // function Home() {
 //   const [backgroundColor, setBackgroundColor] = useState(() => {
-//     return localStorage.getItem('backgroundColor') || '#d9d9d9';
+//     return sessionStorage.getItem('backgroundColor') || '#d9d9d9';
 //   });
 
 //   const [selectedWidgets, setSelectedWidgets] = useState([]);
@@ -43,7 +43,7 @@
 
 //   const handleColorChange = (color) => {
 //     setBackgroundColor(color);
-//     localStorage.setItem('backgroundColor', color);
+//     sessionStorage.setItem('backgroundColor', color);
 //   };
 
 //   const randomGradientColors = [];
@@ -102,7 +102,7 @@ import Loader from "../molecules/loader";
 
 function Home() {
   const [backgroundColor, setBackgroundColor] = useState(() => {
-    return localStorage.getItem("backgroundColor") || "#d9d9d9";
+    return sessionStorage.getItem("backgroundColor") || "#d9d9d9";
   });
 
   const [selectedWidgets, setSelectedWidgets] = useState([]);

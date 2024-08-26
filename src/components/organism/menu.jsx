@@ -7,7 +7,7 @@ import { AppBar, Toolbar, IconButton, Button, Box } from '@material-ui/core';
 import '../../assets/styles/MenuComponent.css';
 import config from '../../config/config';  // Ensure the correct path to config file
 
-const localStorageKey = 'selectedTexts';
+const sessionStorageKey = 'selectedTexts';
 const selectedButtonIndexKey = 'selectedButtonIndex';
 
 const MenuComponent = ({ backgroundColor, onSaveSelectedText }) => {
@@ -18,8 +18,8 @@ const MenuComponent = ({ backgroundColor, onSaveSelectedText }) => {
   const [dashboardName, setDashboardName] = useState(null);
 
   useEffect(() => {
-    const storedSelectedTexts = JSON.parse(localStorage.getItem(localStorageKey)) || [];
-    const storedSelectedButtonIndex = JSON.parse(localStorage.getItem(selectedButtonIndexKey));
+    const storedSelectedTexts = JSON.parse(sessionStorage.getItem(sessionStorageKey)) || [];
+    const storedSelectedButtonIndex = JSON.parse(sessionStorage.getItem(selectedButtonIndexKey));
     setSelectedTexts(storedSelectedTexts);
     setScrollIndex(0);
 
@@ -41,7 +41,7 @@ const MenuComponent = ({ backgroundColor, onSaveSelectedText }) => {
 
   const handleSaveSelectedText = (texts) => {
     setSelectedTexts(texts);
-    localStorage.setItem(localStorageKey, JSON.stringify(texts));
+    sessionStorage.setItem(sessionStorageKey, JSON.stringify(texts));
     setScrollIndex(0);
     onSaveSelectedText(texts);
     if (texts.length > 0) {
@@ -60,7 +60,7 @@ const MenuComponent = ({ backgroundColor, onSaveSelectedText }) => {
 
   // const handleButtonClick = async (index, texts = selectedTexts) => {
   //   setSelectedButtonIndex(index);
-  //   localStorage.setItem(selectedButtonIndexKey, index);
+  //   sessionStorage.setItem(selectedButtonIndexKey, index);
 
   //   if (texts.length > index && index >= 0) {
   //     const selectedMenuKey = texts[index].title.toLowerCase(); // Convert title to lowercase
@@ -115,7 +115,7 @@ const MenuComponent = ({ backgroundColor, onSaveSelectedText }) => {
 
   const handleButtonClick = (index, texts = selectedTexts) => {
     setSelectedButtonIndex(index);
-    localStorage.setItem(selectedButtonIndexKey, index);
+    sessionStorage.setItem(selectedButtonIndexKey, index);
 
     if (texts.length > index && index >= 0) {
       const selectedMenuKey = texts[index].title.toLowerCase(); // Convert title to lowercase

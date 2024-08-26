@@ -8,7 +8,7 @@ import ActionBar from '../organism/action_bar';
 
 function Calls() {
   const endpoint= '/appdata'
-  const [backgroundColor] = useState(() => localStorage.getItem('backgroundColor') || '#d9d9d9');
+  const [backgroundColor] = useState(() => sessionStorage.getItem('backgroundColor') || '#d9d9d9');
 
   useEffect(() => {
     document.title = 'Home';

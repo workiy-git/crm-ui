@@ -33,7 +33,7 @@ const Grid = ({ rows, webformSchema, onFilterChange, pageName }) => {
   const [filter, setFilter] = useState({});
   const navigate = useNavigate();
 
-  const localStorageKey = `visibleColumns_${pageName}`; // Unique key for each tab
+  const sessionStorageKey = `visibleColumns_${pageName}`; // Unique key for each tab
 
   useEffect(() => {
     // Initialize validated data
@@ -52,12 +52,12 @@ const Grid = ({ rows, webformSchema, onFilterChange, pageName }) => {
     const columns = webformSchema.map(field => ({ fieldName: field.fieldName, label: field.label })) || [];
     
     // Fetch saved visible columns from local storage or set all as default
-    const savedVisibleColumns = JSON.parse(localStorage.getItem(localStorageKey)) || columns;
+    const savedVisibleColumns = JSON.parse(sessionStorage.getItem(sessionStorageKey)) || columns;
 
     setAvailableColumns(columns);
     setVisibleColumns(savedVisibleColumns);
     setTempVisibleColumns(savedVisibleColumns);
-  }, [rows, webformSchema, localStorageKey]); // Include localStorageKey dependency
+  }, [rows, webformSchema, sessionStorageKey]); // Include sessionStorageKey dependency
 
   const totalPages = Math.ceil(rows.length / recordsPerPage);
   const startIndex = (pageNumber - 1) * recordsPerPage;
@@ -116,7 +116,7 @@ const Grid = ({ rows, webformSchema, onFilterChange, pageName }) => {
     });
   
     setVisibleColumns(sortedVisibleColumns);
-    localStorage.setItem(localStorageKey, JSON.stringify(sortedVisibleColumns));
+    sessionStorage.setItem(sessionStorageKey, JSON.stringify(sortedVisibleColumns));
     closeColumnModal();
   };
 
@@ -222,8 +222,8 @@ const Grid = ({ rows, webformSchema, onFilterChange, pageName }) => {
   }, []);
 
   useEffect(() => {
-    // Retrieve and apply the filter from localStorage
-    const storedFilter = localStorage.getItem('widgetFilter');
+    // Retrieve and apply the filter from sessionStorage
+    const storedFilter = sessionStorage.getItem('widgetFilter');
     if (storedFilter) {
       // Remove unnecessary characters and parse the filter
       const cleanedFilterString = storedFilter.replace(/\\/g, '').replace(/^"|"$/g, '');
@@ -257,9 +257,9 @@ const Grid = ({ rows, webformSchema, onFilterChange, pageName }) => {
         console.error('Failed to parse the stored filter:', error);
       }
     }
-    // Delete the widgetFilter from localStorage after applying the filter
-    // localStorage.removeItem('widgetFilter');
-    // localStorage.removeItem('pageNameFilter');
+    // Delete the widgetFilter from sessionStorage after applying the filter
+    // sessionStorage.removeItem('widgetFilter');
+    // sessionStorage.removeItem('pageNameFilter');
   }, [dropdownValue, filter, handleFilterChange]);
 
   useEffect(() => {
