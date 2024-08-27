@@ -31,7 +31,7 @@
 }
 
 .sidemenu-scrollable-container {
-  background-color: #121A2C;
+  background-color: #262626;
 }
 
 .sidemenu-profile-container {
@@ -77,7 +77,7 @@
 }
 
 .sidemenu-menu-item-selected {
-  background-color: #DADEFD;
+  background-color: #F5BD71;
   transform: scale(1.1);
   margin: 8px;
   padding: 5px;

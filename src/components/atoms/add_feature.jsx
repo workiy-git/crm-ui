@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Button, Dialog, DialogTitle, DialogContent, DialogActions, Checkbox, FormControlLabel, IconButton } from '@mui/material';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
+import DataSaverOnTwoToneIcon from '@mui/icons-material/DataSaverOnTwoTone';
 import axios from 'axios';
 import config from '../../config/config';
 import '../../assets/styles/AddFeature.css'; // Import the CSS file
@@ -80,7 +81,7 @@ const AddFeature = ({ onSaveSelectedText, storedSelectedTexts }) => {
   return (
     <div>
       <IconButton onClick={handleOpenDialog}>
-        <AddCircleOutlineIcon />
+        <DataSaverOnTwoToneIcon sx={{color:'white'}} />
       </IconButton>
       <Dialog open={dialogOpen} onClose={handleCloseDialog}>
         <DialogTitle>Select Features</DialogTitle>

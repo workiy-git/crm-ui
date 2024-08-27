@@ -79,7 +79,7 @@ const Search = () => {
   }));
 
   const StyledInputBase = styled(InputBase)(({ theme }) => ({
-    color: 'inherit',
+    color: 'white',
     width: '100%',
     '& .MuiInputBase-input': {
       padding: theme.spacing(1, 1, 1, 0),
@@ -87,7 +87,7 @@ const Search = () => {
       paddingLeft: `calc(1em + ${theme.spacing(4)})`,
       transition: theme.transitions.create('width'),
       [theme.breakpoints.up('sm')]: {
-        width: '12ch',
+        width: '40ch',
         '&:focus': {
           width: '20ch',
         },
@@ -97,12 +97,12 @@ const Search = () => {
 
   return (
     <div>
-      <SearchContainer>
+      <SearchContainer style={{background:'black', borderRadius:'100px'}}> 
         <SearchIconWrapper>
           <SearchIcon />
         </SearchIconWrapper>
         <StyledInputBase
-          placeholder="Search…"
+          placeholder="Search"
           inputProps={{ 'aria-label': 'search' }}
           onClick={handleSearchClick}
         />
