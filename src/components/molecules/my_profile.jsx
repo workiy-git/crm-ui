@@ -134,7 +134,8 @@ export default function Myprofile({ backgroundColor, value }) {
               />
               <div className="myprofile-username-main">
                 <Text className={`myprofile-username  ${value}`}>
-                  {userData.username}
+                  {/* {userData.username} */}
+                  {userData.first_name} {userData.last_name}
                 </Text>
                 <Text
                   className={`myprofile-username myprofile-username-role ${value}`}

@@ -49,10 +49,14 @@ const Header = () => {
     <Box sx={{ flexGrow: 1 }}>
       <div className="header-container">
         <Toolbar className="header-toolbar">
+          <div className="hamburger-box-main">
           <Hamburger className="hamburger-box" />
+          </div>
           <Box className="fullscreen-box">
             <FullScreen />
           </Box>
+          <Box className="flex-grow" />
+
           <Box>
             <Search />
           </Box>

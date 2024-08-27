@@ -229,19 +229,19 @@ import WidgetsIcon from '@mui/icons-material/WidgetsOutlined';
 import '../../assets/styles/style.css';
 
 const CreateWidgetItem = styled(Paper)(({ theme }) => ({
-  backgroundColor: '#4BB7D3 !important',
+  backgroundColor: '#EAEAEA !important',
   ...theme.typography.body2,
   textAlign: 'center',
   color: theme.palette.text.secondary,
   width: '100%',
-  height: 100,
-  borderRadius: '10px !important',
+  // height: 100,
+  borderRadius: '25px !important',
   boxShadow: '0px 3px 5px 1px rgba(0,0,0,0.3)', 
-  display: 'flex',
-  alignItems: 'center',
+  // display: 'flex',
+  // alignItems: 'center',
   cursor: 'pointer',
   padding: '0',
-  justifyContent: 'space-between',
+  // justifyContent: 'space-between',
 }));
 
 const Icon = styled('div')({
@@ -488,7 +488,7 @@ const CreateWidget = ({ backgroundColor, dashboardName }) => {
       <Box sx={{ flexGrow: 1 }}>
         <div style={{ width: '100%'}}>
           <div>
-            <button style={{border:'none', alignItems:'center', display:'flex', padding:'8px', borderRadius:'5px',marginRight:'5%', marginTop:'10px', marginLeft:'auto'}} onClick={toggleShowHiddenWidgets}><WidgetsIcon /></button>
+            <button style={{border:'none', alignItems:'center', display:'flex', padding:'8px', borderRadius:'5px',marginRight:'5%', marginTop:'10px', marginLeft:'auto', cursor:'pointer'}} onClick={toggleShowHiddenWidgets}><WidgetsIcon /></button>
           </div>
           {showHiddenWidgets && (
   <div
@@ -526,27 +526,29 @@ const CreateWidget = ({ backgroundColor, dashboardName }) => {
               onDragStart={() => handleDragStart(index)}
               onDragEnter={() => handleDragEnter(index)}
               onDragEnd={() => handleDragEnd(index)}
-              style={{ width: '250px', height: 'auto', margin:'20px 10px', float: 'left' }}
+              style={{ width: '190px', height: 'auto', margin:'20px 10px', float: 'left' }}
             >
-              <div style={{ textAlign: 'end', marginBottom:'-20px', marginRight:'5px' }}>
+              <div style={{ textAlign: 'end', marginBottom:'-25px', marginRight:'10px' }}>
                 <button className='widget-hide-btn' style={{position:'relative', border:'none', background:'wihite', borderRadius:'100px', cursor:'pointer'}} onClick={() => handleHideWidget(index)}>-</button>
               </div>
               <CreateWidgetItem
-                style={{ background:'#4BB7D3 !important' }}
+                style={{ background:'#EAEAEA !important' }}
               >
-                <Icon>
-                  <div style={{ background: '#fff6', borderRadius: '100px', padding: '20px', margin: 'auto', display: 'flex' }}>
-                    <img style={{ height: '30px', width: 'auto', margin: 'auto', filter: 'brightness(0) invert(1)' }} src={widget.icon_url || 'default_icon_url'} alt={widget.title} />
-                  </div>
-                </Icon>
+                <div style={{ padding: '20px 10px', backgroundColor: 'rgba(245, 189, 113, 0.25)', borderRadius:'25px' }} onClick={() => handleWidgetClick({ widget, dashboardName })}>
+                <Title style={{fontSize:'12px' }}>{widget.title}</Title>
+                <div style={{borderBottom:'1px solid black', margin:'5px auto 10px auto', width:'60px'}}></div>
+                  <Icon style={{margin:'auto'}}>
+                    <div style={{ background: '#fff6', borderRadius: '100px', padding: '10px', margin: 'auto', display: 'flex' }}>
+                      <img style={{ height: '20px', width: 'auto', margin: 'auto', filter: 'brightness(0) invert(1)' }} src={widget.icon_url || 'default_icon_url'} alt={widget.title} />
+                    </div>
+                  </Icon>
+                </div>
                 <div
                   variant="contained"
                   color="primary"
-                  onClick={() => handleWidgetClick({ widget, dashboardName })}
-                  style={{ width: '60%', height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}
+                  style={{textAlign:'center', padding:'3px 0' }}
                 >
-                  <Title>{widget.title}</Title>
-                  <Count>{counts[widget.name] !== undefined ? counts[widget.name] : 'Loading...'}</Count>
+                  <Count style={{margin:'0', fontSize:'15px' }}>{counts[widget.name] !== undefined ? counts[widget.name] : 'Loading...'}</Count>
                 </div>
               </CreateWidgetItem>
             </div>

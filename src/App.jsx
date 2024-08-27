@@ -16,7 +16,7 @@ const Layout = ({ children }) => {
   return (
     <div style={{ display: 'flex', height: '100vh', overflow: 'hidden' }}>
       {!isLoginPage && (
-        <div style={{ backgroundColor: "#121A2C" }}>
+        <div style={{ backgroundColor: "#262626" }}>
           <SideMenu />
         </div>
       )}

@@ -15,6 +15,7 @@ import {
 } from '@mui/material';
 import { useNavigate, useLocation } from 'react-router-dom';
 import MyProfile from '../molecules/my_profile';
+import WorkiyLogo from '../atoms/workiy_logo';
 import Text from '@mui/material/Typography';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import config from '../../config/config';
@@ -144,6 +145,7 @@ const SideMenu = () => {
 
   return (
     <div className="sidemenu-scrollable-container">
+      <WorkiyLogo value={isHorizontal ? 'max-logo' : 'min-logo'} />
       <MyProfile value={isHorizontal ? 'username-display' : 'username-hide'} />
       <div style={{ display: 'flex', justifyContent: 'end' }}>
         <button style={{ border: 'none', background: 'none', cursor: 'pointer' }} onClick={handleButtonClick}>
