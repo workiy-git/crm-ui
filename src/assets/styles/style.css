@@ -47,6 +47,17 @@
     transition: color 0.3s ease;
   } */
   
+  .workiy-logo.max-logo{
+     width: 80px;
+     height: auto;
+     margin:10px 0 0 10px;
+  }
+  .workiy-logo.min-logo{
+    width: 50px;
+ }
+ .workiy-logo-main.min-logo{
+  text-align: center;
+ }
   .items.dragging{
     opacity: 1;
   }
@@ -85,4 +96,8 @@
   .wedgets-main:first-child {
     display: block !important; /* Show only the first child */
   }
-  
+  @media (max-width: 600px) {
+    .widget-main {
+      width: 125px !important;
+    }
+  }

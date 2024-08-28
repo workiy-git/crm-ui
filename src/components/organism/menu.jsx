@@ -125,7 +125,7 @@ const MenuComponent = ({ backgroundColor, onSaveSelectedText }) => {
 
   return (
     <>
-      <AppBar position="static" className="menu-appBar" style={{ background: '#E5E5E5' }}>
+      <AppBar position="static" className="menu-appBar" style={{ background: '#F5BD71' }}>
         <Toolbar style={{minHeight:'50px'}} className="menu-toolbar">
           <Box className="menu-selectedTextContainer">
             {selectedTexts.slice(scrollIndex, scrollIndex + 9).map((text, index) => (
@@ -135,7 +135,7 @@ const MenuComponent = ({ backgroundColor, onSaveSelectedText }) => {
                   color={selectedButtonIndex === index ? "secondary" : "primary"}
                   className="menu-featureButton"
                   onClick={() => handleButtonClick(index)}
-                  style={{ backgroundColor: selectedButtonIndex === index ? '#80808080 ' : 'transparent', color: selectedButtonIndex === index ? '#212529' : '#212529', textTransform: 'none', boxShadow: 'none', borderBottom: selectedButtonIndex === index ?  '5px solid #FFC03D' : 'none', width:'max-content'
+                  style={{ backgroundColor: selectedButtonIndex === index ? '#2C2C2CB2 ' : 'transparent', color: selectedButtonIndex === index ? '#ffff' : '#ffff', textTransform: 'none', boxShadow: 'none', borderRadius: selectedButtonIndex === index ?  '15px' : '', width:'max-content', padding: '3px 0px'
                     }}
                 >
                   {text.title}
@@ -150,10 +150,10 @@ const MenuComponent = ({ backgroundColor, onSaveSelectedText }) => {
             </Box>
           )}
           <Box className="menu-buttonGroup">
-            <IconButton className="menu-iconButton">
+            <div className="menu-iconButton">
               <AddFeature onSaveSelectedText={handleSaveSelectedText} storedSelectedTexts={selectedTexts} />
-            </IconButton>
-            <IconButton className="menu-iconButton" onClick={() => console.log('Refresh clicked')}>
+            </div>
+            <IconButton style={{visibility:'hidden'}} className="menu-iconButton" onClick={() => console.log('Refresh clicked')}>
             </IconButton>
           </Box>
         </Toolbar>

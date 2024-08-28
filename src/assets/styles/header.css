@@ -10,11 +10,17 @@ background-color: blue;
 }
 
 .header-container {
-    background: #2C2C2C;
-    color: white;
-    box-shadow: 0px 0px 15px gray;
-    padding: 0px 5px;
-  }
+  background: #2C2C2C;  
+  color: white;
+  box-shadow: 0px 0px 15px gray;
+  padding: 0px 5px 0 0px;
+}
+.hamburger-box-main {
+  height: 100%;
+  align-items: center;
+  display: flex;
+  background-color: #262626;
+}
   
   .header-toolbar {
     flex-grow: 1;
