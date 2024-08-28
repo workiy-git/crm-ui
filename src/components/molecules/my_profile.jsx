@@ -72,6 +72,11 @@ export default function Myprofile({ backgroundColor, value }) {
         console.error("Error fetching data:", error);
       });
   }, []);
+  const handleLogout = () => {
+  sessionStorage.clear();
+  localStorage.clear();
+  navigate("/");
+};
 
   useEffect(() => {
     function handleClickOutside(event) {
@@ -225,6 +230,31 @@ export default function Myprofile({ backgroundColor, value }) {
                         />
                       </ListItemButton>
                     ))}
+                    {myprofileData.logout && (
+                  <ListItemButton
+                    onClick={handleLogout}
+                    sx={{
+                      py: 0,
+                      minHeight: 32,
+                      color: "rgba(255,255,255,.8)",
+                      borderTop: "1px solid #ccc",
+                      marginTop: "10px",
+                    }}
+                  >
+                    <ListItemIcon
+                      sx={{
+                        color: "inherit",
+                        minWidth: "fit-content",
+                        marginRight: "15px",
+                      }}
+                    >
+                      <img
+                        src={myprofileData.logout.icon}
+                        alt={myprofileData.logout.title}
+                      />
+                    </ListItemIcon>
+                  </ListItemButton>
+                )}
                 </Box>
               </Box>
             )}

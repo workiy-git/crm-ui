@@ -284,7 +284,6 @@ const fetchGridData = async (filter) => {
       cellClassName: 'center-align',
       headerName: (
         <div style={{display:'flex', flexDirection:'column', margin:'auto', padding:'0 10px'}}>
-        {/* <lable>Select All</lable> */}
         <Checkbox
           style={{color:'white', padding:'0'}}
           className= "select-all-check-box"
