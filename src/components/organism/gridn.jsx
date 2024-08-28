@@ -559,6 +559,10 @@ const fetchGridData = async (filter) => {
   const handleBoxClose = () => {
     setIsBoxVisible(!isBoxVisible);
   };
+
+  const handleGenerateReportClick = () => {
+    navigate('/generate-report');
+  }
   
   //Loader
   const [isLoading, setIsLoading] = useState(true); 
@@ -595,6 +599,9 @@ const fetchGridData = async (filter) => {
         </Button>
         <Button onClick={() => handleadd("add")}  className='Action-btn' sx={{ color:'white', background:'#212529' }} >
           Add
+        </Button>
+        <Button onClick={handleGenerateReportClick}  className='Action-btn' sx={{ color:'white', background:'#212529' }} >
+          Generate Reports
         </Button>
         <Menu
         anchorEl={menuAnchor}

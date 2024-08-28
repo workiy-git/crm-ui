@@ -1,13 +1,14 @@
 import React from "react";
 import { BrowserRouter as Router, Route, Routes, useLocation } from "react-router-dom";
 import WelcomePage from "./components/pages/welcome";
-import Container from "./components/pages/container";  // Ensure this path is correct
+import Container from "./components/pages/container"; 
 import Home from "./components/pages/home";
 import Loginpage from "./components/pages/login"; 
 import DetailsPage from "./components/pages/details";
 import Underconstruction from "./components/pages/underconstruction";
 import Header from "./components/organism/header";
 import SideMenu from "./components/organism/sidemenu";
+import GenerateReportPage from "./components/pages/generate-reports";
 
 const Layout = ({ children }) => {
   const location = useLocation();
@@ -45,6 +46,7 @@ const App = () => {
           <Route path="/:pageName/edit/:id" element={<DetailsPage mode="edit" />} />
           <Route path="/:pageName/add" element={<DetailsPage mode="add" />} />
           <Route path="/users/profile/:id" element={<DetailsPage mode="profile" />} />
+          <Route path="/generate-report" element={<GenerateReportPage />} />
           <Route path="/underconstruction" element={<Underconstruction />} />
         </Routes>
       </Layout>
