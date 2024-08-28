@@ -81,8 +81,13 @@ background-color: blue;
     padding: 0 15px;
     margin: 0 10px;
     color: black;
+  }
+  .hamburger-list-item.disable{
+    pointer-events: none; /* Prevents click events */
+    cursor: not-allowed; /* Changes the cursor to indicate it's disabled */
 
   }
+  
   .hamburger-list-item:hover {
     background-color: #a1cbeb;
     /* color: white; */
@@ -149,6 +154,7 @@ background-color: blue;
     color: white;
     padding: 15px;
     border-radius: 10px;
+    cursor: default;
   }
   
   .hamburger-nested-list-img {

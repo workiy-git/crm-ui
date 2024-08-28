@@ -80,9 +80,9 @@ const AddFeature = ({ onSaveSelectedText, storedSelectedTexts }) => {
 
   return (
     <div>
-      <IconButton onClick={handleOpenDialog}>
+      <div onClick={handleOpenDialog}>
         <DataSaverOnTwoToneIcon sx={{color:'white'}} />
-      </IconButton>
+      </div>
       <Dialog open={dialogOpen} onClose={handleCloseDialog}>
         <DialogTitle>Select Features</DialogTitle>
         <DialogContent className="add-feature-dialog-content">

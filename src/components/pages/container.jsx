@@ -89,8 +89,7 @@ const Container = () => {
               color: "white",
               padding: "5px 10px",
               fontSize: "20px",
-              background:
-                "linear-gradient(90deg, rgba(12,45,78,1) 0%, rgba(28,104,180,1) 100%)",
+              background: " #F5BD71",
               fontWeight: "bold",
             }}
           >

@@ -9,6 +9,7 @@ const Loader = () => {
         justifyContent: "center",
         alignItems: "center",
         height: "100vh",
+        cursor: "wait",
       }}
     >
       <div>Loading...</div>
