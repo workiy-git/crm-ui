@@ -56,15 +56,15 @@ const Header = () => {
             <FullScreen />
           </Box>
           <Box className="flex-grow" />
-
+{/* 
           <Box>
             <Search />
           </Box>
-          <Box className="flex-grow" />
+          <Box className="flex-grow" /> */}
           <Box className="header-right-box">
-            <Box className="dayin-box">
+            {/* <Box className="dayin-box">
               <Dayin />
-            </Box>
+            </Box> */}
             <Box className="notification-box">
               <Badge>
                 <Notification />

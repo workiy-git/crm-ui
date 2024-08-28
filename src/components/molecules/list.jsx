@@ -55,7 +55,6 @@ export default function Hamburger() {
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, []);
-
   const renderNestedItems = (menuItem) => {
     return (
       <ul className="hamburger-list-container">
@@ -63,7 +62,7 @@ export default function Hamburger() {
           .filter((subKey) => subKey !== 'title' && subKey !== 'icon')
           .map((subKey, subIndex) => (
             <li
-              className="hamburger-list-item"
+              className={`hamburger-list-item ${menuItem[subKey].class}`}
               onClick={() => handleMenuItemClick(menuItem[subKey])}
               key={subIndex}
             >

@@ -9,6 +9,7 @@ import GridMenu from "../molecules/gridmenu";
 import Papa from 'papaparse';
 
 
+
 import {
   Select,
   MenuItem,
@@ -215,6 +216,7 @@ const fetchGridData = async (filter) => {
     setFilterText((prev) => ({ ...prev, [field]: value }));
   };
 
+
   const filteredRows = gridData.filter((row) =>
     columns.every((column) => {
       const value = row[column.field];
@@ -280,7 +282,7 @@ const fetchGridData = async (filter) => {
     {
       field: "select",
       width: 20,
-      padding: "0 10px",
+      padding: "0 0px",
       cellClassName: 'center-align',
       headerName: (
         <div style={{display:'flex', flexDirection:'column', margin:'auto', padding:'0 10px'}}>
@@ -338,7 +340,6 @@ const fetchGridData = async (filter) => {
     ...columns.map((column) => ({
       ...column,
       cellClassName: 'center-align',
-
       renderHeader: (params) => (
         
         <div
@@ -347,6 +348,7 @@ const fetchGridData = async (filter) => {
             flexDirection: "column",
             alignItems: "center",
             padding: "0",
+            height: "40px",
             width: "100%",
             boxSizing: "border-box",
             // color: "white",
@@ -355,10 +357,11 @@ const fetchGridData = async (filter) => {
         >
           <div
             style={{
-              marginBottom: "8px",
+              marginBottom: "5px",
               fontWeight: "bold",
               textAlign: "center",
               width: "100%",
+              fontSize: "10px",
             }}
           >
             {params.colDef.headerName}
@@ -369,7 +372,7 @@ const fetchGridData = async (filter) => {
             value={filterText[params.field] || ""}
             onClick={(e) => e.stopPropagation()} // Stop propagation to prevent sorting
             onChange={(e) => handleFilterChange(params.field, e.target.value)}
-            style={{ width: "80%", background: "#ffffff", borderRadius:'10px' }}
+            style={{ width: "80%", background: "#ffffff", borderRadius:'10px', height:'20px' }}
             className="grid_search"
           />
         </div>
@@ -606,15 +609,15 @@ const fetchGridData = async (filter) => {
 
         </Menu>
         
-        <div className="dropdown" style={{ margin: "8px", width: "300px" }}>
+        <div className="dropdown" style={{ margin: "8px", width: "250px" }}>
           <select
             value={selectedValue}
             onChange={handleChange}
             style={{
               color: "white",
-              background: "#212529",
+              background: "#464646",
               width: "100%",
-              padding: "8px",
+              padding: "5px 10px",
               borderRadius: "4px",
               border: "1px solid #ced4da",
               cursor: "pointer", // Add this line to change the cursor to a pointer
@@ -628,7 +631,7 @@ const fetchGridData = async (filter) => {
             ))}
           </select>
         </div>
-        <div>
+        <div style={{fontSize:'12px'}}>
         <span style={{ marginLeft: "16px" }}>
           Page {page} of {Math.ceil(totalRows / pageSize)}
         </span>
@@ -640,20 +643,22 @@ const fetchGridData = async (filter) => {
           value={pageSize}
           onChange={handlePageSizeChange}
           displayEmpty
-          style={{ marginLeft: "16px", height:'35px'}}
+          className="total_page_select"
+          style={{ marginLeft: "16px", height:'25px', fontSize:'12px !important' }}
         >
           <MenuItem value={10}>10</MenuItem>
           <MenuItem value={25}>25</MenuItem>
           <MenuItem value={50}>50</MenuItem>
         </Select>
         </div>
-        <Box mt={2} mb={2}>
+        <Box>
         <Pagination
           count={Math.ceil(totalRows / pageSize)}
           siblingCount={0}
           page={page}
-          style={{justifyContent:'center', display:'flex'}}
+          style={{justifyContent:'center', display:'flex', width:'200px'}}
           onChange={handlePageChange}
+          className="pagination_main"
         />
         
         </Box>
@@ -669,6 +674,7 @@ const fetchGridData = async (filter) => {
           <CircularProgress />
         </Box>
       ) : (
+        
         <div style={{height:'calc(100vh - 180px)'}}>
           <DataGrid
             rows={filteredRows.slice((page - 1) * pageSize, page * pageSize)}
@@ -679,11 +685,11 @@ const fetchGridData = async (filter) => {
             onPageChange={handlePageChange}
             page={page - 1}
             disableSelectionOnClick
-            columnHeaderHeight={120}
+            // columnHeaderHeight={35}
             className="custom-data-grid-main"
+            getRowHeight={() => 35}
           />
         </div>
-        // <div> </div>
       )}
       <Modal open={showColumnModal} onClose={closeColumnModal} aria-labelledby="modal-title" aria-describedby="modal-description">
   <Box sx={{ ...modalStyle, width: 500 }}>

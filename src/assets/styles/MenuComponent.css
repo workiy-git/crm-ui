@@ -9,6 +9,7 @@
   
   .menu-iconButton {
     color: white;
+    cursor: pointer;
   }
   
   .menu-iconButton:hover {

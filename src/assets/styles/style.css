@@ -50,13 +50,14 @@
   .workiy-logo.max-logo{
      width: 80px;
      height: auto;
-     margin:10px 0 0 10px;
+     margin: 15px 0 0 15px;
   }
   .workiy-logo.min-logo{
     width: 50px;
  }
  .workiy-logo-main.min-logo{
   text-align: center;
+  margin-top: 15px;
  }
   .items.dragging{
     opacity: 1;
