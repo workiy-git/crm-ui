@@ -1,16 +1,11 @@
-import React, { useState, useEffect, useRef } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import axios from "axios";
-
 import {
   Button,
   Typography,
-  TextField,
   Grid,
-  OutlinedInput,
-  InputLabel,
   InputAdornment,
-  IconButton,
   FormControl,
   CircularProgress,
 } from "@mui/material";
@@ -22,15 +17,6 @@ import {
   CognitoUser,
 } from "amazon-cognito-identity-js";
 
-// Add a debounce utility function
-const debounce = (func, wait) => {
-  let timeout;
-  return (...args) => {
-    clearTimeout(timeout);
-    timeout = setTimeout(() => func(...args), wait);
-  };
-};
-
 function Loginpage() {
   const [inputType] = useState("password");
   const [companyName, setCompanyName] = useState("");
@@ -38,13 +24,9 @@ function Loginpage() {
   const [password, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [companylogoData, setcompanylogoData] = useState({});
-  const [currentIndex, setCurrentIndex] = useState(0);
   const [allFieldsFilled, setAllFieldsFilled] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [jwtToken, setJwtToken] = useState("");
-  const timeoutRef = useRef(null);
-  const navigate = useNavigate();
 
   const handleClickShowPassword = () => setShowPassword((show) => !show);
 
@@ -66,24 +48,14 @@ function Loginpage() {
     if (isSubmitting) return;
     setIsSubmitting(true);
 
-     // Clear existing session before login
-  userPool.getCurrentUser()?.signOut();
-
     if (!companyName.trim() || !username.trim() || !password.trim()) {
       setErrorMessage("Please fill in all required fields.");
       setIsSubmitting(false);
-      return;
-    } 
+    } else {
       setErrorMessage("");
-      // Navigate to the home page
-      // You can add your navigation logic here
 
-      // Assuming you have the username and password from your form fields
       const usernameVal = username.trim();
       const passwordVal = password.trim();
-      console.log("Trimmed Username:", usernameVal);
-      console.log("Untrimmed Username:", username);
-
 
       const authenticationData = {
         Username: usernameVal,
@@ -95,7 +67,7 @@ function Loginpage() {
       );
 
       const userData = {
-        Username: usernameVal,
+        Username: username,
         Pool: userPool,
       };
 
@@ -103,8 +75,6 @@ function Loginpage() {
 
       cognitoUser.authenticateUser(authenticationDetails, {
         onSuccess: async (result) => {
-          console.log("JWT Token:", result.getAccessToken().getJwtToken());
-          
           try {
             const response = await fetch(`${config.apiUrl}appdata/retrieve`, {
               method: "POST",
@@ -116,35 +86,30 @@ function Loginpage() {
                 {
                   "$match": {
                     "pageName": "users",
-                    "username": usernameVal, // dynamically include the username
+                    "username": username, // dynamically include the username
                   }
                 }
               ]),
             });
 
             const userData = await response.json();
-            console.log("User data retrieved:", userData); // Add this log
-            
             if (userData && userData.data[0].company === companyName) {
               sessionStorage.setItem("isLoggedIn", "true");
               sessionStorage.setItem(
                 "accessToken",
                 result.getAccessToken().getJwtToken()
               );
-              startSessionTimeout();
 
-              // Redirect to home or another page
-              // window.location.href = "/home";
-              navigate("/home"); // Redirect to a home page or dashboard after login
+              window.location.href = "/home";
             } else {
+              console.error("Company mismatch or user not found:", userData);
               throw new Error(
                 "User not found in the database or company mismatch"
               );
             }
           } catch (error) {
             console.error("User verification failed", error);
-            setErrorMessage(
-              "Entered Company Name does not match with the user. Please try again.");
+            setErrorMessage("Invalid username or password. Please try again.");
             setIsSubmitting(false);
           }
         },
@@ -152,15 +117,9 @@ function Loginpage() {
           console.error("Authentication failed", err);
           setErrorMessage("Invalid username or password. Please try again.");
           setIsSubmitting(false);
-          // Handle login failure
         },
         newPasswordRequired: (userAttributes, requiredAttributes) => {
-          console.log("New password required");
-          // delete userAttributes.email_verified; // We don't need this
-          // Prompt the user for their new password
-
           const newPassword = prompt("Please enter your new password:");
-          // You might also need to collect any required attributes here
           cognitoUser.completeNewPasswordChallenge(
             newPassword,
             {},
@@ -171,19 +130,17 @@ function Loginpage() {
                   "Password changed successfully. Please login with your new password."
                 );
                 setIsSubmitting(false);
-
-                // Navigate to the home page or another page
               },
               onFailure: (err) => {
                 console.error("Failed to change password", err);
                 setErrorMessage(err.message || JSON.stringify(err));
                 setIsSubmitting(false);
-                // Handle failure to change password, show error message to user
               },
             }
           );
         },
       });
+    }
   };
 
   useEffect(() => {
@@ -199,62 +156,10 @@ function Loginpage() {
   }, []);
 
   useEffect(() => {
-    console.log("Checking if all required fields are filled");
-    // Check if all required fields are filled
     setAllFieldsFilled(
       companyName.trim() && username.trim() && password.trim()
     );
   }, [companyName, username, password]);
-  useEffect(() => {
-    const token = sessionStorage.getItem("accessToken");
-    if (token) {
-      setJwtToken(token);
-      startSessionTimeout();
-    }
-  }, []);
-
-  useEffect(() => {
-    const refreshInterval = setInterval(refreshSession, 5 * 60 * 1000); // Refresh every 5 minutes
-    return () => clearInterval(refreshInterval);
-  }, []);
-
-  const refreshSession = () => {
-    const token = sessionStorage.getItem("accessToken");
-    if (token) {
-      sessionStorage.setItem("accessToken", token); // Refresh the token
-    }   // Reset the timeout
-  };
-
-  const startSessionTimeout = () => {
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current);
-    }
-    console.log("Starting session timeout");
-    timeoutRef.current = setTimeout(() => {
-      console.log("Session expired, clearing storage and redirecting");
-      sessionStorage.clear();
-      navigate("/login"); // Redirect to login page
-    }, 15 * 60 * 1000); // 15 minutes
-  };
-
-  // Create a debounced version of the user action handler
-  const handleUserAction = debounce(() => {
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current); // Only reset if there's already a timeout
-      console.log("User action detected, resetting timeout");
-    }
-      startSessionTimeout(); // Reset the timeout on user action
-    
-  }, 1000); // Adjust the debounce wait time as necessary
-
-  useEffect(() => {
-    window.addEventListener("click", handleUserAction);
-    window.addEventListener("keydown", handleUserAction);
-    return () => {
-      window.removeEventListener("click", handleUserAction);
-      window.removeEventListener("keydown", handleUserAction);
-    }
-  }, []);
 
   const handleKeyPress = (event) => {
     if (event.key === "Enter") {
@@ -276,7 +181,7 @@ function Loginpage() {
                 src={companylogoData.login?.icon}
                 alt="background"
                 className="login-background-image"
-              /> 
+              />
               <Typography className="login-quotes-text">
               {companylogoData.welcome.quotes}
               </Typography>
@@ -286,15 +191,21 @@ function Loginpage() {
             <div className="login-right-section">
               <div className="login-right-section-main">
                 <div className="login-title-block">
+                  {/* <img src={companylogoData.login?.icon} alt="" /> */}
                   <Typography variant="h6" className="login-title">
-                  {companylogoData.login.title}
+                    {companylogoData.login.title}
                   </Typography>
                 </div>
-                <Grid className="Login-input">
+                <Grid className="Login-input"> 
                   <Grid item xs={12} sm={6} className="login-form-group">
                     <div className="login-align-items">
                     <Typography  className="login-lable"> {companylogoData.company.lable}</Typography>
-                    <input
+                      {/* <img
+                        src={companylogoData.company?.logo}
+                        alt="logo"
+                        className="login-logo"
+                      /> */}
+                      <input
                       type="text"
                       className="login-text-field"
                       value={companyName}
@@ -302,12 +213,21 @@ function Loginpage() {
                       required
                       placeholder={companylogoData.company.placeholder}
                     />
-                    </div>                  
-                    </Grid>
+                    </div>
+                    
+                   
+                 
+                    
+                  </Grid>
                   <Grid item xs={12} sm={6} className="login-form-group">
                     <div className="login-align-items">
                     <Typography  className="login-lable">{companylogoData.username.lable}</Typography>
-                    <input
+                      {/* <img
+                        src={companylogoData.username.logo}
+                        alt="logo"
+                        className="login-logo"
+                      /> */}
+                      <input
                       type="text"
                       className="login-text-field"
                       value={username}
@@ -316,11 +236,17 @@ function Loginpage() {
                       placeholder={companylogoData.username?.placeholder}
                     />
                     </div>
+                    
                   </Grid>
                   <Grid item xs={12} className="login-form-group">
                     <div className="login-align-items">
                     <Typography  className="login-lable"> {companylogoData.password.lable}</Typography>
-                    <FormControl type={inputType} required>
+                      {/* <img
+                        src={companylogoData.password?.logo}
+                        alt="logo"
+                        className="login-logo"
+                      /> */}
+                      <FormControl type={inputType} required>
                       <div style={{ display: "flex" }}>
                         <input
                           placeholder={companylogoData.password.placeholder}
@@ -359,8 +285,10 @@ function Loginpage() {
                       </div>
                     </FormControl>
                     </div>
+                    
                   </Grid>
                 </Grid>
+               
                 <div className="login-center login-error">
                   {errorMessage && (
                     <Typography variant="body2" className="login-error-message">
@@ -369,28 +297,29 @@ function Loginpage() {
                   )}
                 </div>
                 <div className="login-center">
-                      <Button
-                        variant="contained"
-                        color="primary"
-                        className={
-                            allFieldsFilled ? "login-button" : "login-button-disabled"
-                          }
-                        id="login-button"
-                        onClick={handleLogin}
-                        disabled={!allFieldsFilled || isSubmitting}
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    className={
+                      allFieldsFilled ? "login-button" : "login-button-disabled"
+                    }
+                    id="login-button"
+                    onClick={handleLogin}
+                    disabled={!allFieldsFilled || isSubmitting}
                     style={{
                       cursor: allFieldsFilled ? "pointer" : "not-allowed",
                       opacity: isSubmitting ? 0.7 : 1,
                       pointerEvents: isSubmitting ? "none" : "auto",
                     }}
-                      >
-                        {isSubmitting ? (
+                  >
+                    {isSubmitting ? (
                       <CircularProgress size={24} color="inherit" />
                     ) : (
-                        companylogoData.button?.title
+                      companylogoData.button?.title
                     )}
-                      </Button>                       
-                      </div>
+                  </Button>
+                  
+                </div>
                 <div className="login-center login-submit-block">
                   <a
                     className="login-forgot-password"
@@ -402,9 +331,9 @@ function Loginpage() {
                 <div className="login-center login-submit-block">
                   <Typography
                    className="login-footer" 
-                    >
-                      {companylogoData.footer.title}
-                    </Typography>
+                  >
+                    {companylogoData.footer.title} 
+                  </Typography>
                 </div>
               </div>
             </div>
@@ -416,4 +345,5 @@ function Loginpage() {
     </div>
   );
 }
+
 export default Loginpage;
