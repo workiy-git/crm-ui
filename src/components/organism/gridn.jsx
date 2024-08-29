@@ -603,9 +603,16 @@ const fetchGridData = async (filter) => {
         <Button onClick={() => handleadd("add")}  className='Action-btn' sx={{ color:'white', background:'#212529' }} >
           Add
         </Button>
-        <Button onClick={handleGenerateReportClick}  className='Action-btn' sx={{ color:'white', background:'#212529' }} >
-          Generate Reports
-        </Button>
+        {pageName === 'reports' && (
+            <Button 
+              onClick={handleGenerateReportClick}  
+              className='Action-btn' 
+              sx={{ color: 'white', background: '#212529' }}
+            >
+              Generate Reports
+            </Button>
+          )}
+
         <Menu
         anchorEl={menuAnchor}
         open={Boolean(menuAnchor)}

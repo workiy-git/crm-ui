@@ -497,11 +497,12 @@
 }
 
 .Action-btn {
-  color: black !important;
-  background-color: #DEDEDE !important;
-  width: 85px;
-  padding: 3px !important;
+  background-color: #dedede !important;
+  color: #000 !important;
   font-size: 12px !important;
+  padding: 3px !important;
+  /* width: 85px; */
+  min-width: 85px !important;
 }
 .custom-data-grid-main .MuiDataGrid-menuIcon{
   margin: 0 !important;
