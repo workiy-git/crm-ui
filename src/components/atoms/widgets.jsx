@@ -552,7 +552,7 @@ const CreateWidget = ({ backgroundColor, dashboardName }) => {
                 </div>
               </CreateWidgetItem>
             </div>
-          )) : <div>There is no data</div>}
+          )) : <div></div>}
         </div>
       </Box>
     </ScrollContainer>
