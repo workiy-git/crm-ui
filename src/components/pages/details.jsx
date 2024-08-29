@@ -28,7 +28,10 @@ const DetailsPage = () => {
   const [isEditing, setIsEditing] = useState(false); // Initialize as false
   const [isAdding, setIsAdding] = useState(false); 
   const [refreshTab, setRefreshTab] = useState(false);
-  const [isDialogOpen, setIsDialogOpen] = useState(false); 
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [initialFormData, setInitialFormData] = useState({});
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+
 
   const initializeFormData = useCallback((data, schema) => {
     const initialData = {};
@@ -61,6 +64,7 @@ const DetailsPage = () => {
         if (rowData) {
           const initialFormData = initializeFormData(rowData, pageSchema);
           setFormData(initialFormData);
+          setInitialFormData(initialFormData);
         } else if (id) {
           const apiUrl = `${config.apiUrl.replace(/\/$/, "")}/appdata/${id}`;
           const response = await axios.get(apiUrl);
@@ -68,6 +72,7 @@ const DetailsPage = () => {
 
           const initialFormData = initializeFormData(fetchedData, pageSchema);
           setFormData(initialFormData);
+          setInitialFormData(initialFormData);
         }
       } catch (error) {
         setError("Error fetching webforms data");
@@ -76,6 +81,10 @@ const DetailsPage = () => {
 
     fetchWebformsData();
   }, [id, rowData, pageName, initializeFormData]);
+  useEffect(() => {
+    const hasChanges = JSON.stringify(formData) !== JSON.stringify(initialFormData);
+    setHasUnsavedChanges(hasChanges);
+  }, [formData, initialFormData]);
 
     // Update isEditing and isAdding states based on location changes
     useEffect(() => {
@@ -153,6 +162,17 @@ const DetailsPage = () => {
 
   const handleSave = async () => {
     if (!formData) return;
+
+    // Check if formData has changed from initialFormData
+  if (JSON.stringify(formData) === JSON.stringify(initialFormData)) {
+    handleSaveError("No changes detected. Nothing to save.");
+    return;
+  }
+   // Check if all fields are empty in Add mode
+   if (isAdding && Object.values(formData).every(value => value === "")) {
+    handleSaveError("No data provided. Please fill in the form before submitting.");
+    return;
+  }
   
     try {
       const dataToSend = { pageName, pageId, ...formData };
@@ -274,25 +294,8 @@ const DetailsPage = () => {
                   color:' white'
                 }}
               >
-                <div style={{alignContent:'center'}}>
-                  <div style={{textTransform:'capitalize'}}>{pageName} information</div>
-                  {/* <div>
-                  <Box
-                    style={{
-                      display: "flex",
-                      justifyContent: "end",
-                      alignItems: "center",
-                    }}
-                  >
-                    <div style={{ fontSize:'15px', fontWeight:'100'}}>
-                      CT :{" "}
-                      <span style={{ fontWeight:'300' }}>
-                        {formData?.created_time || "N/A"}
-                      </span>
-                    </div>
-                  </Box>
-                  </div> */}
-                </div>
+ 
+                  <div>{pageName} information</div>
                 
                     <Box
                   style={{
