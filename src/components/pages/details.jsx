@@ -28,7 +28,10 @@ const DetailsPage = () => {
   const [isEditing, setIsEditing] = useState(false); // Initialize as false
   const [isAdding, setIsAdding] = useState(false); 
   const [refreshTab, setRefreshTab] = useState(false);
-  const [isDialogOpen, setIsDialogOpen] = useState(false); 
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [initialFormData, setInitialFormData] = useState({});
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+
 
   const initializeFormData = useCallback((data, schema) => {
     const initialData = {};
@@ -61,6 +64,7 @@ const DetailsPage = () => {
         if (rowData) {
           const initialFormData = initializeFormData(rowData, pageSchema);
           setFormData(initialFormData);
+          setInitialFormData(initialFormData);
         } else if (id) {
           const apiUrl = `${config.apiUrl.replace(/\/$/, "")}/appdata/${id}`;
           const response = await axios.get(apiUrl);
@@ -68,6 +72,7 @@ const DetailsPage = () => {
 
           const initialFormData = initializeFormData(fetchedData, pageSchema);
           setFormData(initialFormData);
+          setInitialFormData(initialFormData);
         }
       } catch (error) {
         setError("Error fetching webforms data");
@@ -76,6 +81,10 @@ const DetailsPage = () => {
 
     fetchWebformsData();
   }, [id, rowData, pageName, initializeFormData]);
+  useEffect(() => {
+    const hasChanges = JSON.stringify(formData) !== JSON.stringify(initialFormData);
+    setHasUnsavedChanges(hasChanges);
+  }, [formData, initialFormData]);
 
     // Update isEditing and isAdding states based on location changes
     useEffect(() => {
@@ -153,6 +162,17 @@ const DetailsPage = () => {
 
   const handleSave = async () => {
     if (!formData) return;
+
+    // Check if formData has changed from initialFormData
+  if (JSON.stringify(formData) === JSON.stringify(initialFormData)) {
+    handleSaveError("No changes detected. Nothing to save.");
+    return;
+  }
+   // Check if all fields are empty in Add mode
+   if (isAdding && Object.values(formData).every(value => value === "")) {
+    handleSaveError("No data provided. Please fill in the form before submitting.");
+    return;
+  }
   
     try {
       const dataToSend = { pageName, pageId, ...formData };
@@ -199,24 +219,29 @@ const DetailsPage = () => {
   return (
     <div
       style={{
-        height: "100vh",
         display: "flex",
         flexDirection: "column",
-        overflow: "hidden",
+        height: "100%",
       }}
     >
-      <div style={{ display: "flex", height: "100%", overflow: "hidden" }}>
-        <div style={{ width: "100%", overflow: "hidden" }}>
+      <div style={{ display: "flex" }}>
+        <div style={{ width: "100%", }}>
           <div
             style={{
               display: "flex",
               justifyContent: "space-between",
-              background: "#212529",
-              color: "white",
+              background: "#F5BD71",
+              color: "black",
               height: "65px",
             }}
           >
-            <h2 style={{ margin: "auto 20px" }}>{pageName} Details Page</h2>
+            <div style={{alignContent:'center'}}>
+              <div>
+            <h2 style={{ margin: "auto 40px", textTransform:'capitalize'}}>{pageName} {mode} Page</h2>
+            <div style={{margin:'10px 20px 10px 40px', borderBottom:'2px solid black' }}></div>
+            </div>
+            </div>
+
             <Box
               style={{
                 display: "flex",
@@ -230,9 +255,9 @@ const DetailsPage = () => {
               <Button>
               <Email formData={formData}/>
               </Button>
-              <Button>
+              {/* <Button>
               <Sms formData={formData}/>
-              </Button>
+              </Button> */}
               <Button
                 variant="contained"
                 color="primary"
@@ -244,13 +269,13 @@ const DetailsPage = () => {
             </Box>
             
           </div>
-          <div style={{ display: "flex", overflow: "hidden", height: "90%" }}>
+          <div style={{ display: "flex", height:'78vh' }}>
             <div
               style={{
-                margin: "10px",
                 width: "75%",
+                margin: "10px",
+                height: "95%",
                 border: "1px solid gray",
-                borderRadius: "10px",
                 position: "relative",
                 background: "white",
               }}
@@ -264,46 +289,34 @@ const DetailsPage = () => {
                   textTransform: "capitalize",
                   display: "flex",
                   justifyContent: "space-between",
+                  height: "7%",
+                  background:' #2C2C2C',
+                  color:' white'
                 }}
               >
-                <div>
+ 
                   <div>{pageName} information</div>
-                  <div>
-                  <Box
-                    style={{
-                      display: "flex",
-                      justifyContent: "end",
-                      alignItems: "center",
-                    }}
-                  >
-                    <div style={{ fontSize:'15px', fontWeight:'100'}}>
-                      CT :{" "}
-                      <span style={{ fontWeight:'300' }}>
-                        {formData?.created_time || "N/A"}
-                      </span>
-                    </div>
-                  </Box>
-                  </div>
-                </div>
                 
-                <Box
-              style={{
-                display: "flex",
-                alignItems: "center",
-                marginRight: "5%",
-              }}
-            >
-              {(!isAdding)  && (
-              <Button
-                variant="contained"
-                color="primary"
-                // onClick={handleAddNew}
-                onClick={() => handleadd("add")}
-                style={{margin:'5px'}}
-              >
-                Add
-              </Button>
-              )}
+                    <Box
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    marginRight: "5%",
+                  }}
+                >
+                {(!isAdding)  && pageName !== 'users' && (
+                <Button
+                  variant="contained"
+                  color="primary"
+                  // onClick={handleAddNew}
+                  onClick={() => handleadd("add")}
+                  style={{margin:'5px'}}
+                >
+                  Add
+                </Button>
+                )}
+             
+          
               {!isAdding && !isEditing && (
                 <Button
                   variant="contained"
@@ -327,7 +340,7 @@ const DetailsPage = () => {
                   Save
                 </Button>
               )}
-              {(!isAdding)  && (
+              {(!isAdding)  && pageName !== 'users' &&(
               <Button
                 variant="contained"
                 color="error"
@@ -349,7 +362,7 @@ const DetailsPage = () => {
             </Box>
               </div>
              
-              <div style={{ height: "75%", overflow: "auto", padding: isEditing || isAdding ? "10px" : "0" }}>
+              <div style={{ overflow: "auto", padding: isEditing || isAdding ? "10px" : "0", height:'80%' }}>
                 <Box sx={{ m: 0 }}>
                   {error && (
                     <Stack sx={{ width: "100%" }} spacing={2}>
@@ -391,7 +404,10 @@ const DetailsPage = () => {
                 </Box>
               </div>
             </div>
-            <div style={{ margin: '10px', display: 'flex', justifyContent: 'space-around', width: '50%', overflow: 'hidden' }}>
+            <div style={{ margin: "10px",
+                height: "95%",
+                border: "1px solid gray",
+                position: "relative", width: '50%'}}>
               <Tab mode={isAdding ? 'add' : isEditing ? 'edit' : 'view'} key={refreshTab} />
             </div>
           </div>

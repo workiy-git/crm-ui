@@ -142,11 +142,14 @@
   top: 60px;
   height: 10px;
 }
+.custom-data-grid-main .MuiDataGrid-scrollbar--vertical{
+  top: 70px;
+}
 .custom-data-grid-main .MuiDataGrid-scrollbar--horizontal::-webkit-scrollbar{
   height: 10px;
 }
 .custom-data-grid-main .MuiDataGrid-scrollbar--horizontal::-webkit-scrollbar-track{
-  background-color: #F5BD71;
+  background-color: #B9B9B9;
 }
 .custom-data-grid-main .MuiDataGrid-footerContainer{
   display: none;
@@ -378,7 +381,7 @@
   width: 20px !important;
   min-width: 20px !important;
 }
-.total_page_select .MuiSelect-select, .css-kk1bwy-MuiButtonBase-root-MuiMenuItem-root{
+.total_page_select .MuiSelect-select, .MuiMenu-list .MuiMenuItem-gutters{
   font-size: 12px !important;
 }
 .page-btn {
@@ -500,6 +503,7 @@
   background-color: #dedede !important;
   color: #000 !important;
   font-size: 12px !important;
+  font-weight: 600 !important;
   padding: 3px !important;
   /* width: 85px; */
   min-width: 85px !important;
