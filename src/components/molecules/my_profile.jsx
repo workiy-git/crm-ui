@@ -102,6 +102,7 @@ export default function Myprofile({ backgroundColor, value }) {
 
   const handleNavigate = (mode) => {
     if (userData) {
+        setOpen(false); // Close the popup
         navigate(`/${pageName}/${mode}/${userData._id}`, {
           state: { rowData: userData, pageName, mode },
         });

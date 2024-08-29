@@ -73,9 +73,11 @@
   }
   .Details_btn_txt{
     display: none;
+    color: black;
   }
   .Details_hover_btn:hover .Details_btn_txt {
     display: block;
+    color: black;
   }
 
   .edit-field-input input, .edit-field-input .css-11u53oe-MuiSelect-select-MuiInputBase-input-MuiOutlinedInput-input, .valuefield input, .valuefield .css-11u53oe-MuiSelect-select-MuiInputBase-input-MuiOutlinedInput-input{
@@ -96,6 +98,10 @@
   
   .wedgets-main:first-child {
     display: block !important; /* Show only the first child */
+  }
+
+  .MuiTabs-indicator{
+    background-color: #FFC03D !important;
   }
   @media (max-width: 600px) {
     .widget-main {

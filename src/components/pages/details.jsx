@@ -199,24 +199,29 @@ const DetailsPage = () => {
   return (
     <div
       style={{
-        height: "100vh",
         display: "flex",
         flexDirection: "column",
-        overflow: "hidden",
+        height: "100%",
       }}
     >
-      <div style={{ display: "flex", height: "100%", overflow: "hidden" }}>
-        <div style={{ width: "100%", overflow: "hidden" }}>
+      <div style={{ display: "flex" }}>
+        <div style={{ width: "100%", }}>
           <div
             style={{
               display: "flex",
               justifyContent: "space-between",
-              background: "#212529",
-              color: "white",
+              background: "#F5BD71",
+              color: "black",
               height: "65px",
             }}
           >
-            <h2 style={{ margin: "auto 20px" }}>{pageName} Details Page</h2>
+            <div style={{alignContent:'center'}}>
+              <div>
+            <h2 style={{ margin: "auto 40px", textTransform:'capitalize'}}>{pageName} {mode} Page</h2>
+            <div style={{margin:'10px 20px 10px 40px', borderBottom:'2px solid black' }}></div>
+            </div>
+            </div>
+
             <Box
               style={{
                 display: "flex",
@@ -230,9 +235,9 @@ const DetailsPage = () => {
               <Button>
               <Email formData={formData}/>
               </Button>
-              <Button>
+              {/* <Button>
               <Sms formData={formData}/>
-              </Button>
+              </Button> */}
               <Button
                 variant="contained"
                 color="primary"
@@ -244,13 +249,13 @@ const DetailsPage = () => {
             </Box>
             
           </div>
-          <div style={{ display: "flex", overflow: "hidden", height: "90%" }}>
+          <div style={{ display: "flex", height:'78vh' }}>
             <div
               style={{
-                margin: "10px",
                 width: "75%",
+                margin: "10px",
+                height: "95%",
                 border: "1px solid gray",
-                borderRadius: "10px",
                 position: "relative",
                 background: "white",
               }}
@@ -264,11 +269,14 @@ const DetailsPage = () => {
                   textTransform: "capitalize",
                   display: "flex",
                   justifyContent: "space-between",
+                  height: "7%",
+                  background:' #2C2C2C',
+                  color:' white'
                 }}
               >
-                <div>
-                  <div>{pageName} information</div>
-                  <div>
+                <div style={{alignContent:'center'}}>
+                  <div style={{textTransform:'capitalize'}}>{pageName} information</div>
+                  {/* <div>
                   <Box
                     style={{
                       display: "flex",
@@ -283,27 +291,29 @@ const DetailsPage = () => {
                       </span>
                     </div>
                   </Box>
-                  </div>
+                  </div> */}
                 </div>
                 
-                <Box
-              style={{
-                display: "flex",
-                alignItems: "center",
-                marginRight: "5%",
-              }}
-            >
-              {(!isAdding)  && (
-              <Button
-                variant="contained"
-                color="primary"
-                // onClick={handleAddNew}
-                onClick={() => handleadd("add")}
-                style={{margin:'5px'}}
-              >
-                Add
-              </Button>
-              )}
+                    <Box
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    marginRight: "5%",
+                  }}
+                >
+                {(!isAdding)  && pageName !== 'users' && (
+                <Button
+                  variant="contained"
+                  color="primary"
+                  // onClick={handleAddNew}
+                  onClick={() => handleadd("add")}
+                  style={{margin:'5px'}}
+                >
+                  Add
+                </Button>
+                )}
+             
+          
               {!isAdding && !isEditing && (
                 <Button
                   variant="contained"
@@ -327,7 +337,7 @@ const DetailsPage = () => {
                   Save
                 </Button>
               )}
-              {(!isAdding)  && (
+              {(!isAdding)  && pageName !== 'users' &&(
               <Button
                 variant="contained"
                 color="error"
@@ -349,7 +359,7 @@ const DetailsPage = () => {
             </Box>
               </div>
              
-              <div style={{ height: "75%", overflow: "auto", padding: isEditing || isAdding ? "10px" : "0" }}>
+              <div style={{ overflow: "auto", padding: isEditing || isAdding ? "10px" : "0", height:'80%' }}>
                 <Box sx={{ m: 0 }}>
                   {error && (
                     <Stack sx={{ width: "100%" }} spacing={2}>
@@ -391,7 +401,10 @@ const DetailsPage = () => {
                 </Box>
               </div>
             </div>
-            <div style={{ margin: '10px', display: 'flex', justifyContent: 'space-around', width: '50%', overflow: 'hidden' }}>
+            <div style={{ margin: "10px",
+                height: "95%",
+                border: "1px solid gray",
+                position: "relative", width: '50%'}}>
               <Tab mode={isAdding ? 'add' : isEditing ? 'edit' : 'view'} key={refreshTab} />
             </div>
           </div>
