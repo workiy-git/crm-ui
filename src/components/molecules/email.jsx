@@ -84,7 +84,7 @@ const Email = ({ formData }) => {
     return (
         <>
             <Button className="Details_hover_btn" onClick={handleClickOpen} style={{ display: 'flex', alignItems: 'center', color:'white' }}>
-                <MailOutlineIcon style={{ color: 'white', marginRight:'10px' }} /><Typography className="Details_btn_txt">Email</Typography>   
+                <MailOutlineIcon style={{ color: 'black', marginRight:'10px' }} /><Typography className="Details_btn_txt">Email</Typography>   
             </Button>
             <Dialog open={open} onClose={handleClose}>
                 <DialogTitle>Select Email Template</DialogTitle>

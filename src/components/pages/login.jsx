@@ -110,12 +110,14 @@ function Loginpage() {
           } catch (error) {
             console.error("User verification failed", error);
             setErrorMessage("Invalid username or password. Please try again.");
+            setPassword("");  // Clear the password field
             setIsSubmitting(false);
           }
         },
         onFailure: (err) => {
           console.error("Authentication failed", err);
           setErrorMessage("Invalid username or password. Please try again.");
+          setPassword("");  // Clear the password field
           setIsSubmitting(false);
         },
         newPasswordRequired: (userAttributes, requiredAttributes) => {

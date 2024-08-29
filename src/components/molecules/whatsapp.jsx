@@ -27,7 +27,7 @@ const Whatsapp = ({ formData }) => {
 
     return (
         <Button className="Details_hover_btn" onClick={handleWhatsappClick} style={{ display: 'flex', alignItems: 'center', color:'white' }}>
-            <WhatsAppIcon style={{ color: 'white', marginRight:'10px' }} /> <Typography className="Details_btn_txt">Whatsapp</Typography>
+            <WhatsAppIcon style={{ color: 'black', marginRight:'10px' }} /> <Typography className="Details_btn_txt">Whatsapp</Typography>
         </Button>
     );
 };

@@ -22,7 +22,7 @@ const Sms = ({ formData }) => {
 
     return (
         <Button className="Details_hover_btn" onClick={handleSmsClick} style={{ display: 'flex', alignItems: 'center',color: 'white' }}>
-            <SmsOutlinedIcon style={{ color: 'white', marginRight:'10px' }} /><Typography className="Details_btn_txt">SMS</Typography>
+            <SmsOutlinedIcon style={{ color: 'black', marginRight:'10px' }} /><Typography className="Details_btn_txt">SMS</Typography>
         </Button>
     );
 };
