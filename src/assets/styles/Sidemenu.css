@@ -1,15 +1,18 @@
 ::-webkit-scrollbar {
-    width: 2px;
+    width: 8px;
     height: 8px;
      /* Width of the scrollbar */
   }
-  
+  .sidemenu-profile-container::-webkit-scrollbar {
+    width: 5px !important;
+  }
   ::-webkit-scrollbar-track {
-    background: #0d2d4e; /* Background color of the track */
+    background: #B9B9B9; /* Background color of the track */
+    border-radius: 10px;
   }
   
   ::-webkit-scrollbar-thumb {
-    background-color: #fff; /* Color of the scrollbar thumb */
+    background-color: #717171; /* Color of the scrollbar thumb */
     border-radius: 10px; /* Rounded corners */
    /* Padding around the thumb */
   }

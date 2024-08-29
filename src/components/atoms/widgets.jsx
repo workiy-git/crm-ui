@@ -539,7 +539,7 @@ const CreateWidget = ({ backgroundColor, dashboardName }) => {
                 <div style={{borderBottom:'1px solid black', margin:'5px auto 10px auto', width:'60px'}}></div>
                   <Icon style={{margin:'auto'}}>
                     <div style={{ background: '#fff6', borderRadius: '100px', padding: '10px', margin: 'auto', display: 'flex' }}>
-                      <img style={{ height: '20px', width: 'auto', margin: 'auto', filter: 'brightness(0) invert(1)' }} src={widget.icon_url || 'default_icon_url'} alt={widget.title} />
+                      <img style={{ height: '20px', width: 'auto', margin: 'auto' }} src={widget.icon_url || 'default_icon_url'} alt={widget.title} />
                     </div>
                   </Icon>
                 </div>

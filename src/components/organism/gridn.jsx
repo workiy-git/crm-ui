@@ -38,7 +38,7 @@ const GridComponent = ({ pageName }) => {
   const [columns, setColumns] = useState([]);
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(10); // Adjust this value as needed
+  const [pageSize, setPageSize] = useState(25); // Adjust this value as needed
   const [totalRows, setTotalRows] = useState(0);
   const [selectOptions, setSelectOptions] = useState([]);
   const [selectedValue, setSelectedValue] = useState("");
@@ -82,6 +82,7 @@ const GridComponent = ({ pageName }) => {
     closeColumnModal();
   };
   const handleDeleteClick = (row) => {
+    handleMenuClose();
     setRowToDelete(row); // Set the row to be deleted
     setDeleteDialogOpen(true); // Open the confirmation dialog
   };
@@ -104,6 +105,14 @@ const GridComponent = ({ pageName }) => {
     setDeleteDialogOpen(false); // Close the dialog
     setRowToDelete(null); // Clear the selected row
   };
+
+  useEffect(() => {
+    if (pageName) {
+      setIsLoading(true); // Set the loader to true when pageName changes
+      setPage(1); // Reset to the first page when the pageName changes
+    }
+  }, [pageName]);
+  
   
   // Fetch select options
   useEffect(() => {
@@ -161,13 +170,30 @@ const GridComponent = ({ pageName }) => {
       handleChange({ target: { value: selectedValue } });
     }
   }, [selectedValue]);
+  
 
+  useEffect(() => {
+    if (pageName) {
+      setIsLoading(true);; // Set the loader to true when pageName changes
+  
+      // if (selectedValue) {
+      //   const filter = JSON.parse(selectedValue);
+      //   fetchGridData(filter).finally(() => {
+      //     setIsLoading(false);
+      //   });
+      // } else {
+      //   setIsLoading(false); // Set the loader to false if there's no selectedValue
+      // }
+    }
+  }, [pageName]);
+  
   //Drop Down Change
   const handleChange = (event) => {
     const filter = JSON.parse(event.target.value);
     setSelectedValue(event.target.value);
     // console.log("filter", filter);
     fetchGridData(filter); // Fetch grid data for the selected option
+    setPage(1);
   };
   // Fetch grid data based on the selected filter
 const fetchGridData = async (filter) => {
@@ -213,6 +239,7 @@ const fetchGridData = async (filter) => {
   // }, [filterText, gridData]);
 
   const handleFilterChange = (field, value) => {
+    setPage(1);
     setFilterText((prev) => ({ ...prev, [field]: value }));
   };
 
@@ -263,6 +290,7 @@ const fetchGridData = async (filter) => {
   };
 
   const handleNavigate = (mode) => {
+      handleMenuClose();
     if (selectedRow) {
         navigate(`/${pageName}/${mode}/${selectedRow._id}`, {
             state: { rowData: selectedRow, pageName, mode },
@@ -469,6 +497,7 @@ const fetchGridData = async (filter) => {
   };
 
   const handleExportClick = () => {
+    closeMenu();
     exportSelectedRows();
   };
   const handleEmailClick = () => {
@@ -618,7 +647,7 @@ const fetchGridData = async (filter) => {
         open={Boolean(menuAnchor)}
         onClose={closeMenu}>
             <MenuItem onClick={handleExportClick}>Export Data</MenuItem>
-            <MenuItem onClick={handleEmailClick}>Send Email</MenuItem>
+            {/* <MenuItem onClick={handleEmailClick}>Send Email</MenuItem> */}
             {/* <MenuItem onClick={handleImportClick}>Import Data</MenuItem> */}
 
         </Menu>
@@ -660,9 +689,9 @@ const fetchGridData = async (filter) => {
           className="total_page_select"
           style={{ marginLeft: "16px", height:'25px', fontSize:'12px !important' }}
         >
-          <MenuItem value={10}>10</MenuItem>
           <MenuItem value={25}>25</MenuItem>
           <MenuItem value={50}>50</MenuItem>
+          <MenuItem value={75}>75</MenuItem>
         </Select>
         </div>
         <Box>
@@ -689,7 +718,7 @@ const fetchGridData = async (filter) => {
         </Box>
       ) : (
         
-        <div style={{height:'calc(100vh - 180px)'}}>
+        <div style={{height:'calc(100vh - 140px)'}}>
           <DataGrid
             rows={filteredRows.slice((page - 1) * pageSize, page * pageSize)}
             columns={columnsWithFilter}
