@@ -15,7 +15,7 @@ const ViewComponent = ({ formData, pageSchema }) => {
   };
 
   return (
-    <Box sx={{ padding: 2, backgroundColor: '#fff', borderRadius: 2, boxShadow: 1 }}>
+    <Box sx={{ padding: 2, backgroundColor: '#fff', }}>
       <Box sx={{ display: 'flex', flexWrap: 'wrap' }}>
         {pageSchema.map((field) => (
           <Box

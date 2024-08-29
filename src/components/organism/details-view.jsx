@@ -44,17 +44,17 @@ const DetailsPage = ({ endpoint }) => {
   };
 
   return (
-    <div style={{ width: '45%' , background: '#0d2d4e', borderRadius: '10px', color: '#FFFFFF', height: '70vh' }}>
+    <div style={{ width: '45%' , background: '#0d2d4e', borderRadius: '10px', color: '#FFFFFF' }}>
         
     
-      <div style={{ display: 'flex', height: '-webkit-fill-available', overflow: 'hidden' }}>
+      <div style={{ display: 'flex', height: '-webkit-fill-available' }}>
       
           <div>
           <Box sx={{ p: 3 }}>
       <Typography variant="h4" gutterBottom>
         Edit User
       </Typography>
-      <form style={{background:'white', padding:'15px', borderRadius:'10px', height:'50vh', overflow:'auto'}} onSubmit={handleSave}>
+      <form style={{background:'white', padding:'15px', borderRadius:'10px'}} onSubmit={handleSave}>
         {Object.entries(formState).map(([key, value]) => (
           key !== "_id" && (
             <TextField
