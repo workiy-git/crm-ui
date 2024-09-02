@@ -39,6 +39,7 @@
     overflow-x: hidden;
     width: 80%;
     margin-left: 40px;
+    overflow: auto;
   }
   
   .menu-selectedTextItem {

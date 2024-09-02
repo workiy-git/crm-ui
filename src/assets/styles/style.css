@@ -108,3 +108,16 @@
       width: 125px !important;
     }
   }
+
+  .edit-field-input [type="date"], .edit-field-input [type="datetime-local"]{
+    cursor: pointer;
+}
+.valuefield [type="date"], .valuefield [type="datetime-local"]{
+  cursor: pointer;
+}
+.details-page-btns{
+  background-color: #DEDEDE !important;
+  color: black !important;
+  padding: 0 !important;
+  min-width: 70px !important;
+}
