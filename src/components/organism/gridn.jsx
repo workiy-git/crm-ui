@@ -303,6 +303,47 @@ const fetchGridData = async (filter) => {
         state: { pageName, mode },
     });
 };
+
+const handleViewReport = async () => {
+  if (!selectedRow) return;
+
+  try {
+    // Fetch the app data using the ID from the selected row
+    const reportId = selectedRow._id;
+    const reportResponse = await axios.get(
+      `${config.apiUrl.replace(/\/$/, "")}/appdata/${reportId}`
+    );
+    
+    const reportData = reportResponse.data.data;
+    console.log('Fetched report data:', reportData);
+
+    const module = reportData.module || 'defaultModule';
+    const selectedColumns = Array.isArray(reportData.selected_columns) ? reportData.selected_columns : [];
+    const filters = Array.isArray(reportData.filter) ? reportData.filter : [];
+
+    const pipeline = [
+      { "$match": { "pageName": module } },
+      { "$project": selectedColumns.reduce((acc, column) => ({ ...acc, [column]: 1 }), {}) },
+      { "$match": filters.reduce((acc, filter) => ({ ...acc, [filter.field]: { [filter.condition]: filter.value } }), {}) }
+    ];
+
+    console.log('Pipeline array:', pipeline);
+
+    // Ensure the pipeline is sent directly as an array
+    const appDataResponse = await axios.post(
+      `${config.apiUrl.replace(/\/$/, "")}/appdata/retrieve`,
+      pipeline,  // Send the pipeline array directly
+      { headers: { 'Content-Type': 'application/json' } }
+    );
+    
+    const filteredData_reportId = appDataResponse.data.data; // Store the fetched data
+    console.log('Fetched app data:', filteredData_reportId);
+
+  } catch (error) {
+    console.error('Error fetching report data:', error);
+  }
+};
+
   const [selectedRows, setSelectedRows] = useState([]);  
   const isAllSelected = selectedRows.length === filteredRows.length && filteredRows.length > 0;
 
@@ -360,7 +401,9 @@ const fetchGridData = async (filter) => {
         handleMenuClose={handleMenuClose} 
         handleNavigate={handleNavigate} 
         handleDeleteClick={handleDeleteClick} 
-        selectedRow={selectedRow} 
+        selectedRow={selectedRow}
+        pageName={pageName} 
+        onViewReport={handleViewReport}
       />
         </div>
       ),
