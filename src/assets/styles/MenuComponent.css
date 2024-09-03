@@ -37,7 +37,7 @@
     flex-direction: row;
     align-items: center;
     overflow-x: hidden;
-    width: 80%;
+    width: 90%;
     margin-left: 40px;
     overflow: auto;
   }

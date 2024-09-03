@@ -428,6 +428,7 @@ const WidgetsList = ({ dashboardName }) => {
             </div>
           )}
         </div>
+        <div style={{ display: 'flex', flexWrap: 'wrap' }}>
         {widgets.length > 0 ? widgets.map((widget, index) => (
           <div
             className={`widget-${index} widget-main`}
@@ -437,7 +438,7 @@ const WidgetsList = ({ dashboardName }) => {
             onDragStart={() => handleDragStart(index)}
             onDragEnter={() => handleDragEnter(index)}
             onDragEnd={() => handleDragEnd(index)}
-            style={{ width: '190px', height: 'auto', margin: '20px 10px', float: 'left' }}
+            style={{ width: '190px', height: 'auto', margin: '20px 10px' }}
           >
             <div style={{ textAlign: 'end', marginBottom: '-25px', marginRight: '10px' }}>
               <button className='widget-hide-btn' style={{ position: 'relative', border: 'none', background: 'white', borderRadius: '100px', cursor: 'pointer' }} onClick={() => handleHideWidget(index)}>-</button>
@@ -445,6 +446,7 @@ const WidgetsList = ({ dashboardName }) => {
             <CreateWidget widget={widget} dashboardName={dashboardName} />
           </div>
         )) : <div></div>}
+        </div>
       </Box>
     </ScrollContainer>
   );

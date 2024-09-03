@@ -14,6 +14,8 @@ const ViewComponent = ({ formData, pageSchema }) => {
     return value || 'N/A';
   };
 
+
+
   return (
     <Box sx={{ padding: 2, backgroundColor: '#fff', }}>
       <Box sx={{ display: 'flex', flexWrap: 'wrap' }}>
