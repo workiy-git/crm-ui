@@ -673,14 +673,14 @@ const CreateWidget = ({ widget, dashboardName }) => {
   };
 
   return (
-    <Box style={{ width: '190px', height: 'auto', margin: '20px 10px', float: 'left' }}>
+    <Box style={{ width: '190px', height: 'auto', float: 'left' }}>
       <CreateWidgetItem onClick={handleWidgetClick}>
         <div style={{ padding: '20px 10px', backgroundColor: 'rgba(245, 189, 113, 0.25)', borderRadius: '25px' }}>
           <Title style={{ fontSize: '12px' }}>{widget.title}</Title>
           <div style={{ borderBottom: '1px solid black', margin: '5px auto 10px auto', width: '60px' }}></div>
           <Icon sx={{margin:'auto'}}>
             <div style={{ background: '#fff6', borderRadius: '100px', padding: '10px', margin: 'auto', display: 'flex' }}>
-              <img style={{ height: '20px', width: 'auto', margin: 'auto' }} src={widget.icon_url || 'default_icon_url'} alt={widget.title} />
+              <img style={{ height: '20px', width: 'auto', margin: 'auto' }} src={widget.icon_url || 'default_icon_url'} alt={widget.title} draggable="false" />
             </div>
           </Icon>
         </div>

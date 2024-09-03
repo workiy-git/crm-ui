@@ -439,7 +439,7 @@ const WidgetsList = ({ dashboardName }) => {
             onDragEnd={() => handleDragEnd(index)}
             style={{ width: '190px', height: 'auto', margin: '20px 10px', float: 'left' }}
           >
-            <div style={{ textAlign: 'end', marginBottom: '-45px', marginRight: '0px' }}>
+            <div style={{ textAlign: 'end', marginBottom: '-25px', marginRight: '10px' }}>
               <button className='widget-hide-btn' style={{ position: 'relative', border: 'none', background: 'white', borderRadius: '100px', cursor: 'pointer' }} onClick={() => handleHideWidget(index)}>-</button>
             </div>
             <CreateWidget widget={widget} dashboardName={dashboardName} />

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { Box, Button, Stack } from '@mui/material';
+import { Typography } from '@mui/material';
 import axios from 'axios';
 import config from '../../config/config';
 import EditComponent from '../organism/edit';
@@ -12,6 +13,7 @@ import Tab from '../organism/details-tab';
 import Whatsapp from '../molecules/whatsapp';
 import Email from '../molecules/email';
 import Sms from '../molecules/sms';
+import KeyboardReturnIcon from '@mui/icons-material/KeyboardReturn';
 import '../../assets/styles/style.css';
 
 const DetailsPage = () => {
@@ -249,23 +251,28 @@ const DetailsPage = () => {
                 marginRight: "5%",
               }}
             >
-              <Button>
+              {pageName !== 'users' && (
               <Whatsapp formData={formData}/>
-              </Button>
-              <Button>
+              )}
+
+              {pageName !== 'users' && (
               <Email formData={formData}/>
-              </Button>
-              {/* <Button>
+              )}
+
+              {/* {pageName !== 'users' && (
               <Sms formData={formData}/>
-              </Button> */}
-              <Button
+              )} */}
+              
+              {/* <Button
                 variant="contained"
-                color="primary"
                 style={{margin:'5px'}}
                 onClick={() => navigate(`/container/${pageName}`)}
               >
-                Back
-              </Button>
+                <KeyboardReturnIcon /> Back
+              </Button> */}
+              <Button onClick={() => navigate(`/container/${pageName}`)} style={{ display: 'flex', alignItems: 'center', color:'black', background: 'rgba(255, 255, 255, 0.4)' }}>
+                <KeyboardReturnIcon style={{ color: 'black', marginRight:'10px' }} /><Typography >Back</Typography>   
+            </Button>
             </Box>
             
           </div>
@@ -306,6 +313,7 @@ const DetailsPage = () => {
                 >
                 {(!isAdding)  && pageName !== 'users' && (
                 <Button
+                  className="details-page-btns"
                   variant="contained"
                   color="primary"
                   // onClick={handleAddNew}
@@ -319,6 +327,7 @@ const DetailsPage = () => {
           
               {!isAdding && !isEditing && (
                 <Button
+                className="details-page-btns"
                   variant="contained"
                   color="primary"
                   // onClick={() => setIsEditing(true)}
@@ -331,6 +340,7 @@ const DetailsPage = () => {
               )}
               {(isEditing || isAdding) && (
                 <Button
+                className="details-page-btns"
                   variant="contained"
                   color="primary"
                   onClick={handleSave}
@@ -342,6 +352,7 @@ const DetailsPage = () => {
               )}
               {(!isAdding)  && pageName !== 'users' &&(
               <Button
+              className="details-page-btns"
                 variant="contained"
                 color="error"
                 onClick={handleOpenDialog}
@@ -352,9 +363,11 @@ const DetailsPage = () => {
               )}
               {(isAdding || isEditing)  && (
               <Button
+              className="details-page-btns"
                 variant="contained"
                 color="error"
                 onClick={() => navigate(-1)}
+                style={{margin:'5px'}}
               >
                 Cancel
               </Button>

@@ -200,6 +200,7 @@ const SideMenu = () => {
               isHorizontal ? 'sidemenu-menu-item-horizontal' : 'sidemenu-menu-item-vertical'
             }`}
             onClick={handleMoreClick}
+            style={{cursor:'pointer'}}
           >
             <MoreHorizIcon sx={{ color: 'white', fontSize: 'x-large' }} />
             <Text variant="body2" className="sidemenu-typography">
