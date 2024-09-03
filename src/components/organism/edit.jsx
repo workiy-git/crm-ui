@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useImperativeHandle, forwardRef  } from 'react';
 import { Box, TextField, Select, MenuItem, FormControl, Checkbox, FormControlLabel } from '@mui/material';
 import axios from 'axios';
 import config from '../../config/config';
 import '../../assets/styles/style.css';
 
-const EditComponent = ({ id, pageSchema, formData, setFormData, onSaveSuccess, onSaveError, pageName, pageID }) => {
+const EditComponent = forwardRef(({ id, pageSchema, formData, setFormData, onSaveSuccess, onSaveError, pageName, pageID }, ref) => {
   const [validationError, setValidationError] = useState('');
   const [formErrors, setFormErrors] = useState({});
   
@@ -42,6 +42,10 @@ const EditComponent = ({ id, pageSchema, formData, setFormData, onSaveSuccess, o
     }
     return !hasErrors;
   };
+  
+  useImperativeHandle(ref, () => ({
+    validateForm,
+  }));
 
   const handleSave = async () => {
     if (!validateForm()) {
@@ -69,11 +73,16 @@ const EditComponent = ({ id, pageSchema, formData, setFormData, onSaveSuccess, o
     }
   };
 
+  useImperativeHandle(ref, () => ({
+    validateForm,
+  }));
+
   const renderInputField = (field) => {
     const isFileInput = field.type === 'file';
     const value = !isFileInput && (formData[field.fieldName] === 'N/A' ? '' : formData[field.fieldName] || '');
     const isError = formErrors[field.fieldName];
     const label = `${field.label || field.fieldName}${field.required ? ' *' : ''}`;
+    const isRequired = field.required === 'true';
 
     const commonProps = {
       name: field.fieldName,
@@ -82,6 +91,7 @@ const EditComponent = ({ id, pageSchema, formData, setFormData, onSaveSuccess, o
       onChange: handleInputChange,
       error: !!isError,
       helperText: isError && formErrors[field.fieldName],
+      ...(isRequired && { required: true }) // Add the required property if isRequired is true
     };
 
     if (!isFileInput) {
@@ -224,10 +234,10 @@ const EditComponent = ({ id, pageSchema, formData, setFormData, onSaveSuccess, o
 
   return (
     <Box style={{display:'flex', flexWrap: 'wrap' }}>
+      {/* {validationError && <div style={{ color: 'red', position:'absolute' }}>{validationError}</div>} */}
       {pageSchema.map((field) => renderInputField(field))}
-      {validationError && <div style={{ color: 'red' }}>{validationError}</div>}
     </Box>
   );
-};
+});
 
 export default EditComponent;

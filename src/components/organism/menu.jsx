@@ -90,7 +90,7 @@ const MenuComponent = ({ backgroundColor, onSaveSelectedText }) => {
                     boxShadow: 'none',
                     borderRadius: selectedButtonIndex === index ? '15px' : '',
                     width: 'max-content',
-                    padding: '3px 0px'
+                    padding: selectedButtonIndex === index ? '3px 5px' : '0px',
                   }}
                 >
                   {text.title}

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { Box, Button, Stack } from '@mui/material';
 import { Typography } from '@mui/material';
@@ -33,6 +33,8 @@ const DetailsPage = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [initialFormData, setInitialFormData] = useState({});
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const editComponentRef = useRef(null);
+  
 
 
   const initializeFormData = useCallback((data, schema) => {
@@ -165,45 +167,64 @@ const DetailsPage = () => {
   const handleSave = async () => {
     if (!formData) return;
 
-    // Check if formData has changed from initialFormData
-  if (JSON.stringify(formData) === JSON.stringify(initialFormData)) {
-    handleSaveError("No changes detected. Nothing to save.");
-    return;
-  }
-   // Check if all fields are empty in Add mode
-   if (isAdding && Object.values(formData).every(value => value === "")) {
-    handleSaveError("No data provided. Please fill in the form before submitting.");
-    return;
-  }
-  
-    try {
-      const dataToSend = { pageName, pageId, ...formData };
-      pageSchema.forEach((field) => {
-        if (!dataToSend.hasOwnProperty(field.fieldName)) {
-          dataToSend[field.fieldName] = "";  // Set default empty value
-        }
-      });
-  
-      if (isAdding) {
-        await axios.post(`${config.apiUrl}/appdata/create`, dataToSend);
-        handleSaveSuccess("Data Added successfully!");
-      
-        // Use setTimeout with a callback function to navigate after 2000ms
-        setTimeout(() => {
-          navigate(`/container/${pageName}`);
-        }, 2000); // 2000ms delay
-      } else {
-        await axios.put(`${config.apiUrl}/appdata/${id}`, dataToSend);
-        handleSaveSuccess("Data saved successfully!");
-        window.scrollTo({ top: 0, behavior: "smooth" });
-      }
-  
-      
-    } catch (error) {
-      handleSaveError("Error saving data.");
-      console.error("Error saving data:", error);
+    // Perform validation
+    if (editComponentRef.current && !editComponentRef.current.validateForm()) {
+      handleSaveError("Please fix the validation errors before saving.");
+      return;
     }
-  };  
+
+    try {
+      const response = await axios.put(`${config.apiUrl}/appdata/${id}`, formData);
+      if (response.status === 200) {
+        handleSaveSuccess("Data updated successfully!");
+      }
+    } catch (err) {
+      handleSaveError("Failed to save data. Please try again.");
+    }
+  };
+
+  // const handleSave = async () => {
+  //   if (!formData) return;
+
+  //   // Check if formData has changed from initialFormData
+  // if (JSON.stringify(formData) === JSON.stringify(initialFormData)) {
+  //   handleSaveError("No changes detected. Nothing to save.");
+  //   return;
+  // }
+  //  // Check if all fields are empty in Add mode
+  //  if (isAdding && Object.values(formData).every(value => value === "")) {
+  //   handleSaveError("No data provided. Please fill in the form before submitting.");
+  //   return;
+  // }
+  
+  //   try {
+  //     const dataToSend = { pageName, pageId, ...formData };
+  //     pageSchema.forEach((field) => {
+  //       if (!dataToSend.hasOwnProperty(field.fieldName)) {
+  //         dataToSend[field.fieldName] = "";  // Set default empty value
+  //       }
+  //     });
+  
+  //     if (isAdding) {
+  //       await axios.post(`${config.apiUrl}/appdata/create`, dataToSend);
+  //       handleSaveSuccess("Data Added successfully!");
+      
+  //       // Use setTimeout with a callback function to navigate after 2000ms
+  //       setTimeout(() => {
+  //         navigate(`/container/${pageName}`);
+  //       }, 2000); // 2000ms delay
+  //     } else {
+  //       await axios.put(`${config.apiUrl}/appdata/${id}`, dataToSend);
+  //       handleSaveSuccess("Data saved successfully!");
+  //       window.scrollTo({ top: 0, behavior: "smooth" });
+  //     }
+  
+      
+  //   } catch (error) {
+  //     handleSaveError("Error saving data.");
+  //     console.error("Error saving data:", error);
+  //   }
+  // };  
   const handleNavigate = (mode) => {
     if (rowData) {
         navigate(`/${pageName}/${mode}/${rowData._id}`, {
@@ -389,6 +410,7 @@ const DetailsPage = () => {
                   )}
                   {isAdding ? (
                     <AddComponent
+                      ref={editComponentRef}
                       formData={formData}
                       setFormData={setFormData}
                       pageSchema={pageSchema}
@@ -399,14 +421,15 @@ const DetailsPage = () => {
                     />
                   ) : isEditing ? (
                     <EditComponent
+                      ref={editComponentRef}
                       id={id}
+                      pageSchema={pageSchema}
                       formData={formData}
                       setFormData={setFormData}
-                      pageSchema={pageSchema}
                       onSaveSuccess={handleSaveSuccess}
                       onSaveError={handleSaveError}
                       pageName={pageName}
-                      pageId={pageId}
+                      pageID={pageId}
                     />
                   ) : (
                     <ViewComponent

@@ -81,12 +81,13 @@
   }
 
   .edit-field-input input, .edit-field-input .css-11u53oe-MuiSelect-select-MuiInputBase-input-MuiOutlinedInput-input, .valuefield input, .valuefield .css-11u53oe-MuiSelect-select-MuiInputBase-input-MuiOutlinedInput-input{
-    padding: 8px 10px;
+    padding: 8px 10px !important;
+    height: 20px !important;
   }
   .edit-field-input-select{
     display: flex !important;
     flex-direction: column !important;
-    padding: 7px !important;
+    /* padding: 7px !important; */
   }
 
   .valuefield{
