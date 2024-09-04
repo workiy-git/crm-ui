@@ -33,7 +33,10 @@ const DetailsPage = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [initialFormData, setInitialFormData] = useState({});
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const [isCancelDialogOpen, setIsCancelDialogOpen] = useState(false);
   const editComponentRef = useRef(null);
+  const [currentPage, setCurrentPage] = useState([]);
+
   
 
 
@@ -57,6 +60,7 @@ const DetailsPage = () => {
         const currentPage = fetchedWebformsData.find(
           (page) => page.pageName === pageName
         );
+        setCurrentPage(currentPage)
         if (!currentPage) {
           setError(`Page ${pageName} not found in webforms collection.`);
           return;
@@ -85,6 +89,7 @@ const DetailsPage = () => {
 
     fetchWebformsData();
   }, [id, rowData, pageName, initializeFormData]);
+
   useEffect(() => {
     const hasChanges = JSON.stringify(formData) !== JSON.stringify(initialFormData);
     setHasUnsavedChanges(hasChanges);
@@ -172,6 +177,11 @@ const DetailsPage = () => {
       handleSaveError("Please fix the validation errors before saving.");
       return;
     }
+    // Check if formData has changed from initialFormData
+    if (JSON.stringify(formData) === JSON.stringify(initialFormData)) {
+      handleSaveError("No changes detected. Nothing to save.");
+      return;
+    }
 
     try {
       const response = await axios.put(`${config.apiUrl}/appdata/${id}`, formData);
@@ -225,6 +235,35 @@ const DetailsPage = () => {
   //     console.error("Error saving data:", error);
   //   }
   // };  
+  // Handle Cancel with Unsaved Changes Confirmation
+  const handleCancel = () => {
+    if (hasUnsavedChanges) {
+      setIsCancelDialogOpen(true);
+    } else {
+      navigate(-1);
+    }
+  };  
+  
+  const handleAdd = () => {
+    if (hasUnsavedChanges) {
+      setIsCancelDialogOpen(true);
+    } else {
+      handleadd("add")
+      // navigate(-1);
+    }
+  };
+
+
+
+  const handleConfirmCancel = () => {
+    setIsCancelDialogOpen(false);
+    navigate(-1);
+  };
+
+  const handleCloseCancelDialog = () => {
+    setIsCancelDialogOpen(false);
+  };
+
   const handleNavigate = (mode) => {
     if (rowData) {
         navigate(`/${pageName}/${mode}/${rowData._id}`, {
@@ -338,7 +377,8 @@ const DetailsPage = () => {
                   variant="contained"
                   color="primary"
                   // onClick={handleAddNew}
-                  onClick={() => handleadd("add")}
+                  // onClick={() => handleadd("add")}
+                onClick={handleAdd}
                   style={{margin:'5px'}}
                 >
                   Add
@@ -387,7 +427,8 @@ const DetailsPage = () => {
               className="details-page-btns"
                 variant="contained"
                 color="error"
-                onClick={() => navigate(-1)}
+                // onClick={() => navigate(-1)}
+                onClick={handleCancel}
                 style={{margin:'5px'}}
               >
                 Cancel
@@ -422,6 +463,7 @@ const DetailsPage = () => {
                   ) : isEditing ? (
                     <EditComponent
                       ref={editComponentRef}
+                      current={currentPage}
                       id={id}
                       pageSchema={pageSchema}
                       formData={formData}
@@ -455,6 +497,13 @@ const DetailsPage = () => {
         content="Are you sure you want to delete this item?"
         onConfirm={handleConfirmDelete}
         onCancel={handleCloseDialog}
+      />
+       <ConfirmationDialog
+        open={isCancelDialogOpen}
+        title="Unsaved Changes"
+        content="You have unsaved changes. Are you sure you want to cancel?"
+        onCancel={handleCloseCancelDialog}
+        onConfirm={handleConfirmCancel}
       />
     </div>
   );

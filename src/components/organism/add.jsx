@@ -91,14 +91,14 @@ const AddComponent = forwardRef(({ formData, setFormData, pageSchema, onSaveSucc
         return (
           <FormControl key={field.fieldName} style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', width: '50%' }} error={!!isError}>
             <label style={{ width: '40%', textAlign: 'left' }}>{label}</label>
-            <TextField className='valuefield' {...commonProps} type={field.type || 'text'} />
+            <TextField className='valuefield edit-field-input' {...commonProps} type={field.type || 'text'} />
           </FormControl>
         );
       case 'select':
         return (
           <FormControl key={field.fieldName} style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', width: '50%' }} error={!!isError}>
             <label style={{ width: '40%', textAlign: 'left' }}>{label}</label>
-            <Select className='valuefield' {...commonProps} displayEmpty>
+            <Select className='valuefield edit-field-input' {...commonProps} displayEmpty>
               <MenuItem value="">
                 <em>{field.placeholder || 'Select an option'}</em>
               </MenuItem>
@@ -116,17 +116,17 @@ const AddComponent = forwardRef(({ formData, setFormData, pageSchema, onSaveSucc
           <FormControlLabel
             key={field.fieldName}
             control={
-              <Checkbox name={field.fieldName} checked={formData[field.fieldName] || false} onChange={handleInputChange} />
+              <Checkbox className='edit-field-input' name={field.fieldName} checked={formData[field.fieldName] || false} onChange={handleInputChange} />
             }
             label={label}
-            style={{ width: '50%' }}
+            style={{ width: '50%', margin:'0' }}
           />
         );
       default:
         return (
           <FormControl key={field.fieldName} style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', width: '50%' }} error={!!isError}>
             <label style={{ width: '40%', textAlign: 'left' }}>{label}</label>
-            <TextField className='valuefield' {...commonProps} />
+            <TextField className='valuefield edit-field-input' {...commonProps} />
           </FormControl>
         );
     }

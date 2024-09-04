@@ -368,6 +368,7 @@ const handleViewReport = async () => {
       sortable: false,
       renderCell: (params) => (
         <Checkbox
+        style={{padding:"0"}}
           checked={selectedRows.includes(params.id)}
           onChange={(event) =>
             handleRowSelection(params.id, event.target.checked)
@@ -387,6 +388,7 @@ const handleViewReport = async () => {
             onClick={(event) => {
               event.stopPropagation(); // Prevent checkbox selection
               handleMenuOpen(event, params.row); // Open the menu
+              
             }}
             onContextMenu={(event) => {
               event.stopPropagation(); // Prevent checkbox selection
@@ -774,6 +776,9 @@ const handleViewReport = async () => {
             // columnHeaderHeight={35}
             className="custom-data-grid-main"
             getRowHeight={() => 35}
+            onRowDoubleClick={(params) => {
+              handleNavigate("view", params.row); // Calls handleNavigate with "view" mode
+            }}
           />
         </div>
       )}

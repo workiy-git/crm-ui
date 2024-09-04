@@ -4,7 +4,7 @@ import axios from 'axios';
 import config from '../../config/config';
 import '../../assets/styles/style.css';
 
-const EditComponent = forwardRef(({ id, pageSchema, formData, setFormData, onSaveSuccess, onSaveError, pageName, pageID }, ref) => {
+const EditComponent = forwardRef(({ current, id, pageSchema, formData, setFormData, onSaveSuccess, onSaveError, pageName, pageID }, ref) => {
   const [validationError, setValidationError] = useState('');
   const [formErrors, setFormErrors] = useState({});
   
@@ -22,16 +22,26 @@ const EditComponent = forwardRef(({ id, pageSchema, formData, setFormData, onSav
     const fieldValue = type === 'checkbox' ? checked : value;
     setFormData((prevData) => ({ ...prevData, [name]: fieldValue }));
   };
-
+  console.log("currentPage", current)
   const validateForm = () => {
     let hasErrors = false;
     const errors = {};
 
     pageSchema.forEach((field) => {
+      const fieldValue = formData[field.fieldName];
+      
       if (field.required && (!formData[field.fieldName] || formData[field.fieldName] === 'N/A')) {
-        errors[field.fieldName] = `${field.label || field.fieldName} is mandatory`;
+        errors[field.fieldName] = `${field.requiredMessage}`;
         hasErrors = true;
       }
+       // Pattern validation
+    if (field.pattern && fieldValue) {
+      const regex = new RegExp(field.pattern);
+      if (!regex.test(fieldValue)) {
+        errors[field.fieldName] = field.validationMessage;
+        hasErrors = true;
+      }
+    }
     });
 
     setFormErrors(errors);
@@ -94,9 +104,15 @@ const EditComponent = forwardRef(({ id, pageSchema, formData, setFormData, onSav
       ...(isRequired && { required: true }) // Add the required property if isRequired is true
     };
 
+    const inputProps = {
+      ...(isFileInput ? {} : { value }),
+      ...(field.pattern && { pattern: field.pattern }), // Apply pattern if provided
+    };
+
     if (!isFileInput) {
       commonProps.value = value;
     }
+    
 
     switch (field.htmlControl) {
       case 'input':
@@ -130,7 +146,7 @@ const EditComponent = forwardRef(({ id, pageSchema, formData, setFormData, onSav
                 fontSize: '12px',
               }}
               type={field.type || 'text'}
-              inputProps={isFileInput ? {} : undefined} // Ensure no 'value' prop on file input
+              inputProps={inputProps}
             />
           </FormControl>
         );

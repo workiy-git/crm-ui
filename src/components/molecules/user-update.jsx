@@ -330,8 +330,11 @@ const Updates = ({ mode }) => {
                             sx={{ margin: 'auto' }}
                           />
                         </div>
-                        <Typography variant="body2" color="text.primary" sx={{ marginRight: 1,fontSize:'13px' }}>
+                        {/* <Typography variant="body2" color="text.primary" sx={{ marginRight: 1,fontSize:'13px' }}>
                           {action} {userData.username} : made the following changes:
+                        </Typography> */}
+                        <Typography variant="body2" color="text.primary" sx={{ marginRight: 1,fontSize:'13px' }}>
+                          <span style={{fontWeight:'bold'}}>{userData.first_name} {userData.last_name} </span>: made the following changes:
                         </Typography>
                       </Box>
                     </ListItem>
