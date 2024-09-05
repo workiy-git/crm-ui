@@ -521,9 +521,9 @@
   width: 50px !important;
   min-width: 50px !important;
 } */
-.custom-data-grid-main .MuiDataGrid-columnHeader[aria-colindex="1"] .MuiDataGrid-menuIcon, .custom-data-grid-main .MuiDataGrid-columnHeader[aria-colindex="2"] .MuiDataGrid-menuIcon {
+/* .custom-data-grid-main .MuiDataGrid-columnHeader[aria-colindex="1"] .MuiDataGrid-menuIcon, .custom-data-grid-main .MuiDataGrid-columnHeader[aria-colindex="2"] .MuiDataGrid-menuIcon {
   display: none;
-}
+} */
 .grid_search input{
   padding: 0;
 }
