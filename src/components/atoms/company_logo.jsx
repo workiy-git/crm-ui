@@ -30,16 +30,19 @@ function Companylogo() {
         // borderRight: '3px dashed gray',
         borderRadius: '0',
         background: 'white',
+        padding:'2px 10px 1px 2px'
+        ,height:'55px'
       };
     const logoHeightStyle = {
-        height: '100%',
+        height: '100%'
       };
 
     return (
         <div>
                 <div>
                     <Box sx={{ display: 'flex'  }}>
-                    <IconButton size="large" color="inherit" style={dashedBorderStyle} sx={{  marginLeft:'25px',height:'50px', background:'white' }}>
+                    <IconButton size="large" color="inherit" style={dashedBorderStyle} sx={{ 
+       }}>
                     <img alt="" src={companylogoData.business_logo}  style={logoHeightStyle}/>
                     </IconButton>
                     {/* <IconButton size="large" color="inherit" sx={{  height:{xs : '50px', md :'70px'} }}> 

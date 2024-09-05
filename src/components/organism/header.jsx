@@ -70,7 +70,7 @@ const Header = () => {
                 <Notification />
               </Badge>
             </Box>
-            <Companylogo  style={{background:'white'}}/>
+            <Companylogo/>
           </Box>
         </Toolbar>
       </div>

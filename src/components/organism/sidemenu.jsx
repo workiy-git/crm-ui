@@ -34,7 +34,7 @@ const SideMenu = () => {
   const maxVerticalItems = 7;
   const maxHorizontalItems = 7;
   const [expandicon, setexpandicon] = useState(null); // Initialize as null to handle loading state
-  
+  const [selectedExpandicon, setselectedExpandicon] = useState(null); 
   useEffect(() => {
     const initializeState = async () => {
       const savedIsHorizontal = sessionStorage.getItem('isHorizontal') === 'true';
@@ -84,11 +84,18 @@ const SideMenu = () => {
       const fetchMenuExpanderIcon = async () => {
         try {
           const response = await axios.get(`${config.apiUrl}/menus/menu_bar`);
+          
+          // Set the expander icon
           setexpandicon(response.data.data.menu_expander.icon);
+          
+          // Set the selected expand icon
+          setselectedExpandicon(response.data.data.menu_expander.selectedicon);
+          
         } catch (error) {
           console.error('Error fetching data:', error);
         }
       };
+      
 
       fetchMenuData();
       fetchMenuExpanderIcon();
@@ -110,7 +117,9 @@ const SideMenu = () => {
       return newState;
     });
   };
-
+  
+  // Define your icons for expanded and selected states
+  const expandIcon = isHorizontal ? selectedExpandicon : expandicon;
   const handleMoreClick = () => {
     setAvailableMenuItems(menuItems.filter(item => !selectedMenuItems.some(selected => selected.title === item.title)));
     setOpen(true);
@@ -148,13 +157,16 @@ const SideMenu = () => {
       <WorkiyLogo value={isHorizontal ? 'max-logo' : 'min-logo'} />
       <MyProfile value={isHorizontal ? 'username-display' : 'username-hide'} />
       <div style={{ display: 'flex', justifyContent: 'end' }}>
-        <button style={{ border: 'none', background: 'none', cursor: 'pointer' }} onClick={handleButtonClick}>
-          <img
-            style={{ height: '20px', margin: '10px 10px 15px auto', filter: 'brightness(0) invert(1)' }}
-            src={expandicon}
-            alt=""
-          />
-        </button>
+      <button 
+  style={{ border: 'none', background: 'none', cursor: 'pointer' }} 
+  onClick={handleButtonClick}
+>
+  <img
+    style={{ height: '20px', margin: '10px 10px 15px auto', filter: 'brightness(0) invert(1)' }}
+    src={expandIcon}
+    alt="Expand"
+  />
+</button>
       </div>
       <div className="sidemenu-profile-container">
         {displayedMenuItems.map((menuItem, index) => {
