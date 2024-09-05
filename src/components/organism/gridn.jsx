@@ -195,6 +195,7 @@ const GridComponent = ({ pageName }) => {
     fetchGridData(filter); // Fetch grid data for the selected option
     setPage(1);
   };
+  
   // Fetch grid data based on the selected filter
 const fetchGridData = async (filter) => {
   try {
@@ -210,7 +211,10 @@ const fetchGridData = async (filter) => {
     setTotalRows(dataWithIds.length);
 
     if (response.data.data.length > 0) {
-      const dynamicColumns = Object.keys(dataWithIds[0]).map((key) => ({
+      const dynamicColumns = Object.keys(dataWithIds[0])
+      .filter((key) => key !== "PageId" && key !== "pageName" &&  key !== "_id" && key !== "appdata" && key !== "history" 
+      && key !== "id" && key !== "comments" && key !== "pageID")
+      .map((key) => ({
         field: key,
         headerName: key
           .replace(/_/g, " ")
@@ -366,6 +370,7 @@ const handleViewReport = async () => {
         </div>
       ),
       sortable: false,
+      disableColumnMenu: true,
       renderCell: (params) => (
         <Checkbox
         style={{padding:"0"}}
@@ -380,6 +385,7 @@ const handleViewReport = async () => {
       field: "actions",
       headerName: "",
       sortable: false,
+      disableColumnMenu: true,
       width: 20,
       renderCell: (params) => (
         
@@ -409,6 +415,7 @@ const handleViewReport = async () => {
       />
         </div>
       ),
+      
     },
     ...columns.map((column) => ({
       ...column,
