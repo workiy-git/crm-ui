@@ -1,44 +1,77 @@
-import React, { useState, useEffect, useImperativeHandle, forwardRef  } from 'react';
+import React, { useState, useEffect, useImperativeHandle, forwardRef } from 'react';
 import { Box, TextField, Select, MenuItem, FormControl, Checkbox, FormControlLabel } from '@mui/material';
 import axios from 'axios';
 import config from '../../config/config';
 
 const AddComponent = forwardRef(({ formData, setFormData, pageSchema, onSaveSuccess, onSaveError, pageName, pageId }, ref) => {
-  const handleInputChange = (event) => {
-    const { name, value, type, checked } = event.target;
-    const fieldValue = type === 'checkbox' ? checked : value;
-    setFormData((prevData) => ({ ...prevData, [name]: fieldValue }));
-  };
   const [validationError, setValidationError] = useState('');
   const [formErrors, setFormErrors] = useState({});
+
+  useEffect(() => {
+    if (!formData) {
+      setFormData({});
+    }
+  }, [formData, setFormData]);
+
+  const validateField = (fieldName, value) => {
+    const fieldSchema = pageSchema.find(field => field.fieldName === fieldName);
+    let error = "";
+
+    if (!fieldSchema) return "";
+
+    if (fieldSchema.required && !value) {
+      error = `${fieldSchema.label || fieldName} is required.`;
+    }
+
+    if (fieldSchema.pattern && value) {
+      const regex = new RegExp(fieldSchema.pattern);
+      if (!regex.test(value)) {
+        error = `${fieldSchema.validationMessage || 'Invalid value'}`;
+      }
+    }
+
+    return error;
+  };
 
   const validateForm = () => {
     let hasErrors = false;
     const errors = {};
 
     pageSchema.forEach((field) => {
-      if (field.required && (!formData[field.fieldName] || formData[field.fieldName] === 'N/A')) {
-        errors[field.fieldName] = `${field.label || field.fieldName} is mandatory`;
+      const fieldValue = formData[field.fieldName];
+      const error = validateField(field.fieldName, fieldValue);
+      if (error) {
+        errors[field.fieldName] = error;
         hasErrors = true;
       }
     });
 
     setFormErrors(errors);
-    if (hasErrors) {
-      setValidationError('Please fill all mandatory fields');
-    } else {
-      setValidationError('');
-    }
+    setValidationError(hasErrors ? 'Please fill all mandatory fields correctly' : '');
     return !hasErrors;
   };
-  
+
+  const handleInputChange = (event) => {
+    const { name, value, type, checked } = event.target;
+    const fieldValue = type === 'checkbox' ? checked : value;
+
+    // Update form data and validate
+    setFormData((prevData) => {
+      const newData = { ...prevData, [name]: fieldValue };
+      // Validate this field only
+      const error = validateField(name, fieldValue);
+      setFormErrors((prevErrors) => ({ ...prevErrors, [name]: error }));
+      return newData;
+    });
+  };
+
   useImperativeHandle(ref, () => ({
     validateForm,
   }));
 
   const handleSave = async () => {
     if (!validateForm()) {
-      onSaveError('Please fill all mandatory fields');
+      onSaveError('Please fill all mandatory fields correctly');
       return;
     }
 
@@ -53,19 +86,6 @@ const AddComponent = forwardRef(({ formData, setFormData, pageSchema, onSaveSucc
   };
 
   const renderInputField = (field) => {
-    // const value = formData[field.fieldName] || '';
-    // const isError = false; // Modify as necessary for error handling
-    // const label = `${field.label || field.fieldName}${field.required ? ' *' : ''}`;
-
-    // const commonProps = {
-    //   name: field.fieldName,
-    //   value: value,
-    //   placeholder: field.placeholder || 'Not Specified',
-    //   fullWidth: true,
-    //   onChange: handleInputChange,
-    //   error: !!isError,
-    //   helperText: isError && `${field.label || field.fieldName} is mandatory`,
-    // };
     const isFileInput = field.type === 'file';
     const value = !isFileInput && (formData[field.fieldName] === 'N/A' ? '' : formData[field.fieldName] || '');
     const isError = formErrors[field.fieldName];
@@ -119,7 +139,7 @@ const AddComponent = forwardRef(({ formData, setFormData, pageSchema, onSaveSucc
               <Checkbox className='edit-field-input' name={field.fieldName} checked={formData[field.fieldName] || false} onChange={handleInputChange} />
             }
             label={label}
-            style={{ width: '50%', margin:'0' }}
+            style={{ width: '50%', margin: '0' }}
           />
         );
       default:
