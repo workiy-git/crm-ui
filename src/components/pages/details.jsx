@@ -171,7 +171,7 @@ const DetailsPage = () => {
 
   const handleSave = async () => {
     if (!formData) return;
-
+    console.log("form",formData)
     // Perform validation
     if (editComponentRef.current && !editComponentRef.current.validateForm()) {
       handleSaveError("Please fix the validation errors before saving.");
@@ -182,59 +182,40 @@ const DetailsPage = () => {
       handleSaveError("No changes detected. Nothing to save.");
       return;
     }
+// Check if all fields are empty in Add mode
+if (isAdding && Object.values(formData).every(value => value === "")) {
+  handleSaveError("No data provided. Please fill in the form before submitting.");
+  return;
+}
 
-    try {
-      const response = await axios.put(`${config.apiUrl}/appdata/${id}`, formData);
-      if (response.status === 200) {
-        handleSaveSuccess("Data updated successfully!");
+  try {
+    const dataToSend = { pageName, pageId, ...formData };
+    pageSchema.forEach((field) => {
+      if (!dataToSend.hasOwnProperty(field.fieldName)) {
+        dataToSend[field.fieldName] = "";  // Set default empty value
       }
-    } catch (err) {
-      handleSaveError("Failed to save data. Please try again.");
+    });
+
+    if (isAdding) {
+      await axios.post(`${config.apiUrl}/appdata/create`, dataToSend);
+      handleSaveSuccess("Data Added successfully!");
+    
+      // Use setTimeout with a callback function to navigate after 2000ms
+      setTimeout(() => {
+        navigate(`/container/${pageName}`);
+      }, 2000); // 2000ms delay
+    } else {
+      await axios.put(`${config.apiUrl}/appdata/${id}`, dataToSend);
+      handleSaveSuccess("Data saved successfully!");
+      window.scrollTo({ top: 0, behavior: "smooth" });
     }
+
+    
+  } catch (error) {
+    handleSaveError("Error saving data.");
+    console.error("Error saving data:", error);
+  }
   };
-
-  // const handleSave = async () => {
-  //   if (!formData) return;
-
-  //   // Check if formData has changed from initialFormData
-  // if (JSON.stringify(formData) === JSON.stringify(initialFormData)) {
-  //   handleSaveError("No changes detected. Nothing to save.");
-  //   return;
-  // }
-  //  // Check if all fields are empty in Add mode
-  //  if (isAdding && Object.values(formData).every(value => value === "")) {
-  //   handleSaveError("No data provided. Please fill in the form before submitting.");
-  //   return;
-  // }
-  
-  //   try {
-  //     const dataToSend = { pageName, pageId, ...formData };
-  //     pageSchema.forEach((field) => {
-  //       if (!dataToSend.hasOwnProperty(field.fieldName)) {
-  //         dataToSend[field.fieldName] = "";  // Set default empty value
-  //       }
-  //     });
-  
-  //     if (isAdding) {
-  //       await axios.post(`${config.apiUrl}/appdata/create`, dataToSend);
-  //       handleSaveSuccess("Data Added successfully!");
-      
-  //       // Use setTimeout with a callback function to navigate after 2000ms
-  //       setTimeout(() => {
-  //         navigate(`/container/${pageName}`);
-  //       }, 2000); // 2000ms delay
-  //     } else {
-  //       await axios.put(`${config.apiUrl}/appdata/${id}`, dataToSend);
-  //       handleSaveSuccess("Data saved successfully!");
-  //       window.scrollTo({ top: 0, behavior: "smooth" });
-  //     }
-  
-      
-  //   } catch (error) {
-  //     handleSaveError("Error saving data.");
-  //     console.error("Error saving data:", error);
-  //   }
-  // };  
   // Handle Cancel with Unsaved Changes Confirmation
   const handleCancel = () => {
     if (hasUnsavedChanges) {

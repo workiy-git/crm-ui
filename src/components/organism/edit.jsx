@@ -7,52 +7,71 @@ import '../../assets/styles/style.css';
 const EditComponent = forwardRef(({ current, id, pageSchema, formData, setFormData, onSaveSuccess, onSaveError, pageName, pageID }, ref) => {
   const [validationError, setValidationError] = useState('');
   const [formErrors, setFormErrors] = useState({});
+  
 
   useEffect(() => {
     if (!formData) {
       setFormData({});
     }
   }, [formData, setFormData]);
+// const validationMessage =field.validationMessage
+  const validateField = (fieldName, value) => {
+    const fieldSchema = pageSchema.find(field => field.fieldName === fieldName);
+    let error = "";
+    console.log("formData",fieldName)
+    if (!fieldSchema) return "";
 
-  const handleInputChange = (event) => {
-    const { name, value, type, checked } = event.target;
-    const fieldValue = type === 'checkbox' ? checked : value;
-    // Helper function to set nested field values
-  const setNestedValue = (obj, path, value) => {
-    const keys = path.split('.');
-    let current = obj;
-    for (let i = 0; i < keys.length - 1; i++) {
-      current = current[keys[i]] = current[keys[i]] || {};
+    if (fieldSchema.required && !value) {
+      error = `${fieldName} is required.`;
     }
-    current[keys[keys.length - 1]] = value;
-    return { ...obj };
+
+    if (fieldSchema.pattern && value) {
+      const regex = new RegExp(fieldSchema.pattern);
+      const validationMessage = (fieldSchema.validationMessage);
+      console.log("asdf",fieldSchema)
+      if (!regex.test(value)) {
+        error = `${validationMessage}`;
+      }
+    }
+
+    return error;
   };
 
-  setFormData((prevData) => setNestedValue(prevData, name, fieldValue));
-};
+  const handleInputChange = (e, fieldName) => {
+    const value = e.target.type === 'checkbox' ? e.target.checked : e.target.value;
+    const error = validateField(fieldName, value);
+
+    setFormData(prevState => ({
+      ...prevState,
+      [fieldName]: value,
+    }));
+
+    setFormErrors(prevErrors => ({
+      ...prevErrors,
+      [fieldName]: error
+    }));
+  };
 
 
-  const validateForm = () => {
-    let hasErrors = false;
-    const errors = {};
+const validateForm = () => {
+  let hasErrors = false;
+  const errors = {};
 
-    pageSchema.forEach((field) => {
-      const fieldValue = formData[field.fieldName];
-
-      if (field.required && (!formData[field.fieldName] || formData[field.fieldName] === 'N/A')) {
-        errors[field.fieldName] = field.requiredMessage;
+  pageSchema.forEach((field) => {
+    const fieldValue = formData[field.fieldName];
+    
+    if (field.required && (!fieldValue || fieldValue === 'N/A')) {
+      errors[field.fieldName] = `${field.requiredMessage}`;
+      hasErrors = true;
+    }
+    if (field.pattern && fieldValue) {
+      const regex = new RegExp(field.pattern);
+      if (!regex.test(fieldValue)) {
+        errors[field.fieldName] = field.validationMessage;
         hasErrors = true;
       }
-
-      // Pattern validation
-      if (field.pattern && fieldValue) {
-        const regex = new RegExp(field.pattern);
-        if (!regex.test(fieldValue)) {
-          errors[field.fieldName] = field.validationMessage;
-          hasErrors = true;
-        }
-      }
-    });
+    }
+  });
 
     setFormErrors(errors);
     setValidationError(hasErrors ? 'Please fill all mandatory fields' : '');
@@ -63,31 +82,6 @@ const EditComponent = forwardRef(({ current, id, pageSchema, formData, setFormDa
     validateForm,
   }));
 
-  const handleSave = async () => {
-    if (!validateForm()) {
-      onSaveError('Please fill all mandatory fields');
-      for (const key in formErrors) {
-        const element = document.querySelector(`[name="${key}"]`);
-        if (element) {
-          element.scrollIntoView({ behavior: 'smooth', block: 'center' });
-          break;
-        }
-      }
-      return;
-    }
-
-    try {
-      const dataToSend = { pageName, pageID, ...formData };
-      if (id) {
-        await axios.put(`${config.apiUrl}/appdata/${id}`, dataToSend);
-        onSaveSuccess('Data updated successfully!');
-      }
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    } catch (error) {
-      onSaveError('Error saving data.');
-      console.error('Error saving data:', error);
-    }
-  };
 
   const renderInputField = (field) => {
     const isFileInput = field.type === 'file';
@@ -101,7 +95,7 @@ const EditComponent = forwardRef(({ current, id, pageSchema, formData, setFormDa
       name: field.fieldName,
       placeholder: field.placeholder || 'Not Specified',
       fullWidth: true,
-      onChange: handleInputChange,
+      onChange: (e) => handleInputChange(e, field.fieldName),
       error: !!isError,
       helperText: isError && formErrors[field.fieldName],
       ...(isRequired && { required: true }) // Add the required property if isRequired is true
@@ -111,6 +105,10 @@ const EditComponent = forwardRef(({ current, id, pageSchema, formData, setFormDa
       ...(isFileInput ? {} : { value }),
       ...(field.pattern && { pattern: field.pattern }), // Apply pattern if provided
     };
+    if (!isFileInput) {
+      commonProps.value = value;
+    }
+    
   
     const formControlStyles = {
       display: 'flex',
@@ -189,7 +187,8 @@ const EditComponent = forwardRef(({ current, id, pageSchema, formData, setFormDa
                 className='edit-field-input'
                 name={field.fieldName}
                 checked={formData[field.fieldName] || false}
-                onChange={handleInputChange}
+                // onChange={handleInputChange}
+                onChange={(e) => handleInputChange(e, field.fieldName)}
               />
             }
             label={label}
