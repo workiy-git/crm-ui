@@ -164,7 +164,7 @@ const SideMenu = () => {
   <img
     style={{ height: '20px', margin: '10px 10px 15px auto', filter: 'brightness(0) invert(1)' }}
     src={expandIcon}
-    alt="Expand"
+    // alt="Expand"
   />
 </button>
       </div>

@@ -177,7 +177,7 @@ const GridComponent = ({ pageName }) => {
 
   useEffect(() => {
     if (pageName) {
-      setIsLoading(true);; // Set the loader to true when pageName changes
+      setIsLoading(true); // Set the loader to true when pageName changes
   
       // if (selectedValue) {
       //   const filter = JSON.parse(selectedValue);

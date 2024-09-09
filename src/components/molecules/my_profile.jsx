@@ -174,10 +174,11 @@ export default function Myprofile({ backgroundColor, value }) {
                         minWidth: "fit-content",
                         marginRight: "15px",
                       }}
-                      style={{ height: "40px", width: "40px", padding: "0px" }}
+                     
                     >
                       <img
-                        style={{ width: "100%", borderRadius: "100px" }}
+                         style={{ height: "40px", width: "40px", padding: "0px", borderRadius:'100px' }}
+                        // sx={{ width: 30, height: 30, outline: "white 2px solid" }}
                         src={userData.profile_img}
                         alt={userData.profile_img}
                       />

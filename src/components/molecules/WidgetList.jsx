@@ -293,6 +293,7 @@ import { Box } from '@material-ui/core';
 import { experimentalStyled as styled } from '@mui/material/styles';
 import config from '../../config/config';
 import WidgetsIcon from '@mui/icons-material/WidgetsOutlined';
+import "../../assets/styles/style.css"
 
 const ScrollContainer = styled(Box)({
   overflowY: 'auto',
@@ -428,7 +429,7 @@ const WidgetsList = ({ dashboardName }) => {
             </div>
           )}
         </div>
-        <div style={{ display: 'flex', flexWrap: 'wrap' }}>
+        <div className='widget_main_div' style={{ display: 'flex', flexWrap: 'wrap' }}>
         {widgets.length > 0 ? widgets.map((widget, index) => (
           <div
             className={`widget-${index} widget-main`}

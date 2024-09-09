@@ -106,7 +106,29 @@
   }
   @media (max-width: 600px) {
     .widget-main {
-      width: 125px !important;
+      /* width: 125px !important; */
+      margin: 5px auto !important;
+    }
+    .widget_main_div{
+      height: 65vh;
+    }
+    .details_page_main{
+      display: block !important;
+      overflow: auto !important;
+    }
+    .details_page_inputs{
+      width: 100% !important;
+    }
+    .details_page_sub_main{
+      width: 90% !important;
+      height: auto !important;
+      margin: 10px auto !important
+    }
+    .details_page_heading{
+      font-size: 14px !important;
+    }
+    .header_company_logo{
+      height: 40% !important;
     }
   }
 
