@@ -323,12 +323,12 @@ function Loginpage() {
                   
                 </div>
                 <div className="login-center login-submit-block">
-                  <a
-                    className="login-forgot-password"
-                    href={companylogoData.forget?.url || "/"}
-                  >
-                    {companylogoData.forget?.title}
-                  </a>
+                <a
+  className="login-forgot-password"
+  href="/forget-password"
+>
+  {companylogoData.forget?.title || "Forgot Password?"}
+</a>
                 </div>
                 <div className="login-center login-submit-block">
                   <Typography
