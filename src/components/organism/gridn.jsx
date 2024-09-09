@@ -93,10 +93,13 @@ const GridComponent = ({ pageName }) => {
       try {
         await axios.delete(`${config.apiUrl.replace(/\/$/, '')}/appdata/${id}`);
         setGridData((prevData) => prevData.filter((row) => row._id !== id));
+        setSuccess('Data deleted successfully');
         setDeleteDialogOpen(false); // Close the dialog
         setRowToDelete(null); // Clear the selected row
+        
       } catch (error) {
         console.error('Error deleting data:', error);
+        setError(error)
       }
     }
   };
@@ -174,7 +177,7 @@ const GridComponent = ({ pageName }) => {
 
   useEffect(() => {
     if (pageName) {
-      setIsLoading(true);; // Set the loader to true when pageName changes
+      setIsLoading(true); // Set the loader to true when pageName changes
   
       // if (selectedValue) {
       //   const filter = JSON.parse(selectedValue);

@@ -280,7 +280,7 @@ if (isAdding && Object.values(formData).every(value => value === "")) {
           >
             <div style={{alignContent:'center'}}>
               <div>
-            <h2 style={{ margin: "auto 40px", textTransform:'capitalize'}}>{pageName} {mode} Page</h2>
+            <h2 className='details_page_heading' style={{ margin: "auto 40px", textTransform:'capitalize'}}>{pageName} {mode} Page</h2>
             <div style={{margin:'10px 20px 10px 40px', borderBottom:'2px solid black' }}></div>
             </div>
             </div>
@@ -317,8 +317,8 @@ if (isAdding && Object.values(formData).every(value => value === "")) {
             </Box>
             
           </div>
-          <div style={{ display: "flex", height:'78vh' }}>
-            <div
+          <div className="details_page_main" style={{ display: "flex", height:'78vh' }}>
+            <div className='details_page_sub_main'
               style={{
                 width: "75%",
                 margin: "10px",
@@ -463,7 +463,7 @@ if (isAdding && Object.values(formData).every(value => value === "")) {
                 </Box>
               </div>
             </div>
-            <div style={{ margin: "10px",
+            <div className='details_page_sub_main' style={{ margin: "10px",
                 height: "95%",
                 border: "1px solid gray",
                 position: "relative", width: '50%'}}>

@@ -21,6 +21,7 @@ const ViewComponent = ({ formData, pageSchema }) => {
       <Box sx={{ display: 'flex', flexWrap: 'wrap' }}>
         {pageSchema.map((field) => (
           <Box
+          className='details_page_inputs'
             key={field.fieldName}
             sx={{
               display: 'flex',

@@ -109,14 +109,14 @@ const AddComponent = forwardRef(({ formData, setFormData, pageSchema, onSaveSucc
     switch (field.htmlControl) {
       case 'input':
         return (
-          <FormControl key={field.fieldName} style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', width: '50%' }} error={!!isError}>
+          <FormControl className='details_page_inputs' key={field.fieldName} style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', width: '50%' }} error={!!isError}>
             <label style={{ width: '40%', textAlign: 'left' }}>{label}</label>
             <TextField className='valuefield edit-field-input' {...commonProps} type={field.type || 'text'} />
           </FormControl>
         );
       case 'select':
         return (
-          <FormControl key={field.fieldName} style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', width: '50%' }} error={!!isError}>
+          <FormControl className='details_page_inputs' key={field.fieldName} style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', width: '50%' }} error={!!isError}>
             <label style={{ width: '40%', textAlign: 'left' }}>{label}</label>
             <Select className='valuefield edit-field-input' {...commonProps} displayEmpty>
               <MenuItem value="">
@@ -134,6 +134,7 @@ const AddComponent = forwardRef(({ formData, setFormData, pageSchema, onSaveSucc
       case 'checkbox':
         return (
           <FormControlLabel
+          className='details_page_inputs'
             key={field.fieldName}
             control={
               <Checkbox className='edit-field-input' name={field.fieldName} checked={formData[field.fieldName] || false} onChange={handleInputChange} />
@@ -144,7 +145,7 @@ const AddComponent = forwardRef(({ formData, setFormData, pageSchema, onSaveSucc
         );
       default:
         return (
-          <FormControl key={field.fieldName} style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', width: '50%' }} error={!!isError}>
+          <FormControl className='details_page_inputs' key={field.fieldName} style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', width: '50%' }} error={!!isError}>
             <label style={{ width: '40%', textAlign: 'left' }}>{label}</label>
             <TextField className='valuefield edit-field-input' {...commonProps} />
           </FormControl>

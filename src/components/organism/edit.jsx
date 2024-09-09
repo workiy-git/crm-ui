@@ -134,7 +134,7 @@ const validateForm = () => {
     switch (field.htmlControl) {
       case 'input':
         return (
-          <FormControl key={field.fieldName} style={formControlStyles} error={!!isError}>
+          <FormControl className='details_page_inputs' key={field.fieldName} style={formControlStyles} error={!!isError}>
             <label style={labelStyles}>{label}</label>
             <TextField
               className='edit-field-input'
@@ -152,7 +152,7 @@ const validateForm = () => {
         );
         case 'select':
       return (
-        <FormControl key={field.fieldName} style={formControlStyles} error={!!isError}>
+        <FormControl className='details_page_inputs' key={field.fieldName} style={formControlStyles} error={!!isError}>
           <label style={labelStyles}>{label}</label>
           <Select
             className='edit-field-input'
@@ -181,6 +181,7 @@ const validateForm = () => {
       case 'checkbox':
         return (
           <FormControlLabel
+          className='details_page_inputs'
             key={field.fieldName}
             control={
               <Checkbox
@@ -208,7 +209,7 @@ const validateForm = () => {
         );
       default:
         return (
-          <FormControl key={field.fieldName} style={formControlStyles} error={!!isError}>
+          <FormControl className='details_page_inputs' key={field.fieldName} style={formControlStyles} error={!!isError}>
             <label style={labelStyles}>{label}</label>
             <TextField className='edit-field-input' {...commonProps} style={{
               width: '50%',
