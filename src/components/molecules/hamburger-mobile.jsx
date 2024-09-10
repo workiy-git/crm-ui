@@ -20,27 +20,35 @@ const FireNav = styled(List)({
   },
 });
 
-export default function Hamburger() {
+export default function HamburgerMobile() {
   const [open, setOpen] = useState(false);
   const theme = useTheme();
   const isMdUp = useMediaQuery(theme.breakpoints.up('md'));
   const [hamburgerData, setHamburgerData] = useState([]);
+  const [openItems, setOpenItems] = useState({}); // New state to track open submenus
   const menuRef = useRef(null);
 
   const handleMenuItemClick = (menuItem) => {
-    // console.log('Clicked on:', menuItem.path);
+    // Handle navigation to different URLs
     const url = `${menuItem.path}`;
     window.location.href = url;
+  };
+
+  const toggleSubmenu = (index) => {
+    // Toggle the open state for the clicked menu item
+    setOpenItems((prevOpenItems) => ({
+      ...prevOpenItems,
+      [index]: !prevOpenItems[index], // Toggle the specific index
+    }));
   };
 
   useEffect(() => {
     axios.get(`${config.apiUrl}/menus/header`)
       .then((response) => {
-        // console.log('Data received:', response.data.data.hamburger);
         setHamburgerData(response.data.data.hamburger);
       })
       .catch((error) => {
-        // console.error('Error fetching data:', error);
+        // Handle error
       });
   }, []);
 
@@ -55,7 +63,8 @@ export default function Hamburger() {
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, []);
-  const renderNestedItems = (menuItem) => {
+
+  const renderNestedItems = (menuItem, parentIndex) => {
     return (
       <ul className="hamburger-list-container">
         {Object.keys(menuItem)
@@ -64,7 +73,7 @@ export default function Hamburger() {
             <li
               className={`hamburger-list-item ${menuItem[subKey].class}`}
               onClick={() => handleMenuItemClick(menuItem[subKey])}
-              key={subIndex}
+              key={`${parentIndex}-${subIndex}`}
             >
               <img
                 alt={menuItem[subKey].title} // Provide meaningful alt text
@@ -73,8 +82,8 @@ export default function Hamburger() {
               />
               {menuItem[subKey].title}
               {menuItem[subKey].children && (
-                <Collapse in={true} timeout="auto" unmountOnExit>
-                  {renderNestedItems(menuItem[subKey].children)}
+                <Collapse in={openItems[`${parentIndex}-${subIndex}`]} timeout="auto" unmountOnExit>
+                  {renderNestedItems(menuItem[subKey].children, `${parentIndex}-${subIndex}`)}
                 </Collapse>
               )}
             </li>
@@ -97,7 +106,7 @@ export default function Hamburger() {
           palette: {},
         })}
       >
-        <div className="hamburger-menu-container hamburger-desktop" ref={menuRef}>
+        <div className="hamburger-menu-container hamburger-mobile" ref={menuRef}>
           <FireNav component="nav" disablePadding className="hamburger-nav">
             <ListItemButton
               alignItems="flex-start"
@@ -115,15 +124,23 @@ export default function Hamburger() {
                 className={`hamburger-nav ${open ? 'hamburger-nav-open' : 'hamburger-nav-close'}`}
               >
                 {open && (
-                  <Box sx={{ display: "flex" }}>
+                  <Box sx={{ display: "block" }}>
                     {Object.keys(hamburgerData)
                       .filter((key) => key !== 'hamburger_image' && key !== 'hamburger_md_image')
                       .map((key, index) => {
                         const menuItem = hamburgerData[key];
                         return (
-                          <div key={index}>
+                          <div style={{margin:'5px 0'}} key={index}>
                             <ListItemButton
-                              sx={{ padding: "0px 16px !important", minHeight: 40, color: 'rgba(255,255,255,.8)', display: 'flex', flexDirection: 'column', width: '100%' }}
+                              sx={{
+                                padding: "0px 16px !important", 
+                                minHeight: 40, 
+                                color: 'rgba(255,255,255,.8)', 
+                                display: 'flex', 
+                                flexDirection: 'column', 
+                                width: '100%'
+                              }}
+                              onClick={() => toggleSubmenu(index)} // Toggle the submenu
                             >
                               <ul className="hamburger-nested-item">
                                 <li className="hamburger-nested-list-item">
@@ -136,8 +153,8 @@ export default function Hamburger() {
                                 </li>
                               </ul>
                             </ListItemButton>
-                            <Collapse in={open} timeout="auto" unmountOnExit>
-                              {renderNestedItems(menuItem)}
+                            <Collapse in={openItems[index]} timeout="auto" unmountOnExit>
+                              {renderNestedItems(menuItem, index)}
                             </Collapse>
                           </div>
                         );

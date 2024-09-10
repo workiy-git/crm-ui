@@ -11,6 +11,7 @@ import Notification from '../atoms/notification';
 import Dayin from '../atoms/dayin';
 import config from '../../config/config';
 import '../../assets/styles/header.css'
+import HamburgerMobile from '../molecules/hamburger-mobile';
 
 
 const Header = () => {
@@ -51,6 +52,7 @@ const Header = () => {
         <Toolbar className="header-toolbar">
           <div className="hamburger-box-main">
           <Hamburger className="hamburger-box" />
+          <HamburgerMobile  className="hamburger-box"/>
           </div>
           <Box className="fullscreen-box">
             <FullScreen />

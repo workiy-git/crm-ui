@@ -74,14 +74,16 @@ const ForgetPassword = () => {
   };
 
   return (
-    <div>
-      <Typography variant="h6">
+    <div style={{height:'100%', display:'flex'}}>
+    <div style={{width:'30%', margin:'auto', textAlign:'center', border:'1px #c2c2cc solid', borderRadius:'5px', padding:'20px'}}>
+      <Typography variant="h6" style={{marginBottom:'20px'}}>
         {step === 1 ? "Forget Password" : "Enter Verification Code and New Password"}
       </Typography>
 
       {step === 1 ? (
-        <form onSubmit={handleRequestReset}>
+        <form style={{display:'flex', flexDirection:'column', alignItems:'center', gap:'20px'}} onSubmit={handleRequestReset}>
           <TextField
+          style={{width:'80%'}}
             label="Username"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
@@ -89,6 +91,7 @@ const ForgetPassword = () => {
             required
           />
           <TextField
+          style={{width:'80%'}}
             label="Mobile Number"
             value={mobileNumber}
             onChange={(e) => setMobileNumber(e.target.value)}
@@ -103,7 +106,7 @@ const ForgetPassword = () => {
           )}
           <Button
             variant="contained"
-            color="primary"
+            style={{background:'#f2a742', color:'black'}}
             type="submit"
             disabled={isSubmitting}
           >
@@ -111,8 +114,9 @@ const ForgetPassword = () => {
           </Button>
         </form>
       ) : (
-        <form onSubmit={handleResetPassword}>
+        <form  style={{display:'flex', flexDirection:'column', alignItems:'center', gap:'20px'}} onSubmit={handleResetPassword}>
           <TextField
+          style={{width:'50%'}}
             label="Verification Code"
             value={verificationCode}
             onChange={(e) => setVerificationCode(e.target.value)}
@@ -120,6 +124,7 @@ const ForgetPassword = () => {
             required
           />
           <TextField
+          style={{width:'50%'}}
             label="New Password"
             type="password"
             value={newPassword}
@@ -135,7 +140,7 @@ const ForgetPassword = () => {
           )}
           <Button
             variant="contained"
-            color="primary"
+            style={{background:'#f2a742', color:'black'}}
             type="submit"
             disabled={isSubmitting}
           >
@@ -143,6 +148,7 @@ const ForgetPassword = () => {
           </Button>
         </form>
       )}
+      </div>
     </div>
   );
 };
