@@ -36,7 +36,6 @@ const ForgetPassword = () => {
       onSuccess: (data) => {
         console.log("Code sent to:", data.CodeDeliveryDetails.Destination);
         setSuccessMessage("A verification code has been sent to your mobile.");
-        navigate("/login");
         setStep(2); // Move to the next step to enter verification code & new password
         setIsSubmitting(false);
       },
@@ -62,6 +61,9 @@ const ForgetPassword = () => {
       onSuccess: () => {
         setSuccessMessage("Password reset successfully. Please log in again.");
         setIsSubmitting(false);
+        setTimeout(() => {
+          navigate("/"); // Only navigate to login after the password is reset
+        }, 2000); // Small delay to show success message
       },
       onFailure: (err) => {
         console.error(err);
