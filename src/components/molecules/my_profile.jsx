@@ -90,8 +90,13 @@ export default function Myprofile({ backgroundColor, value }) {
   };
 
   const handleMenuItemClick = (path) => {
-    const url = `${path}`;
-    window.location.href = url;
+    if (path === "/") { // Assuming "/" is the logout path
+      sessionStorage.clear(); // Clear the session storage
+      localStorage.clear();  // Clear local storage
+      window.location.href = path; // Navigate to the logout path
+    } else {
+      window.location.href = path; // Navigate to other paths
+    }
   };
 
   const handleProfileClick = () => {
