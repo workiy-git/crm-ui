@@ -186,3 +186,24 @@ background-color: blue;
 .username-hide{
   display: none;
 }
+
+
+/* For screens with a max width of 678px, show HamburgerMobile and hide Hamburger */
+@media (max-width: 678px) {
+  .hamburger-mobile {
+    display: block;
+  }
+
+  .hamburger-desktop {
+    display: none;
+  }
+}
+@media (min-width: 677px) {
+  .hamburger-mobile {
+    display: none;
+  }
+
+  .hamburger-desktop {
+    display: block;
+  }
+}
