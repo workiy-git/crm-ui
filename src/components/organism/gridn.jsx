@@ -300,8 +300,9 @@ const fetchGridData = async (filter) => {
       handleMenuClose();
     if (selectedRow) {
         navigate(`/${pageName}/${mode}/${selectedRow._id}`, {
-            state: { rowData: selectedRow, pageName, mode },
+            state: { rowDataId: selectedRow._id, pageName, mode },
         });
+        console.log("rowdata",selectedRow)
         handleMenuClose();
     }
   };
