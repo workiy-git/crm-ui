@@ -7,11 +7,26 @@ const AddComponent = forwardRef(({ formData, setFormData, pageSchema, onSaveSucc
   const [validationError, setValidationError] = useState('');
   const [formErrors, setFormErrors] = useState({});
 
+  // Initialize formData with default values based on schema
   useEffect(() => {
-    if (!formData) {
-      setFormData({});
+    if (!formData || Object.keys(formData).length === 0) {
+      const initializedFormData = {};
+      pageSchema.forEach(field => {
+        if (field.type === 'checkbox') {
+          initializedFormData[field.fieldName] = false;  // Default for checkboxes
+        } else if (field.type === 'select') {
+          initializedFormData[field.fieldName] = ''; // Default for select
+        } else if (field.type === 'datetime-local') {
+          // Default for datetime-local to current time
+          const currentDate = new Date();
+          initializedFormData[field.fieldName] = currentDate.toISOString().slice(0, 16); 
+        } else {
+          initializedFormData[field.fieldName] = ''; // Default for other input types
+        }
+      });
+      setFormData(initializedFormData);
     }
-  }, [formData, setFormData]);
+  }, [formData, setFormData, pageSchema]);
 
   const validateField = (fieldName, value) => {
     const fieldSchema = pageSchema.find(field => field.fieldName === fieldName);
@@ -87,7 +102,8 @@ const AddComponent = forwardRef(({ formData, setFormData, pageSchema, onSaveSucc
 
   const renderInputField = (field) => {
     const isFileInput = field.type === 'file';
-    const value = !isFileInput && (formData[field.fieldName] === 'N/A' ? '' : formData[field.fieldName] || '');
+    let value = !isFileInput && (formData[field.fieldName] === 'N/A' ? '' : formData[field.fieldName] || '');
+
     const isError = formErrors[field.fieldName];
     const label = `${field.label || field.fieldName}${field.required ? ' *' : ''}`;
     const isRequired = field.required === 'true';

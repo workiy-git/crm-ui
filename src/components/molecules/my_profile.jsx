@@ -109,7 +109,7 @@ export default function Myprofile({ backgroundColor, value }) {
     if (userData) {
         setOpen(false); // Close the popup
         navigate(`/${pageName}/${mode}/${userData._id}`, {
-          state: { rowData: userData, pageName, mode },
+          state: { rowDataId: userData._id, pageName, mode },
         });
     }
   };

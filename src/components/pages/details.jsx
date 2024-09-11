@@ -20,8 +20,22 @@ const DetailsPage = () => {
   const { id } = useParams();
   const location = useLocation();
   const navigate = useNavigate();
-  const { rowData, pageName, pageId, mode } = location.state || {};
+  const { rowDataId, pageName, pageId, mode } = location.state || {};
 
+  
+  useEffect(() => {
+    axios
+      .get(`${config.apiUrl}/appdata/${rowDataId}`)
+      .then((response) => {
+        setrowData(response.data.data);
+        console.log("detailsdata", response.data.data)
+      })
+      .catch((error) => {
+        console.error("Error fetching data:", error);
+      });
+  }, []);
+  
+  const [rowData, setrowData] = useState([]);
   const [formData, setFormData] = useState({});
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
@@ -37,7 +51,6 @@ const DetailsPage = () => {
   const editComponentRef = useRef(null);
   const [currentPage, setCurrentPage] = useState([]);
 
-  
 
 
   const initializeFormData = useCallback((data, schema) => {
@@ -110,16 +123,20 @@ const DetailsPage = () => {
       }
     }, [location]);
 
-  const handleSaveSuccess = (message) => {
-    setSuccess(message);
-    setError("");
-    setIsEditing(false);
-    setIsAdding(false);
-    setRefreshTab(prev => !prev);
-    setTimeout(() => {
-      setSuccess("");
-    }, 2000);
-  };
+ const handleSaveSuccess = (message) => {
+  setSuccess(message);
+  setError("");
+  setIsEditing(false);
+  setIsAdding(false);
+  setRefreshTab((prev) => !prev);
+
+  // Update initialFormData to the current formData after save
+  setInitialFormData(formData);
+
+  setTimeout(() => {
+    setSuccess("");
+  }, 2000);
+};
 
   const handleSaveError = (message) => {
     setError(message);
