@@ -195,6 +195,7 @@ if (isAdding && Object.values(formData).every(value => value === "")) {
         dataToSend[field.fieldName] = "";  // Set default empty value
       }
     });
+    console.log("dataToSend",dataToSend)
 
     if (isAdding) {
       await axios.post(`${config.apiUrl}/appdata/create`, dataToSend);
