@@ -1,11 +1,8 @@
 
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import Header from "../organism/header";
 import MenuComponent from "../organism/menu";
-import SideMenu from "../organism/sidemenu";
 import Submenu from "../organism/submenu";
-import BackgroundColorChanger from "../atoms/BackgroundColorChanger";
 import Footer from "../atoms/Footer";
 import config from "../../config/config";
 import Loader from "../molecules/loader";
@@ -27,8 +24,6 @@ function Home() {
     if (!isLoggedIn) {
       // Redirect to login page
       window.location.href = "/";
-    } else {
-      console.log("User is logged in with accessToken:", accessToken);
     }
 
     axios

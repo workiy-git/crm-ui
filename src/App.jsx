@@ -1,14 +1,15 @@
 import React from "react";
 import { BrowserRouter as Router, Route, Routes, useLocation } from "react-router-dom";
-import Container from "./components/pages/container"; 
+import Container from "./components/pages/container";
 import Home from "./components/pages/home";
-import Loginpage from "./components/pages/login"; 
-import ForgetPassword from "./components/pages/forgetpassword"; 
+import Loginpage from "./components/pages/login";
 import DetailsPage from "./components/pages/details";
 import Underconstruction from "./components/pages/underconstruction";
 import Header from "./components/organism/header";
 import SideMenu from "./components/organism/sidemenu";
 import GenerateReportPage from "./components/pages/generate-reports";
+import ProtectedRoute from "./protectedRoute"; 
+import { AuthProvider } from "./AuthContext"; 
 
 const Layout = ({ children }) => {
   const location = useLocation();
@@ -17,9 +18,11 @@ const Layout = ({ children }) => {
   return (
     <div style={{ display: 'flex', height: '100vh', overflow: 'hidden' }}>
       {!hideHeaderAndSideMenu && (
+        <ProtectedRoute>
         <div style={{ backgroundColor: "#262626" }}>
           <SideMenu />
         </div>
+        </ProtectedRoute>
       )}
       <div style={{ width: '100%', overflow: 'hidden' }}>
         {!hideHeaderAndSideMenu && (
@@ -35,22 +38,20 @@ const Layout = ({ children }) => {
 
 const App = () => {
   return (
-    <Router>
+    <AuthProvider>
       <Layout>
         <Routes>
           <Route path="/" element={<Loginpage />} />
-          <Route path="/forget-password" element={<ForgetPassword />} />
-          <Route path="/home" element={<Home />} />
-          <Route path="/container/:pageName" element={<Container />} />
-          <Route path="/:pageName/view/:id" element={<DetailsPage mode="view" />} />
-          <Route path="/:pageName/edit/:id" element={<DetailsPage mode="edit" />} />
-          <Route path="/:pageName/add" element={<DetailsPage mode="add" />} />
-          <Route path="/users/profile/:id" element={<DetailsPage mode="profile" />} />
-          <Route path="/generate-report" element={<GenerateReportPage />} />
-          <Route path="/underconstruction" element={<Underconstruction />} />
+          <Route path="/home" element={ <ProtectedRoute> <Home /> </ProtectedRoute> } />
+          <Route path="/container/:pageName" element={ <ProtectedRoute> <Container /> </ProtectedRoute> } />
+          <Route path="/:pageName/view/:id" element={ <ProtectedRoute> <DetailsPage mode="view" /> </ProtectedRoute> } />
+          <Route path="/:pageName/edit/:id" element={ <ProtectedRoute> <DetailsPage mode="edit" /> </ProtectedRoute>} />
+          <Route path="/:pageName/add" element={ <ProtectedRoute> <DetailsPage mode="add" /> </ProtectedRoute> } />
+          <Route path="/users/profile/:id" element={ <ProtectedRoute> <DetailsPage mode="profile" /> </ProtectedRoute> } />
+          <Route path="/underconstruction" element={ <ProtectedRoute> <Underconstruction /> </ProtectedRoute> } />
         </Routes>
       </Layout>
-    </Router>
+      </AuthProvider>
   );
 };
 
