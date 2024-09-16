@@ -2,7 +2,7 @@ import React, { createContext, useContext, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 const AuthContext = createContext(null);
-const INACTIVITY_LIMIT = 1 * 60 * 1000; // 15 minutes in milliseconds
+const INACTIVITY_LIMIT = 15 * 60 * 1000; // 15 minutes in milliseconds
 
 export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
