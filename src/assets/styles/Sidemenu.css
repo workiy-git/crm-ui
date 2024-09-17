@@ -35,15 +35,20 @@
 
 .sidemenu-scrollable-container {
   background-color: #262626;
+  
 }
 
 .sidemenu-profile-container {
   text-align: center;
   margin: auto;
   overflow-y: auto;
+  margin-top: 30px;
   max-height: 70vh;
   overflow-x: hidden;
   padding: 3%;
+  margin-top: 50px;
+
+
 }
 
 .sidemenu-menu-item-horizontal {
@@ -117,4 +122,23 @@
   margin-left: 10px !important;
   width: max-content;
   margin: 5px 0 auto 10px !important;
+}
+.expand-button {
+  background: #808080;
+  border: none;
+  z-index: 0;
+  padding: 35px 3px 50px 7px;
+  border-radius: 0px 5px 5px 0px;
+  cursor: pointer;
+  height: 20px;
+  margin: 200px -30px 15px auto;
+  position: absolute;
+  
+}
+.sidemenu-scrollable-container .expand-button {
+  display: none; /* This hides the image inside the button */
+}
+.sidemenu-scrollable-container:hover .expand-button {
+  display: block;
+transition: display 2s ease; /* Image is shown when hovered */
 }
