@@ -157,16 +157,20 @@ const SideMenu = () => {
       <WorkiyLogo value={isHorizontal ? 'max-logo' : 'min-logo'} />
       <MyProfile value={isHorizontal ? 'username-display' : 'username-hide'} />
       <div style={{ display: 'flex', justifyContent: 'end' }}>
+        <div style={{background:'#000'}}>
       <button 
-  style={{ border: 'none', background: 'none', cursor: 'pointer' }} 
+  className='expand-button'
   onClick={handleButtonClick}
 >
+
   <img
-    style={{ height: '20px', margin: '10px 10px 15px auto', filter: 'brightness(0) invert(1)' }}
+    style={{ height: '20px',margin: '0px 0px 0px auto', filter: 'brightness(0) invert(1)', padding:'0px'}}
     src={expandIcon}
     // alt="Expand"
   />
+
 </button>
+</div>
       </div>
       <div className="sidemenu-profile-container">
         {displayedMenuItems.map((menuItem, index) => {
