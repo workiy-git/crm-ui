@@ -43,7 +43,7 @@ const App = () => {
       <Layout>
         <Routes>
           <Route path="/" element={<Loginpage />} />
-          <Route path="/forget-password" element={<Loginpage />} />
+          <Route path="/forget-password" element={<ForgetPassword />} />
           <Route path="/home" element={ <ProtectedRoute> <Home /> </ProtectedRoute> } />
           <Route path="/container/:pageName" element={ <ProtectedRoute> <Container /> </ProtectedRoute> } />
           <Route path="/:pageName/view/:id" element={ <ProtectedRoute> <DetailsPage mode="view" /> </ProtectedRoute> } />
