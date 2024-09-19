@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Route, Routes, useLocation } from "react-route
 import Container from "./components/pages/container";
 import Home from "./components/pages/home";
 import Loginpage from "./components/pages/login";
+import ForgetPassword from "./components/pages/forgetpassword";
 import DetailsPage from "./components/pages/details";
 import Underconstruction from "./components/pages/underconstruction";
 import Header from "./components/organism/header";
@@ -42,6 +43,7 @@ const App = () => {
       <Layout>
         <Routes>
           <Route path="/" element={<Loginpage />} />
+          <Route path="/forget-password" element={<Loginpage />} />
           <Route path="/home" element={ <ProtectedRoute> <Home /> </ProtectedRoute> } />
           <Route path="/container/:pageName" element={ <ProtectedRoute> <Container /> </ProtectedRoute> } />
           <Route path="/:pageName/view/:id" element={ <ProtectedRoute> <DetailsPage mode="view" /> </ProtectedRoute> } />
