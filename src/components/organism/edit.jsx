@@ -166,9 +166,12 @@ const validateForm = () => {
             }}
             displayEmpty
           >
-            <MenuItem value="">
-              <em>{field.placeholder || 'Select an option'}</em>
+            <MenuItem  className='edit-field-input-select' disabled value="">
+            Select an option
             </MenuItem>
+            {/* <MenuItem  className='edit-field-input-select' value="None">
+              {field.placeholder || 'None'}
+            </MenuItem> */}
             {Array.isArray(field.options) && field.options.map((option, index) => (
               <MenuItem className='edit-field-input-select' key={index} value={option}>
                 {option}

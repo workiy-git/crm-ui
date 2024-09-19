@@ -15,13 +15,15 @@ import Email from '../molecules/email';
 import Sms from '../molecules/sms';
 import KeyboardReturnIcon from '@mui/icons-material/KeyboardReturn';
 import '../../assets/styles/style.css';
+// import { Notification } from '../atoms/notification'
+import { useNotifications } from '../atoms/notification'; // Import the hook
 
 const DetailsPage = () => {
   const { id } = useParams();
   const location = useLocation();
   const navigate = useNavigate();
   const { rowDataId, pageName, pageId, mode } = location.state || {};
-
+  const { fetchNotifications } = useNotifications();
   
   useEffect(() => {
     axios
@@ -103,6 +105,7 @@ const DetailsPage = () => {
     fetchWebformsData();
   }, [id, rowData, pageName, initializeFormData]);
 
+
   useEffect(() => {
     const hasChanges = JSON.stringify(formData) !== JSON.stringify(initialFormData);
     setHasUnsavedChanges(hasChanges);
@@ -124,6 +127,7 @@ const DetailsPage = () => {
     }, [location]);
 
  const handleSaveSuccess = (message) => {
+  fetchNotifications();
   setSuccess(message);
   setError("");
   setIsEditing(false);
@@ -147,6 +151,7 @@ const DetailsPage = () => {
   };
 
   const handleDeleteSuccess = () => {
+    fetchNotifications();
     setSuccess("Data deleted successfully");
     setTimeout(() => {
       navigate(`/container/${pageName}`); // Ensure this is the correct path to navigate after deletion
@@ -170,6 +175,7 @@ const DetailsPage = () => {
     try {
       const apiUrl = `${config.apiUrl.replace(/\/$/, "")}/appdata/${id}`;
       await axios.delete(apiUrl);
+      fetchNotifications();
       handleDeleteSuccess();
     } catch (error) {
       handleDeleteError("Error deleting data");
@@ -187,6 +193,7 @@ const DetailsPage = () => {
   };
 
   const handleSave = async () => {
+    fetchNotifications();
     if (!formData) return;
     console.log("form",formData)
     // Perform validation

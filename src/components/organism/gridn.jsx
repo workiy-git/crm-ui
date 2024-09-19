@@ -30,6 +30,7 @@ import {
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import Loader from "../molecules/loader";
 import Pagination from "@mui/material/Pagination";
+import { useNotifications } from '../atoms/notificationCount'; // Import the hook
 
 const endpoint = "/controls/retrive";
 const gridEndpoint = "/appdata/retrieve";
@@ -53,6 +54,7 @@ const GridComponent = ({ pageName }) => {
   const [rowToDelete, setRowToDelete] = useState(null);
   const [anchorEl, setAnchorEl] = useState(null);
   const [selectedRow, setSelectedRow] = useState(null);
+  const { fetchNotifications } = useNotifications();
 
   // const [filteredRows, setFilteredRows] = useState(gridData);
   //not confirmed
@@ -94,6 +96,7 @@ const GridComponent = ({ pageName }) => {
         await axios.delete(`${config.apiUrl.replace(/\/$/, '')}/appdata/${id}`);
         setGridData((prevData) => prevData.filter((row) => row._id !== id));
         setSuccess('Data deleted successfully');
+        fetchNotifications();
         setDeleteDialogOpen(false); // Close the dialog
         setRowToDelete(null); // Clear the selected row
         
