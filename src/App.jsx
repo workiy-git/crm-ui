@@ -9,6 +9,7 @@ import Underconstruction from "./components/pages/underconstruction";
 import Header from "./components/organism/header";
 import SideMenu from "./components/organism/sidemenu";
 import GenerateReportPage from "./components/pages/generate-reports";
+import ReportGrid from "./components/organism/reportGrid";
 import ProtectedRoute from "./protectedRoute"; 
 import { AuthProvider } from "./AuthContext"; 
 
@@ -50,6 +51,8 @@ const App = () => {
           <Route path="/:pageName/edit/:id" element={ <ProtectedRoute> <DetailsPage mode="edit" /> </ProtectedRoute>} />
           <Route path="/:pageName/add" element={ <ProtectedRoute> <DetailsPage mode="add" /> </ProtectedRoute> } />
           <Route path="/users/profile/:id" element={ <ProtectedRoute> <DetailsPage mode="profile" /> </ProtectedRoute> } />
+          <Route path="/generate-report" element={ <ProtectedRoute> <GenerateReportPage /> </ProtectedRoute> } />
+          <Route path="/view-report" element={ <ProtectedRoute> <ReportGrid /> </ProtectedRoute> } />
           <Route path="/underconstruction" element={ <ProtectedRoute> <Underconstruction /> </ProtectedRoute> } />
         </Routes>
       </Layout>

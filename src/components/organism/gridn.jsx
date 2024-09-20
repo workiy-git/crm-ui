@@ -315,6 +315,8 @@ const fetchGridData = async (filter) => {
     });
 };
 
+const [filteredData, setFilteredData] = useState([]);
+
 const handleViewReport = async () => {
   if (!selectedRow) return;
 
@@ -332,11 +334,13 @@ const handleViewReport = async () => {
     const selectedColumns = Array.isArray(reportData.selected_columns) ? reportData.selected_columns : [];
     const filters = Array.isArray(reportData.filter) ? reportData.filter : [];
 
-    const pipeline = [
-      { "$match": { "pageName": module } },
-      { "$project": selectedColumns.reduce((acc, column) => ({ ...acc, [column]: 1 }), {}) },
-      { "$match": filters.reduce((acc, filter) => ({ ...acc, [filter.field]: { [filter.condition]: filter.value } }), {}) }
-    ];
+    // const pipeline = [
+    //   { "$match": { "pageName": module } },
+    //   { "$project": selectedColumns.reduce((acc, column) => ({ ...acc, [column]: 1 }), {}) },
+    //   { "$match": filters.reduce((acc, filter) => ({ ...acc, [filter.field]: { [filter.condition]: filter.value } }), {}) }
+    // ];
+
+    const pipeline = reportData.formatted_filter;
 
     console.log('Pipeline array:', pipeline);
 
@@ -349,6 +353,12 @@ const handleViewReport = async () => {
     
     const filteredData_reportId = appDataResponse.data.data; // Store the fetched data
     console.log('Fetched app data:', filteredData_reportId);
+
+    // Update the state with the fetched data
+    setFilteredData(filteredData_reportId);
+
+    // Navigate to the ReportGrid component and pass the filtered data
+    navigate('/view-report', { state: { filteredData: filteredData_reportId } });
 
   } catch (error) {
     console.error('Error fetching report data:', error);
