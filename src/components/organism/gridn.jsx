@@ -30,7 +30,7 @@ import {
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import Loader from "../molecules/loader";
 import Pagination from "@mui/material/Pagination";
-import { useNotifications } from '../atoms/notificationCount'; // Import the hook
+import { useNotifications } from '../atoms/notification'; // Import the hook
 
 const endpoint = "/controls/retrive";
 const gridEndpoint = "/appdata/retrieve";
