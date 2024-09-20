@@ -643,21 +643,24 @@
 
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Box, TextField, Select, MenuItem, FormControl, Checkbox, FormControlLabel } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
+import { Box, TextField, Select, MenuItem, FormControl, Checkbox, FormControlLabel, Button } from '@mui/material';
 import config from '../../config/config';
 
 const GenerateReportPage = () => {
   const [fields, setFields] = useState([]);
   const [filterConditions, setFilterConditions] = useState({});
   const [formData, setFormData] = useState({});
-  const [selectedFields, setSelectedFields] = useState([]);
-  const [conditions, setConditions] = useState([]);
+  const [selectedField, setSelectedField] = useState('');
   const [filteredData, setFilteredData] = useState([]);
   const [pageNames, setPageNames] = useState([]);
   const [selectedPageName, setSelectedPageName] = useState([]);
   const [moduleFields, setModuleFields] = useState([]);
   const [availableColumns, setAvailableColumns] = useState([]);
+  const [selectedRow, setSelectedRow] = useState(null);
+  const [selectedFields, setSelectedFields] = useState([]);
   const [selectedFieldConditions, setSelectedFieldConditions] = useState({});
+  const [conditions, setConditions] = useState([]);
 
   useEffect(() => {
     const fetchFields = async () => {
@@ -750,22 +753,33 @@ const GenerateReportPage = () => {
     );
   };
 
-  const handleConditionChange = (fieldName, condition, value) => {
+  // const handleConditionChange = (fieldName, condition, value) => {
+  //   setConditions(prevConditions => {
+  //     const existingCondition = prevConditions.find(cond => cond.field === fieldName);
+  //     if (existingCondition) {
+  //       console.log('Selected Condition:', condition);
+  //       return prevConditions.map(cond =>
+  //         cond.field === fieldName ? { field: fieldName, condition, value } : cond
+  //       );
+  //     } else {
+  //       console.log('Selected Condition:', condition);
+  //       return [...prevConditions, { field: fieldName, condition, value }];
+  //     }
+  //   });
+  // };
+  const handleConditionChange = (fieldName, condition, value, index) => {
     setConditions(prevConditions => {
-      const existingCondition = prevConditions.find(cond => cond.field === fieldName);
-      if (existingCondition) {
-        console.log('Selected Condition:', condition);
-        return prevConditions.map(cond =>
-          cond.field === fieldName ? { field: fieldName, condition, value } : cond
-        );
-      } else {
-        console.log('Selected Condition:', condition);
-        return [...prevConditions, { field: fieldName, condition, value }];
-      }
+      const newConditions = [...prevConditions];
+      newConditions[index] = { ...newConditions[index], condition, value };
+      return newConditions;
     });
   };
 
-  const handleFieldSelectChange = async (selectedPageName, fieldName, selectedField) => {
+  const addCondition = () => {
+    setConditions(prevConditions => [...prevConditions, { field: '', condition: '', value: '' }]);
+  };
+
+  const handleFieldSelectChange = async (selectedPageName, fieldName, selectedField, index) => {
     console.log('Selected pageName:', selectedPageName, 'Selected field:', selectedField);
     
     const webforms = JSON.parse(sessionStorage.getItem('webforms'));
@@ -774,7 +788,7 @@ const GenerateReportPage = () => {
     const fieldType = selectedPage?.fields.find(f => f.fieldName === selectedField)?.dataType;
     
     console.log('Selected field:', selectedField, 'Field type:', fieldType);
-  
+
     if (!fieldType) {
       console.error(`Field type for selected field "${selectedField}" not found.`);
       setSelectedFieldConditions(prevState => ({
@@ -783,15 +797,17 @@ const GenerateReportPage = () => {
       }));
       return;
     }
-  
+
     const storedFilterConditions = sessionStorage.getItem('filterConditions');
     if (storedFilterConditions) {
       const filterConditions = JSON.parse(storedFilterConditions);
       const matchedConditions = filterConditions[fieldType] || {};
-  
+
+      console.log('Matched conditions from storage:', matchedConditions);
+
       setSelectedFieldConditions(prevState => ({
         ...prevState,
-        [fieldName]: matchedConditions
+        [selectedField]: matchedConditions
       }));
     } else {
       try {
@@ -799,20 +815,30 @@ const GenerateReportPage = () => {
         const filterConditions = response.data.data.filterConditions;
         sessionStorage.setItem('filterConditions', JSON.stringify(filterConditions));
         const matchedConditions = filterConditions[fieldType] || {};
-  
+
+        console.log('Matched conditions from API:', matchedConditions);
+
         setSelectedFieldConditions(prevState => ({
           ...prevState,
-          [fieldName]: matchedConditions
+          [selectedField]: matchedConditions
         }));
       } catch (error) {
         console.error('Error fetching filter conditions:', error);
         setSelectedFieldConditions(prevState => ({
           ...prevState,
-          [fieldName]: {}
+          [selectedField]: {}
         }));
       }
     }
-    handleConditionChange(fieldName, '', '');
+
+    // Update the selected field for the specific filter
+    setConditions(prevConditions => {
+      const newConditions = [...prevConditions];
+      newConditions[index] = { ...newConditions[index], field: selectedField };
+      return newConditions;
+    });
+
+    handleConditionChange(selectedField, '', '', index);
   };
 
   const constructQuery = (field, condition, value) => {
@@ -832,22 +858,35 @@ const GenerateReportPage = () => {
   };
 
   const handleGenerateReport = async () => {
-    // Construct the pipeline
+    // Construct the initial pipeline
     const pipeline = [
       { "$match": { "pageName": formData.module } },
-      { "$project": selectedFields.reduce((acc, column) => ({ ...acc, [column]: 1 }), {}) },
-      { "$match": conditions.reduce((acc, filter) => {
-        const conditionConfig = selectedFieldConditions[filter.field]?.[filter.condition];
-        if (conditionConfig) {
-          if (conditionConfig.operator === '$not') {
-            return { ...acc, [filter.field]: { $not: { [conditionConfig.suboperator]: filter.value, $options: conditionConfig.options } } };
-          } else {
-            return { ...acc, [filter.field]: { [conditionConfig.operator]: filter.value } };
-          }
-        }
-        return acc;
-      }, {}) }
+      { "$project": selectedFields.reduce((acc, column) => ({ ...acc, [column]: 1 }), {}) }
     ];
+
+    // Combine all filter conditions into a single $match stage
+    const combinedMatchStage = conditions.reduce((acc, filter) => {
+      const conditionConfig = selectedFieldConditions[filter.field]?.[filter.condition];
+      console.log('filter.field:', filter.field);
+      console.log('filter.condition:', filter.condition);
+      console.log('conditionConfig:', conditionConfig);
+      console.log('selectedFieldConditions:', selectedFieldConditions);
+
+      if (conditionConfig) {
+        if (conditionConfig.operator === '$not') {
+          acc[filter.field] = { $not: { [conditionConfig.suboperator]: filter.value, $options: conditionConfig.options } };
+        } else {
+          acc[filter.field] = { [conditionConfig.operator]: filter.value };
+        }
+      }
+      return acc;
+    }, {});
+
+    // Add the combined $match stage to the pipeline
+    pipeline.push({ "$match": combinedMatchStage });
+
+    console.log('pipeline:', pipeline);
+
     // Construct the data object dynamically
     const dataToSend = {
       pageName: 'reports',
@@ -859,40 +898,88 @@ const GenerateReportPage = () => {
       })),
       formatted_filter: pipeline
     };
-  
+
     // Add other fields dynamically from formData
     Object.keys(formData).forEach(key => {
       if (key !== 'pageName' && key !== 'filter') {
         dataToSend[key] = formData[key];
       }
     });
-  
+
     // Add selected columns
     dataToSend.selected_columns = selectedFields;
-  
+
     try {
       const response = await axios.post(`${config.apiUrl.replace(/\/$/, '')}/appdata/create`, dataToSend);
       console.log('Report submitted successfully:', response.data);
+
+      // Navigate to /view-report with the filtered data
+      navigate('/view-report', { state: { filteredData: response.data } });
     } catch (error) {
       console.error('Error submitting report:', error);
     }
   };
 
-  const fetchFilteredData = async () => {
-    const filterCriteria = {
-      pageName: 'reports',
-      fields: selectedFields,
-      conditions: conditions.map(cond => constructQuery(cond.field, cond.condition, cond.value)),
-    };
+  // const fetchFilteredData = async () => {
+  //   const filterCriteria = {
+  //     pageName: 'reports',
+  //     fields: selectedFields,
+  //     conditions: conditions.map(cond => constructQuery(cond.field, cond.condition, cond.value)),
+  //   };
 
+  //   try {
+  //     const response = await axios.post(`${config.apiUrl.replace(/\/$/, '')}/appdata/retrieve`, filterCriteria);
+  //     setFilteredData(response.data.data);
+  //     console.log('Filtered data fetched successfully:', response.data.data);
+  //   } catch (error) {
+  //     console.error('Error fetching filtered data:', error);
+  //   }
+  // };
+
+  const handleViewReport = async () => {
+    if (!selectedRow) return;
+  
     try {
-      const response = await axios.post(`${config.apiUrl.replace(/\/$/, '')}/appdata/retrieve`, filterCriteria);
-      setFilteredData(response.data.data);
-      console.log('Filtered data fetched successfully:', response.data.data);
+      // Fetch the app data using the ID from the selected row
+      const reportId = selectedRow._id;
+      const reportResponse = await axios.get(
+        `${config.apiUrl.replace(/\/$/, "")}/appdata/${reportId}`
+      );
+      
+      const reportData = reportResponse.data.data;
+      console.log('Fetched report data:', reportData);
+  
+      const module = reportData.module || 'defaultModule';
+      const selectedColumns = Array.isArray(reportData.selected_columns) ? reportData.selected_columns : [];
+      const filters = Array.isArray(reportData.filter) ? reportData.filter : [];
+  
+      const pipeline = reportData.formatted_filter;
+  
+      console.log('Pipeline array:', pipeline);
+  
+      // Ensure the pipeline is sent directly as an array
+      const appDataResponse = await axios.post(
+        `${config.apiUrl.replace(/\/$/, "")}/appdata/retrieve`,
+        pipeline,  // Send the pipeline array directly
+        { headers: { 'Content-Type': 'application/json' } }
+      );
+      
+      const filteredData_reportId = appDataResponse.data.data; // Store the fetched data
+      console.log('Fetched app data:', filteredData_reportId);
+  
+      // Update the state with the fetched data
+      setFilteredData(filteredData_reportId);
+  
+      // Navigate to the ReportGrid component and pass the filtered data
+      navigate('/view-report', { state: { filteredData: filteredData_reportId } });
+  
     } catch (error) {
-      console.error('Error fetching filtered data:', error);
+      console.error('Error fetching report data:', error);
     }
   };
+  
+  // Ensure you have a navigate hook
+  const navigate = useNavigate();
 
   const renderInputField = (field) => {
     const isFileInput = field.type === 'file';
@@ -1034,51 +1121,56 @@ const GenerateReportPage = () => {
             />
           </FormControl>
         );
-      case 'filter':
-        return (
-          <div key={field.fieldName}>
-            <label>{label}</label>
-            <div style={{ display: 'flex', flexDirection: 'row', gap: '10px', marginTop: '10px' }}>
-              <Select
-                onChange={(e) => handleFieldSelectChange(selectedPageName, field.fieldName, e.target.value)}
-                displayEmpty
-                value={conditions.find(cond => cond.field === field.fieldName)?.field || ''}
-                style={{ width: '30%' }}
-              >
-                <MenuItem disabled value="">
-                  Select field
-                </MenuItem>
-                {availableColumns.length > 0 && availableColumns.map((column) => (
-                  <MenuItem key={column.fieldName} value={column.fieldName}>
-                    {column.label}
-                  </MenuItem>
-                ))}
-              </Select>
-              <Select
-                onChange={(e) => handleConditionChange(field.fieldName, e.target.value, '')}
-                displayEmpty
-                value={conditions.find(cond => cond.field === field.fieldName)?.condition || ''}
-                style={{ width: '30%' }}
-              >
-                <MenuItem disabled value="">
-                  Select condition
-                </MenuItem>
-                {selectedFieldConditions[field.fieldName] && Object.keys(selectedFieldConditions[field.fieldName]).map((condition, idx) => (
-                  <MenuItem key={idx} value={condition}>
-                    {selectedFieldConditions[field.fieldName][condition].description}
-                  </MenuItem>
-                ))}
-              </Select>
-              <TextField
-                type="text"
-                placeholder="Enter value"
-                value={conditions.find(cond => cond.field === field.fieldName)?.value || ''}
-                onChange={(e) => handleConditionChange(field.fieldName, conditions.find(cond => cond.field === field.fieldName)?.condition || '=', e.target.value)}
-                style={{ width: '30%' }}
-              />
+        case 'filter':
+          return (
+            <div key={field.fieldName}>
+              <label>{label}</label>
+              {conditions.map((condition, index) => (
+                <div key={index} style={{ display: 'flex', flexDirection: 'row', gap: '10px', marginTop: '10px' }}>
+                  <Select
+                    onChange={(e) => handleFieldSelectChange(formData.module, condition.fieldName, e.target.value, index)}
+                    displayEmpty
+                    value={condition.field || ''}
+                    style={{ width: '30%' }}
+                  >
+                    <MenuItem disabled value="">
+                      Select field
+                    </MenuItem>
+                    {availableColumns.length > 0 && availableColumns.map((column) => (
+                      <MenuItem key={column.fieldName} value={column.fieldName}>
+                        {column.label}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                  <Select
+                    onChange={(e) => handleConditionChange(condition.field, e.target.value, '', index)}
+                    displayEmpty
+                    value={condition.condition || ''}
+                    style={{ width: '30%' }}
+                  >
+                    <MenuItem disabled value="">
+                      Select condition
+                    </MenuItem>
+                    {selectedFieldConditions[condition.field] && Object.keys(selectedFieldConditions[condition.field]).map((cond, idx) => (
+                      <MenuItem key={idx} value={cond}>
+                        {selectedFieldConditions[condition.field][cond].description}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                  <TextField
+                    type="text"
+                    placeholder="Enter value"
+                    value={condition.value || ''}
+                    onChange={(e) => handleConditionChange(condition.field, condition.condition || '=', e.target.value, index)}
+                    style={{ width: '30%' }}
+                  />
+                </div>
+              ))}
+              <Button onClick={addCondition} variant="contained" color="primary" style={{ marginTop: '10px' }}>
+                Add Condition
+              </Button>
             </div>
-          </div>
-        );
+          );
       default:
         return null;
     }
@@ -1107,7 +1199,7 @@ const GenerateReportPage = () => {
           sx={{
             display: 'flex',
             flexDirection: 'row',
-            justifyContent: 'space-between',
+            justifyContent: 'center',
             width: '100%',
             marginTop: 2,
           }}
@@ -1119,13 +1211,13 @@ const GenerateReportPage = () => {
           >
             Generate Report
           </button>
-          <button
+          {/* <button
             type="button"
             onClick={fetchFilteredData}
             style={{ backgroundColor: '#2196F3', color: 'white', border: 'none', padding: '10px 20px', cursor: 'pointer' }}
           >
             Fetch Filtered Data
-          </button>
+          </button> */}
         </Box>
         {filteredData.length > 0 && (
           <Box
