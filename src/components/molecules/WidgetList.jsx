@@ -289,7 +289,6 @@ import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import CreateWidget from '../atoms/widgets';
 import { Box } from '@material-ui/core';
-// import CircularProgress from '@mui/material/CircularProgress';
 import { experimentalStyled as styled } from '@mui/material/styles';
 import config from '../../config/config';
 import WidgetsIcon from '@mui/icons-material/WidgetsOutlined';
@@ -336,16 +335,39 @@ const WidgetsList = ({ dashboardName }) => {
   const [draggingIndex, setDraggingIndex] = useState(null);
   const hiddenWidgetsRef = useRef(null);
 
+  // Fetch widgets and restore hidden widgets from localStorage
   useEffect(() => {
     const fetchWidgets = async () => {
-      const retrievedWidgets = await retrieveWidgets(dashboardName);
-      setWidgets(retrievedWidgets);
-      setLoading(false);
+      try {
+        // Fetch the widgets from the server
+        const retrievedWidgets = await retrieveWidgets(dashboardName);
+        
+        // Retrieve hidden widgets from localStorage
+        const storedHiddenWidgets = retrievedWidgets.filter((_, index) => {
+          const isHidden = localStorage.getItem(`hiddenWidgets_${dashboardName}_widget-${index}`);
+          return !!isHidden;
+        });
+
+        // Set visible widgets
+        const visibleWidgets = retrievedWidgets.filter((_, index) => {
+          const isHidden = localStorage.getItem(`hiddenWidgets_${dashboardName}_widget-${index}`);
+          return !isHidden;
+        });
+
+        setWidgets(visibleWidgets);
+        setHiddenWidgets(storedHiddenWidgets);
+      } catch (error) {
+        console.error('Error retrieving dashboard data:', error);
+        setWidgets([]);
+      } finally {
+        setLoading(false);
+      }
     };
 
     fetchWidgets();
   }, [dashboardName]);
 
+  // Close hidden widgets pop-up when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (hiddenWidgetsRef.current && !hiddenWidgetsRef.current.contains(event.target)) {
@@ -359,6 +381,7 @@ const WidgetsList = ({ dashboardName }) => {
     };
   }, []);
 
+  // Handle drag events
   const handleDragStart = (index) => {
     setDraggingIndex(index);
     setTimeout(() => {
@@ -381,18 +404,34 @@ const WidgetsList = ({ dashboardName }) => {
     document.querySelector(`.widget-${index}`);
   };
 
+  // Hide widget and save hidden widgets to localStorage with a unique key
   const handleHideWidget = (index) => {
-    setHiddenWidgets([...hiddenWidgets, widgets[index]]);
-    setWidgets(widgets.filter((_, i) => i !== index));
+    const updatedHiddenWidgets = [...hiddenWidgets, widgets[index]];
+    const updatedWidgets = widgets.filter((_, i) => i !== index);
+
+    setHiddenWidgets(updatedHiddenWidgets);
+    setWidgets(updatedWidgets);
+    
+    // Save hidden widget to localStorage with a unique key
+    localStorage.setItem(`hiddenWidgets_${dashboardName}_widget-${index}`, JSON.stringify(widgets[index]));
   };
 
+  // Toggle hidden widgets display
   const toggleShowHiddenWidgets = () => {
     setShowHiddenWidgets(!showHiddenWidgets);
   };
 
+  // Restore hidden widget and update localStorage
   const handleRestoreWidget = (index) => {
-    setWidgets([...widgets, hiddenWidgets[index]]);
-    setHiddenWidgets(hiddenWidgets.filter((_, i) => i !== index));
+    const restoredWidget = hiddenWidgets[index];
+    const updatedWidgets = [...widgets, restoredWidget];
+    const updatedHiddenWidgets = hiddenWidgets.filter((_, i) => i !== index);
+
+    setWidgets(updatedWidgets);
+    setHiddenWidgets(updatedHiddenWidgets);
+    
+    // Remove the restored widget from localStorage
+    localStorage.removeItem(`hiddenWidgets_${dashboardName}_widget-${index}`);
   };
 
   return (
@@ -400,53 +439,144 @@ const WidgetsList = ({ dashboardName }) => {
       <Box sx={{ flexGrow: 1 }}>
         <div style={{ width: '100%' }}>
           <div>
-            <button style={{ border: 'none', alignItems: 'center', display: 'flex', padding: '8px', borderRadius: '5px', marginRight: '5%', marginTop: '10px', marginLeft: 'auto', cursor: 'pointer' }} onClick={toggleShowHiddenWidgets}><WidgetsIcon /></button>
+            <button
+              style={{
+                border: 'none',
+                alignItems: 'center',
+                display: 'flex',
+                padding: '8px',
+                borderRadius: '5px',
+                marginRight: '5%',
+                marginTop: '10px',
+                marginLeft: 'auto',
+                cursor: 'pointer',
+              }}
+              onClick={toggleShowHiddenWidgets}
+            >
+              <WidgetsIcon />
+            </button>
           </div>
           {showHiddenWidgets && (
             <div
               ref={hiddenWidgetsRef}
-              style={{ position: 'absolute', zIndex: '10', background: 'white', padding: '20px', maxHeight: '30%', top: '32%', right: '2%', overflow: 'auto', borderRadius: '5px' }}
+              style={{
+                position: 'absolute',
+                zIndex: '10',
+                background: 'white',
+                padding: '20px',
+                maxHeight: '30%',
+                top: '32%',
+                right: '2%',
+                overflow: 'auto',
+                borderRadius: '5px',
+              }}
             >
-              <div style={{ borderBottom: '1px dashed gray', textAlign: 'center', marginBottom: '10px' }}>Available Filters</div>
+              <div
+                style={{
+                  borderBottom: '1px dashed gray',
+                  textAlign: 'center',
+                  marginBottom: '10px',
+                }}
+              >
+                Available Filters
+              </div>
               {hiddenWidgets.length > 0 ? (
                 hiddenWidgets.map((widget, index) => (
                   <div key={index}>
                     <div
-                      style={{ display: 'flex', background: '#212529', color: 'white', padding: '5px', borderRadius: '5px', margin: '10px' }}
+                      style={{
+                        display: 'flex',
+                        background: '#212529',
+                        color: 'white',
+                        padding: '5px',
+                        borderRadius: '5px',
+                        margin: '10px',
+                      }}
                     >
-                      <div style={{ display: 'flex', cursor: 'pointer' }} onClick={() => handleRestoreWidget(index)}>
-                        <div style={{ background: '#fff6', borderRadius: '100px', padding: '5px', margin: 'auto', display: 'flex', marginRight: '5px' }}>
-                          <img style={{ height: '15px', width: 'auto', margin: 'auto', filter: 'brightness(0) invert(1)' }} src={widget.icon_url || 'default_icon_url'} alt={widget.title} />
+                      <div
+                        style={{ display: 'flex', cursor: 'pointer' }}
+                        onClick={() => handleRestoreWidget(index)}
+                      >
+                        <div
+                          style={{
+                            background: '#fff6',
+                            borderRadius: '100px',
+                            padding: '5px',
+                            margin: 'auto',
+                            display: 'flex',
+                            marginRight: '5px',
+                          }}
+                        >
+                          <img
+                            style={{
+                              height: '15px',
+                              width: 'auto',
+                              margin: 'auto',
+                              filter: 'brightness(0) invert(1)',
+                            }}
+                            src={widget.icon_url || 'default_icon_url'}
+                            alt={widget.title}
+                          />
                         </div>
-                        <div style={{ marginRight: '5px' }}>{widget.title} </div>
+                        <div style={{ marginRight: '5px' }}>{widget.title}</div>
                       </div>
                     </div>
                   </div>
                 ))
               ) : (
-                <div style={{ textAlign: 'center', color: 'gray', marginTop: '10px' }}>No filters available</div>
+                <div
+                  style={{ textAlign: 'center', color: 'gray', marginTop: '10px' }}
+                >
+                  No filters available
+                </div>
               )}
             </div>
           )}
         </div>
         <div className='widget_main_div' style={{ display: 'flex', flexWrap: 'wrap' }}>
-        {widgets.length > 0 ? widgets.map((widget, index) => (
-          <div
-            className={`widget-${index} widget-main`}
-            key={index}
-            item
-            draggable
-            onDragStart={() => handleDragStart(index)}
-            onDragEnter={() => handleDragEnter(index)}
-            onDragEnd={() => handleDragEnd(index)}
-            style={{ width: '190px', height: 'auto', margin: '20px 10px' }}
-          >
-            <div style={{ textAlign: 'end', marginBottom: '-25px', marginRight: '10px' }}>
-              <button className='widget-hide-btn' style={{ position: 'relative', border: 'none', background: 'white', borderRadius: '100px', cursor: 'pointer' }} onClick={() => handleHideWidget(index)}>-</button>
-            </div>
-            <CreateWidget widget={widget} dashboardName={dashboardName} />
-          </div>
-        )) : <div></div>}
+          {widgets.length > 0 ? (
+            widgets.map((widget, index) => (
+              <div
+                className={`widget-${index} widget-main`}
+                key={index}
+                item
+                draggable
+                onDragStart={() => handleDragStart(index)}
+                onDragEnter={() => handleDragEnter(index)}
+                onDragEnd={() => handleDragEnd(index)}
+                style={{
+                  width: '190px',
+                  height: 'auto',
+                  margin: '20px 10px',
+                }}
+              >
+                <div
+                  style={{
+                    textAlign: 'end',
+                    marginBottom: '-25px',
+                    marginRight: '10px',
+                  }}
+                >
+                  <button
+                    className='widget-hide-btn'
+                    style={{
+                      position: 'relative',
+                      border: 'none',
+                      background: 'white',
+                      borderRadius: '100px',
+                      cursor: 'pointer',
+                    }}
+                    onClick={() => handleHideWidget(index)}
+                  >
+                    -
+                  </button>
+                </div>
+                <CreateWidget widget={widget} dashboardName={dashboardName} />
+              </div>
+            ))
+          ) : (
+            <div></div>
+          )}
         </div>
       </Box>
     </ScrollContainer>

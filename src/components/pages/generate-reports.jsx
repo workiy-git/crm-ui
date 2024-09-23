@@ -646,6 +646,9 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { Box, TextField, Select, MenuItem, FormControl, Checkbox, FormControlLabel, Button } from '@mui/material';
 import config from '../../config/config';
+import { Margin } from '@mui/icons-material';
+import AddIcon from '@mui/icons-material/Add';
+import FilterAltOutlinedIcon from '@mui/icons-material/FilterAltOutlined';
 
 const GenerateReportPage = () => {
   const [fields, setFields] = useState([]);
@@ -1008,13 +1011,14 @@ const GenerateReportPage = () => {
       display: 'flex',
       flexDirection: 'row',
       alignItems: 'center',
-      width: '50%',
+      width: '70%',
       borderBottom: '1px solid #e0e0e0',
       paddingBottom: 1,
       paddingTop: 1,
       paddingLeft: 2,
       paddingRight: 2,
       boxSizing: 'border-box',
+      margin: 'auto'
     };
   
     const labelStyles = {
@@ -1121,17 +1125,71 @@ const GenerateReportPage = () => {
             />
           </FormControl>
         );
+      default:
+        return null;
+    }
+  };
+  const renderInputFields = (field) => {
+    const isFileInput = field.type === 'file';
+    const value = !isFileInput && (formData[field.fieldName] === 'N/A' ? '' : formData[field.fieldName] || '');
+    const label = `${field.label || field.fieldName}${field.required ? ' *' : ''}`;
+    const isRequired = field.required === 'true';
+  
+    const commonProps = {
+      name: field.fieldName,
+      placeholder: field.placeholder || 'Not Specified',
+      fullWidth: true,
+      onChange: (e) => handleInputChange(e, field.fieldName),
+      ...(isRequired && { required: true }) // Add the required property if isRequired is true
+    };
+  
+    const inputProps = {
+      ...(isFileInput ? {} : { value }),
+      ...(field.pattern && { pattern: field.pattern }), // Apply pattern if provided
+    };
+  
+    if (!isFileInput) {
+      commonProps.value = value;
+    }
+  
+    const formControlStyles = {
+      display: 'flex',
+      flexDirection: 'row',
+      alignItems: 'center',
+      width: '50%',
+      borderBottom: '1px solid #e0e0e0',
+      paddingBottom: 1,
+      paddingTop: 1,
+      paddingLeft: 2,
+      paddingRight: 2,
+      boxSizing: 'border-box',
+    };
+  
+    const labelStyles = {
+      width: '40%',
+      textAlign: 'left',
+      fontWeight: 'bold',
+      color: '#333',
+      fontSize: '12px',
+    };
+  
+    switch (field.htmlControl) {
+      
         case 'filter':
           return (
             <div key={field.fieldName}>
-              <label>{label}</label>
+              {/* <label>{label}</label> */}
+              <Button onClick={addCondition} variant="contained" style={{ marginTop: '10px', background:'#D9D9D9', color:'black', borderRadius:'100px' }}>
+               <AddIcon style={{marginRight:'10px', fontSize:'20px'}}/> Add Condition
+              </Button>
               {conditions.map((condition, index) => (
-                <div key={index} style={{ display: 'flex', flexDirection: 'row', gap: '10px', marginTop: '10px' }}>
+                <div key={index} style={{ display: 'flex', flexDirection: 'column', gap: '5px', marginTop: '10px', background:'#F5F5F5', padding:'15px', borderRadius:'10px' }}>
                   <Select
                     onChange={(e) => handleFieldSelectChange(formData.module, condition.fieldName, e.target.value, index)}
                     displayEmpty
                     value={condition.field || ''}
-                    style={{ width: '30%' }}
+                    className='edit-field-input'
+                    style={{ width: '60%', margin:'auto' }}
                   >
                     <MenuItem disabled value="">
                       Select field
@@ -1146,7 +1204,8 @@ const GenerateReportPage = () => {
                     onChange={(e) => handleConditionChange(condition.field, e.target.value, '', index)}
                     displayEmpty
                     value={condition.condition || ''}
-                    style={{ width: '30%' }}
+                    className='edit-field-input'
+                    style={{ width: '60%', margin:'auto' }}
                   >
                     <MenuItem disabled value="">
                       Select condition
@@ -1162,13 +1221,12 @@ const GenerateReportPage = () => {
                     placeholder="Enter value"
                     value={condition.value || ''}
                     onChange={(e) => handleConditionChange(condition.field, condition.condition || '=', e.target.value, index)}
-                    style={{ width: '30%' }}
+                    className='edit-field-input'
+                    style={{ width: '60%', margin:'auto' }}
                   />
                 </div>
               ))}
-              <Button onClick={addCondition} variant="contained" color="primary" style={{ marginTop: '10px' }}>
-                Add Condition
-              </Button>
+             
             </div>
           );
       default:
@@ -1181,20 +1239,30 @@ const GenerateReportPage = () => {
       className='page_box'
       sx={{
         width: '100%',
-        padding: 2,
+        // padding: 2,
         boxSizing: 'border-box',
-        backgroundColor: '#f5f5f5',
       }}
     >
+      <div style={{background:'#F5BD71', color:'black', padding:'10px 20px', fontWeight:'bold'}}>Reports</div>
       <Box
         className='details_form_container'
         sx={{
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
+          height:'78vh'
         }}
       >
-        {fields.map((field) => renderInputField(field))}
+        <div style={{display:'flex', width:'100%', height:'70vh'}}>
+          <div style={{width:'60%', margin: '10px', height:'100%'}}>
+            <div style={{background:'#2C2C2C', color:'#FFC03D', padding:'10px'}}>Gernearte Report</div>
+            <div style={{marginTop:'10px', height:'80%', overflow:'auto'}}>{fields.map((field) => renderInputField(field))}</div>
+          </div>
+          <div style={{width:'35%', margin: '10px', height:'100%'}}>
+            <div style={{background:'#2C2C2C', color:'#FFC03D', padding:'10px', display:'flex', alignItems:'center'}}> <FilterAltOutlinedIcon style={{marginRight:'10px', borderRadius:'5px', padding:'1px', border: '1px solid'}}/> Filter</div>
+            <div style={{height:'80%', overflow:'auto'}}>{fields.map((field) => renderInputFields(field))}</div>
+          </div>
+        </div>
         <Box
           sx={{
             display: 'flex',
@@ -1207,7 +1275,7 @@ const GenerateReportPage = () => {
           <button
             type="button"
             onClick={handleGenerateReport}
-            style={{ backgroundColor: '#4CAF50', color: 'white', border: 'none', padding: '10px 20px', cursor: 'pointer' }}
+            style={{ backgroundColor: '#D9D9D9', color: 'black', border: 'none', padding: '10px 20px', cursor: 'pointer', borderRadius:'10px', fontWeight:'bold' }}
           >
             Generate Report
           </button>

@@ -40,17 +40,31 @@ const EditComponent = forwardRef(({ current, id, pageSchema, formData, setFormDa
   const handleInputChange = (e, fieldName) => {
     const value = e.target.type === 'checkbox' ? e.target.checked : e.target.value;
     const error = validateField(fieldName, value);
-
-    setFormData(prevState => ({
-      ...prevState,
-      [fieldName]: value,
-    }));
-
+  
+    if (fieldName.includes('.')) {
+      // Handle nested fields
+      const [parentField, childField] = fieldName.split('.');
+      setFormData(prevState => ({
+        ...prevState,
+        [parentField]: {
+          ...prevState[parentField],
+          [childField]: value,
+        },
+      }));
+    } else {
+      // Handle normal fields
+      setFormData(prevState => ({
+        ...prevState,
+        [fieldName]: value,
+      }));
+    }
+  
     setFormErrors(prevErrors => ({
       ...prevErrors,
       [fieldName]: error
     }));
   };
+  
 
 
 const validateForm = () => {
@@ -156,9 +170,10 @@ const validateForm = () => {
           return (
             <Box key={field.fieldName} style={{ width: '100%' }}>
               <label style={labelStyles}>{label}</label>
+              <div style={{ display: 'flex',  flexWrap: 'wrap' }}>
               {field.fields.map((subField) => (
                 <FormControl key={subField.fieldName} className='details_page_inputs' style={formControlStyles} error={!!formErrors[subField.fieldName]}>
-                  <label style={{ ...labelStyles, width: '30%' }}>{subField.label}</label>
+                  <label  style={labelStyles}>{subField.label}</label>
                   <TextField
                     className='edit-field-input'
                     name={`${field.fieldName}.${subField.fieldName}`}  // Nested name
@@ -178,6 +193,7 @@ const validateForm = () => {
                   />
                 </FormControl>
               ))}
+              </div>
             </Box>
           );
         }
@@ -216,7 +232,7 @@ const validateForm = () => {
               }}
               displayEmpty
             >
-              <MenuItem disabled value="">
+              <MenuItem className='edit-field-input-select' disabled value="">
                 Select an option
               </MenuItem>
               {Array.isArray(field.options) && field.options.map((option, index) => (
@@ -233,16 +249,23 @@ const validateForm = () => {
         return (
           <FormControlLabel
             className='details_page_inputs'
+            
             key={field.fieldName}
             control={
+              <div style={{display:'flex', width:'100%', alignItems:'center'}}>
+              <label style={labelStyles}>{label}</label>
               <Checkbox
+               style={{
+                color: '#666',
+              }}
                 className='edit-field-input'
                 name={field.fieldName}
                 checked={formData[field.fieldName] || false}
                 onChange={(e) => handleInputChange(e, field.fieldName)}
               />
+              </div>
             }
-            label={label}
+            
             style={{
               display: 'flex',
               alignItems: 'center',
