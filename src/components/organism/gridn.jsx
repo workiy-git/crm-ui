@@ -92,6 +92,7 @@ const GridComponent = ({ pageName }) => {
   const handleConfirmDelete = async () => {
     if (rowToDelete) {
       const id = rowToDelete._id; // Assuming `_id` is the unique identifier for the row
+
       try {
         await axios.delete(`${config.apiUrl.replace(/\/$/, '')}/appdata/${id}`);
         setGridData((prevData) => prevData.filter((row) => row._id !== id));
@@ -316,6 +317,47 @@ const fetchGridData = async (filter) => {
 };
 
 const [filteredData, setFilteredData] = useState([]);
+const [convertDialogOpen, setConvertDialogOpen] = useState(false);
+
+
+
+const openConfirmationDialog = () => {
+  setConvertDialogOpen(true);
+};
+
+const handleConfirmconcertToLead = async () => {
+  handleMenuClose(); // Close the menu if needed
+
+  if (selectedRow) {
+    const id = selectedRow._id; // Get the unique ID for the row
+    const updatedRow = { pageName: "leads" }; // Only updating the pageName field
+
+    // Log for debugging purposes
+    console.log('ID:', id);
+    console.log('Updated Data being sent:', updatedRow);
+
+    try {
+      // Send the PUT request with only the pageName field
+      await axios.put(`${config.apiUrl}/appdata/${id}`, updatedRow);
+      setSuccess('Convert To Lead successfully');
+      fetchGridData(); // Refetch the grid data after the update
+      setTimeout(() => setSuccess(''), 3000); // Clear success message after 3 seconds
+    } catch (error) {
+      console.error('Error Converting Data:', error);
+    }
+  }
+
+  // Close the dialog after confirmation
+  setConvertDialogOpen(false);
+};
+
+const handleCancelconcertToLead = () => {
+  setConvertDialogOpen(false); // Close the dialog without doing anything
+};
+
+
+
+
 
 const handleViewReport = async () => {
   if (!selectedRow) return;
@@ -429,6 +471,9 @@ const handleViewReport = async () => {
         selectedRow={selectedRow}
         pageName={pageName} 
         onViewReport={handleViewReport}
+        convertToLead={openConfirmationDialog}
+        // convertToLead={handleConfirmconcertToLead}
+
       />
         </div>
       ),
@@ -862,6 +907,13 @@ const handleViewReport = async () => {
   onConfirm={handleConfirmDelete}
   onCancel={handleCancelDelete}
 />
+<ConfirmationDialog
+        open={convertDialogOpen}
+        title="Convert To Lead"
+        content={`Are you sure you want to Convert To Lead?`}
+        onConfirm={handleConfirmconcertToLead}
+        onCancel={handleCancelconcertToLead}
+      />
 
     </div>
   );
