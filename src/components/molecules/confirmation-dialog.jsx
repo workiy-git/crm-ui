@@ -13,7 +13,8 @@ const ConfirmationDialog = ({ open, title, content, onConfirm, onCancel }) => {
       <Button onClick={onCancel} style={{border:'1px solid #c2c2c2' ,color:'#000',padding:'5px 15px'}} >
         Cancel
       </Button>
-      <Button onClick={onConfirm} style={{background:'#dedede', color:'#000',padding:'5px 20px'}} startIcon={<Delete />}>
+      {/* <Button onClick={onConfirm} style={{background:'#dedede', color:'#000',padding:'5px 20px'}} startIcon={<Delete />}> */}
+      <Button onClick={onConfirm} style={{background:'#dedede', color:'#000',padding:'5px 20px'}}>
         Confirm
       </Button>
     </DialogActions>
