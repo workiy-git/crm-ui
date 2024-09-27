@@ -220,7 +220,7 @@ const fetchGridData = async (filter) => {
     if (response.data.data.length > 0) {
       const dynamicColumns = Object.keys(dataWithIds[0])
       .filter((key) => key !== "PageId" && key !== "pageName" &&  key !== "_id" && key !== "appdata" && key !== "history" 
-      && key !== "id" && key !== "comments" && key !== "pageID")
+      && key !== "id" && key !== "comments" && key !== "pageID" && key !== "filter" && key !== "formatted_filter" && key !== "selected_columns")
       .map((key) => ({
         field: key,
         headerName: key
@@ -232,6 +232,13 @@ const fetchGridData = async (filter) => {
       setColumns(dynamicColumns);
       setAvailableColumns(dynamicColumns); // Set available columns here
     }
+    else {
+      setIsLoading(true);
+      setTimeout(() => {
+        setIsLoading(false);
+      }, 2000); // 2000 milliseconds = 2 seconds
+    }
+
   } catch (error) {
     console.error("Error fetching grid data:", error);
   }
