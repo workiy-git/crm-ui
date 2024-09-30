@@ -13,12 +13,12 @@ const ForgetPassword = () => {
   const [successMessage, setSuccessMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const navigate = useNavigate(); 
+  const navigate = useNavigate();
 
   // Cognito User Pool Data
   const poolData = {
-    UserPoolId: "us-east-1_AEdwzu9Xx", // Your user pool id here
-    ClientId: "6258t5vdisgcu7rjkuc5c94ba9", // Your client id here
+    UserPoolId: "ap-south-1_y7TfqTA4N", // Your user pool id here
+    ClientId: "2ic7i6hn5p5j3vqtk2sbhj4gg3", // Your client id here
   };
   const userPool = new CognitoUserPool(poolData);
 
@@ -74,80 +74,107 @@ const ForgetPassword = () => {
   };
 
   return (
-    <div style={{height:'100%', display:'flex'}}>
-    <div style={{width:'30%', margin:'auto', textAlign:'center', border:'1px #c2c2cc solid', borderRadius:'5px', padding:'20px'}}>
-      <Typography variant="h6" style={{marginBottom:'20px'}}>
-        {step === 1 ? "Forget Password" : "Enter Verification Code and New Password"}
-      </Typography>
+    <div style={{ height: "100%", display: "flex" }}>
+      <div
+        style={{
+          width: "30%",
+          margin: "auto",
+          textAlign: "center",
+          border: "1px #c2c2cc solid",
+          borderRadius: "5px",
+          padding: "20px",
+        }}
+      >
+        <Typography variant="h6" style={{ marginBottom: "20px" }}>
+          {step === 1
+            ? "Forget Password"
+            : "Enter Verification Code and New Password"}
+        </Typography>
 
-      {step === 1 ? (
-        <form style={{display:'flex', flexDirection:'column', alignItems:'center', gap:'20px'}} onSubmit={handleRequestReset}>
-          <TextField
-          style={{width:'80%'}}
-            label="Username"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            fullWidth
-            required
-          />
-          <TextField
-          style={{width:'80%'}}
-            label="Mobile Number"
-            value={mobileNumber}
-            onChange={(e) => setMobileNumber(e.target.value)}
-            fullWidth
-            required
-          />
-          {errorMessage && (
-            <Typography color="error">{errorMessage}</Typography>
-          )}
-          {successMessage && (
-            <Typography color="primary">{successMessage}</Typography>
-          )}
-          <Button
-            variant="contained"
-            style={{background:'#f2a742', color:'black'}}
-            type="submit"
-            disabled={isSubmitting}
+        {step === 1 ? (
+          <form
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              gap: "20px",
+            }}
+            onSubmit={handleRequestReset}
           >
-            {isSubmitting ? "Submitting..." : "Send Verification Code"}
-          </Button>
-        </form>
-      ) : (
-        <form  style={{display:'flex', flexDirection:'column', alignItems:'center', gap:'20px'}} onSubmit={handleResetPassword}>
-          <TextField
-          style={{width:'50%'}}
-            label="Verification Code"
-            value={verificationCode}
-            onChange={(e) => setVerificationCode(e.target.value)}
-            fullWidth
-            required
-          />
-          <TextField
-          style={{width:'50%'}}
-            label="New Password"
-            type="password"
-            value={newPassword}
-            onChange={(e) => setNewPassword(e.target.value)}
-            fullWidth
-            required
-          />
-          {errorMessage && (
-            <Typography color="error">{errorMessage}</Typography>
-          )}
-          {successMessage && (
-            <Typography color="primary">{successMessage}</Typography>
-          )}
-          <Button
-            variant="contained"
-            style={{background:'#f2a742', color:'black'}}
-            type="submit"
-            disabled={isSubmitting}
+            <TextField
+              style={{ width: "80%" }}
+              label="Username"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              fullWidth
+              required
+            />
+            <TextField
+              style={{ width: "80%" }}
+              label="Mobile Number"
+              value={mobileNumber}
+              onChange={(e) => setMobileNumber(e.target.value)}
+              fullWidth
+              required
+            />
+            {errorMessage && (
+              <Typography color="error">{errorMessage}</Typography>
+            )}
+            {successMessage && (
+              <Typography color="primary">{successMessage}</Typography>
+            )}
+            <Button
+              variant="contained"
+              style={{ background: "#f2a742", color: "black" }}
+              type="submit"
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? "Submitting..." : "Send Verification Code"}
+            </Button>
+          </form>
+        ) : (
+          <form
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              gap: "20px",
+            }}
+            onSubmit={handleResetPassword}
           >
-            {isSubmitting ? "Submitting..." : "Reset Password"}
-          </Button>
-        </form>
-      )}
+            <TextField
+              style={{ width: "50%" }}
+              label="Verification Code"
+              value={verificationCode}
+              onChange={(e) => setVerificationCode(e.target.value)}
+              fullWidth
+              required
+            />
+            <TextField
+              style={{ width: "50%" }}
+              label="New Password"
+              type="password"
+              value={newPassword}
+              onChange={(e) => setNewPassword(e.target.value)}
+              fullWidth
+              required
+            />
+            {errorMessage && (
+              <Typography color="error">{errorMessage}</Typography>
+            )}
+            {successMessage && (
+              <Typography color="primary">{successMessage}</Typography>
+            )}
+            <Button
+              variant="contained"
+              style={{ background: "#f2a742", color: "black" }}
+              type="submit"
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? "Submitting..." : "Reset Password"}
+            </Button>
+          </form>
+        )}
       </div>
     </div>
   );

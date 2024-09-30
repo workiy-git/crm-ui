@@ -39,8 +39,8 @@ function Loginpage() {
 
   // Define your Cognito User Pool Data
   const poolData = {
-    UserPoolId: "us-east-1_AEdwzu9Xx", // Your user pool id here
-    ClientId: "6258t5vdisgcu7rjkuc5c94ba9", // Your client id here
+    UserPoolId: "ap-south-1_y7TfqTA4N", // Your user pool id here
+    ClientId: "2ic7i6hn5p5j3vqtk2sbhj4gg3", // Your client id here
   };
   const userPool = new CognitoUserPool(poolData);
 
@@ -86,11 +86,11 @@ function Loginpage() {
               },
               body: JSON.stringify([
                 {
-                  "$match": {
-                    "pageName": "users",
-                    "username": username, // dynamically include the username
-                  }
-                }
+                  $match: {
+                    pageName: "users",
+                    username: username, // dynamically include the username
+                  },
+                },
               ]),
             });
 
@@ -98,24 +98,33 @@ function Loginpage() {
             if (userData && userData.data[0].company === companyName) {
               sessionStorage.clear();
               sessionStorage.setItem("isLoggedIn", "true");
-              sessionStorage.setItem("accessToken", result.getAccessToken().getJwtToken());
+              sessionStorage.setItem(
+                "accessToken",
+                result.getAccessToken().getJwtToken()
+              );
               login(result.getAccessToken().getJwtToken());
               // Verify session storage
             } else {
               console.error("Company mismatch or user not found:", userData);
-              throw new Error("User not found in the database or company mismatch");
+              throw new Error(
+                "User not found in the database or company mismatch"
+              );
             }
           } catch (error) {
             console.error("User verification failed", error);
-            setErrorMessage("Invalid username or password. Please try again.");
-            setPassword("");  // Clear the password field
+            setErrorMessage(
+              "Invalid username or password. Please try again.User Verification Failed"
+            );
+            setPassword(""); // Clear the password field
             setIsSubmitting(false);
           }
         },
         onFailure: (err) => {
           console.error("Authentication failed", err);
-          setErrorMessage("Invalid username or password. Please try again.");
-          setPassword("");  // Clear the password field
+          setErrorMessage(
+            "Invalid username or password. Please try again Authentication Failed."
+          );
+          setPassword(""); // Clear the password field
           setIsSubmitting(false);
           if (!retry) {
             console.log("Retrying login...");
