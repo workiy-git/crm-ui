@@ -1,6 +1,6 @@
 // config.development.js
 const devConfig = {
-  apiUrl: 'http://localhost:9000/api',
+  apiUrl: 'https://2ri4gekir4.execute-api.ap-south-1.amazonaws.com/dev',
   // other development configurations...
 };
 
