@@ -203,46 +203,61 @@ const GridComponent = ({ pageName }) => {
     setPage(1);
   };
   
-  // Fetch grid data based on the selected filter
-const fetchGridData = async (filter) => {
-  try {
-    const response = await axios.post(
-      `${config.apiUrl.replace(/\/$/, "")}${gridEndpoint}`,
-      filter
-    );
-    const dataWithIds = response.data.data.map((item, index) => ({
-      ...item,
-      id: item._id || index,
-    }));
-    setGridData(dataWithIds);
-    setTotalRows(dataWithIds.length);
-
-    if (response.data.data.length > 0) {
-      const dynamicColumns = Object.keys(dataWithIds[0])
-      .filter((key) => key !== "PageId" && key !== "pageName" &&  key !== "_id" && key !== "appdata" && key !== "history" 
-      && key !== "id" && key !== "comments" && key !== "pageID" && key !== "filter" && key !== "formatted_filter" && key !== "selected_columns")
-      .map((key) => ({
-        field: key,
-        headerName: key
-          .replace(/_/g, " ")
-          .replace(/\b\w/g, (char) => char.toUpperCase()),
-        width: 150,
-      }));
-      setIsLoading(false);
-      setColumns(dynamicColumns);
-      setAvailableColumns(dynamicColumns); // Set available columns here
+  const flattenObject = (obj, parent = '', res = {}) => {
+    for (let key in obj) {
+      if (typeof obj[key] === 'object' && obj[key] !== null && !Array.isArray(obj[key])) {
+        flattenObject(obj[key], `${parent}${key}.`, res);
+      } else {
+        res[`${key}`] = obj[key];
+      }
     }
-    else {
-      setIsLoading(true);
-      setTimeout(() => {
+    return res;
+  };
+  
+  const fetchGridData = async (filter) => {
+    try {
+      const response = await axios.post(
+        `${config.apiUrl.replace(/\/$/, "")}${gridEndpoint}`,
+        filter
+      );
+      
+      const dataWithIds = response.data.data.map((item, index) => {
+        const flattenedItem = flattenObject(item); // Flatten the object
+        return {
+          ...flattenedItem,
+          id: item._id || index,
+        };
+      });
+  
+      setGridData(dataWithIds);
+      setTotalRows(dataWithIds.length);
+  
+      if (response.data.data.length > 0) {
+        const dynamicColumns = Object.keys(dataWithIds[0])
+          .filter((key) => key !== "PageId" && key !== "pageName" &&  key !== "_id" && key !== "appdata" && key !== "history" 
+          && key !== "id" && key !== "comments" && key !== "pageID" && key !== "filter" && key !== "formatted_filter" && key !== "selected_columns" 
+          && key !== "profile_img") 
+          .map((key) => ({
+            field: key,
+            headerName: key
+              .replace(/_/g, " ")
+              .replace(/\b\w/g, (char) => char.toUpperCase()),
+            width: 150,
+          }));
         setIsLoading(false);
-      }, 2000); // 2000 milliseconds = 2 seconds
+        setColumns(dynamicColumns);
+        setAvailableColumns(dynamicColumns); // Set available columns here
+      } else {
+        setIsLoading(true);
+        setTimeout(() => {
+          setIsLoading(false);
+        }, 2000); // 2000 milliseconds = 2 seconds
+      }
+    } catch (error) {
+      console.error("Error fetching grid data:", error);
     }
-
-  } catch (error) {
-    console.error("Error fetching grid data:", error);
-  }
-};
+  };
+  ;
 
 
   // Filter grid data based on the search text

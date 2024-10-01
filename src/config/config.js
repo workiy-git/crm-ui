@@ -8,7 +8,7 @@ const configMap = {
   development: devConfig,
 };
 
-const environment = process.env.NODE_ENV || "production";
+const environment = process.env.NODE_ENV || "development";
 const config = configMap[environment];
 
 export default config;
