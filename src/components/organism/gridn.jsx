@@ -326,7 +326,7 @@ const GridComponent = ({ pageName }) => {
       handleMenuClose();
     if (selectedRow) {
         navigate(`/${pageName}/${mode}/${selectedRow._id}`, {
-            state: { rowDataId: selectedRow._id, pageName, mode },
+            state: { rowData: selectedRow, pageName, mode },
         });
         console.log("rowdata",selectedRow)
         handleMenuClose();

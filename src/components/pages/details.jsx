@@ -22,22 +22,10 @@ const DetailsPage = () => {
   const { id } = useParams();
   const location = useLocation();
   const navigate = useNavigate();
-  const { rowDataId, pageName, pageId, mode } = location.state || {};
+  const { rowData, pageName, pageId, mode } = location.state || {};
   const { fetchNotifications } = useNotifications();
-  
-  useEffect(() => {
-    axios
-      .get(`${config.apiUrl}/appdata/${rowDataId}`)
-      .then((response) => {
-        setrowData(response.data.data);
-        console.log("detailsdata", response.data.data)
-      })
-      .catch((error) => {
-        console.error("Error fetching data:", error);
-      });
-  }, []);
-  
-  const [rowData, setrowData] = useState([]);
+ 
+  // const [rowData, setrowData] = useState([]);
   const [formData, setFormData] = useState({});
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
@@ -62,7 +50,7 @@ const DetailsPage = () => {
     });
     return initialData;
   }, []);
-  
+
   useEffect(() => {
     const fetchWebformsData = async () => {
       try {
@@ -126,21 +114,34 @@ const DetailsPage = () => {
       }
     }, [location]);
 
- const handleSaveSuccess = (message) => {
-  fetchNotifications();
-  setSuccess(message);
-  setError("");
-  setIsEditing(false);
-  setIsAdding(false);
-  setRefreshTab((prev) => !prev);
-
-  // Update initialFormData to the current formData after save
-  setInitialFormData(formData);
-
-  setTimeout(() => {
-    setSuccess("");
-  }, 2000);
-};
+    const handleSaveSuccess = async (message) => {
+      fetchNotifications();
+      setSuccess(message);
+    
+      try {
+        // Fetch the updated data after saving
+        const updatedData = await axios.get(`${config.apiUrl}/appdata/${id}`);
+        console.log("updatedData", updatedData.data.data);
+    
+        // Navigate to the updated view
+        navigate(`/${pageName}/view/${updatedData.data._id}`, {
+          state: { rowData: updatedData.data.data, pageName, mode: 'view' },
+        });
+      } catch (error) {
+        console.error("Error fetching updated data:", error);
+        setError("Error fetching updated data.");
+      }
+    
+      setError("");
+      setIsEditing(false);
+      setIsAdding(false);
+      setRefreshTab((prev) => !prev);
+      
+      setTimeout(() => {
+        setSuccess("");
+      }, 2000);
+    };
+    
 
   const handleSaveError = (message) => {
     setError(message);
@@ -194,8 +195,10 @@ const DetailsPage = () => {
 
   const handleSave = async () => {
     fetchNotifications();
+
     if (!formData) return;
-    console.log("form",formData)
+    console.log("formdata",formData)
+
     // Perform validation
     if (editComponentRef.current && !editComponentRef.current.validateForm()) {
       handleSaveError("Please fix the validation errors before saving.");
@@ -220,7 +223,7 @@ if (isAdding && Object.values(formData).every(value => value === "")) {
       }
     });
     console.log("dataToSend",dataToSend)
-
+    console.log("rowData",rowData)
     if (isAdding) {
       await axios.post(`${config.apiUrl}/appdata/create`, dataToSend);
       handleSaveSuccess("Data Added successfully!");
@@ -231,7 +234,14 @@ if (isAdding && Object.values(formData).every(value => value === "")) {
       }, 2000); // 2000ms delay
     } else {
       await axios.put(`${config.apiUrl}/appdata/${id}`, dataToSend);
+      // const updatedData = await axios.get(`${config.apiUrl}/appdata/${id}`);
+      // console.log("updatedData",updatedData.data.data)
+      // console.log("rowData",rowData)
       handleSaveSuccess("Data saved successfully!");
+      // navigate(`/${pageName}/view/${updatedData._id}`, {
+      //   state: { rowData: updatedData.data.data, pageName, mode: 'view' },
+      // });
+
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
 
