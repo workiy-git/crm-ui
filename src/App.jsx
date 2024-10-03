@@ -3,11 +3,13 @@ import { BrowserRouter as Router, Route, Routes, useLocation } from "react-route
 import Container from "./components/pages/container";
 import Home from "./components/pages/home";
 import Loginpage from "./components/pages/login";
+import ForgetPassword from "./components/pages/forgetpassword";
 import DetailsPage from "./components/pages/details";
 import Underconstruction from "./components/pages/underconstruction";
 import Header from "./components/organism/header";
 import SideMenu from "./components/organism/sidemenu";
 import GenerateReportPage from "./components/pages/generate-reports";
+import ReportGrid from "./components/organism/reportGrid";
 import ProtectedRoute from "./protectedRoute"; 
 import { AuthProvider } from "./AuthContext"; 
 
@@ -42,12 +44,15 @@ const App = () => {
       <Layout>
         <Routes>
           <Route path="/" element={<Loginpage />} />
+          <Route path="/forget-password" element={<ForgetPassword />} />
           <Route path="/home" element={ <ProtectedRoute> <Home /> </ProtectedRoute> } />
           <Route path="/container/:pageName" element={ <ProtectedRoute> <Container /> </ProtectedRoute> } />
           <Route path="/:pageName/view/:id" element={ <ProtectedRoute> <DetailsPage mode="view" /> </ProtectedRoute> } />
           <Route path="/:pageName/edit/:id" element={ <ProtectedRoute> <DetailsPage mode="edit" /> </ProtectedRoute>} />
           <Route path="/:pageName/add" element={ <ProtectedRoute> <DetailsPage mode="add" /> </ProtectedRoute> } />
           <Route path="/users/profile/:id" element={ <ProtectedRoute> <DetailsPage mode="profile" /> </ProtectedRoute> } />
+          <Route path="/generate-report" element={ <ProtectedRoute> <GenerateReportPage /> </ProtectedRoute> } />
+          <Route path="/view-report" element={ <ProtectedRoute> <ReportGrid /> </ProtectedRoute> } />
           <Route path="/underconstruction" element={ <ProtectedRoute> <Underconstruction /> </ProtectedRoute> } />
         </Routes>
       </Layout>

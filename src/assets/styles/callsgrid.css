@@ -541,3 +541,11 @@
   height: 40px !important;
 
 }
+
+.grid_popup_menu_bar .MuiPaper-elevation8{
+  box-shadow: 0px 0px 3px 0px rgb(92, 91, 91);
+}
+
+.MuiDataGrid-row--borderBottom{
+  background-color: #2C2C2C !important;
+}

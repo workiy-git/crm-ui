@@ -40,17 +40,31 @@ const EditComponent = forwardRef(({ current, id, pageSchema, formData, setFormDa
   const handleInputChange = (e, fieldName) => {
     const value = e.target.type === 'checkbox' ? e.target.checked : e.target.value;
     const error = validateField(fieldName, value);
-
-    setFormData(prevState => ({
-      ...prevState,
-      [fieldName]: value,
-    }));
-
+  
+    if (fieldName.includes('.')) {
+      // Handle nested fields
+      const [parentField, childField] = fieldName.split('.');
+      setFormData(prevState => ({
+        ...prevState,
+        [parentField]: {
+          ...prevState[parentField],
+          [childField]: value,
+        },
+      }));
+    } else {
+      // Handle normal fields
+      setFormData(prevState => ({
+        ...prevState,
+        [fieldName]: value,
+      }));
+    }
+  
     setFormErrors(prevErrors => ({
       ...prevErrors,
       [fieldName]: error
     }));
   };
+  
 
 
 const validateForm = () => {
@@ -85,11 +99,10 @@ const validateForm = () => {
 
   const renderInputField = (field) => {
     const isFileInput = field.type === 'file';
-    const fieldValuePath = field.fieldName.split('.').reduce((prev, curr) => prev && prev[curr], formData); // Resolve nested field value
     const value = !isFileInput && (formData[field.fieldName] === 'N/A' ? '' : formData[field.fieldName] || '');
     const isError = formErrors[field.fieldName];
     const label = `${field.label || field.fieldName}${field.required ? ' *' : ''}`;
-    const isRequired = field.required === 'true';
+    const isRequired = field.required === true;
   
     const commonProps = {
       name: field.fieldName,
@@ -98,17 +111,17 @@ const validateForm = () => {
       onChange: (e) => handleInputChange(e, field.fieldName),
       error: !!isError,
       helperText: isError && formErrors[field.fieldName],
-      ...(isRequired && { required: true }) // Add the required property if isRequired is true
+      ...(isRequired && { required: true }),
     };
   
     const inputProps = {
       ...(isFileInput ? {} : { value }),
-      ...(field.pattern && { pattern: field.pattern }), // Apply pattern if provided
+      ...(field.pattern && { pattern: field.pattern }),
     };
+    
     if (!isFileInput) {
       commonProps.value = value;
     }
-    
   
     const formControlStyles = {
       display: 'flex',
@@ -130,7 +143,7 @@ const validateForm = () => {
       color: '#333',
       fontSize: '12px',
     };
-
+  
     switch (field.htmlControl) {
       case 'input':
         return (
@@ -150,52 +163,109 @@ const validateForm = () => {
             />
           </FormControl>
         );
-        case 'select':
-      return (
-        <FormControl className='details_page_inputs' key={field.fieldName} style={formControlStyles} error={!!isError}>
-          <label style={labelStyles}>{label}</label>
-          <Select
-            className='edit-field-input'
-            {...commonProps}
-            value={formData[field.fieldName] || ''} // Set the value from formData
-            style={{
-              width: '50%',
-              textAlign: 'left',
-              color: '#666',
-              fontSize: '12px',
-            }}
-            displayEmpty
-          >
-            <MenuItem  className='edit-field-input-select' disabled value="">
-            Select an option
-            </MenuItem>
-            {/* <MenuItem  className='edit-field-input-select' value="None">
-              {field.placeholder || 'None'}
-            </MenuItem> */}
-            {Array.isArray(field.options) && field.options.map((option, index) => (
-              <MenuItem className='edit-field-input-select' key={index} value={option}>
-                {option}
+      
+      case 'textarea':
+        // Check if the textarea has nested fields (like address)
+        if (field.fields && Array.isArray(field.fields)) {
+          return (
+            <Box key={field.fieldName} style={{ width: '100%' }}>
+              <label style={labelStyles}>{label}</label>
+              <div style={{ display: 'flex',  flexWrap: 'wrap' }}>
+              {field.fields.map((subField) => (
+                <FormControl key={subField.fieldName} className='details_page_inputs' style={formControlStyles} error={!!formErrors[subField.fieldName]}>
+                  <label  style={labelStyles}>{subField.label}</label>
+                  <TextField
+                    className='edit-field-input'
+                    name={`${field.fieldName}.${subField.fieldName}`}  // Nested name
+                    placeholder={subField.placeholder || 'Not Specified'}
+                    fullWidth
+                    value={formData[field.fieldName]?.[subField.fieldName] || ''}
+                    onChange={(e) => handleInputChange(e, `${field.fieldName}.${subField.fieldName}`)}
+                    sx={{
+                      width: '50%',
+                      textAlign: 'left',
+                      color: '#666',
+                      fontSize: '12px',
+                    }}
+                    type={subField.type || 'text'}
+                    error={!!formErrors[`${field.fieldName}.${subField.fieldName}`]}
+                    helperText={formErrors[`${field.fieldName}.${subField.fieldName}`]}
+                  />
+                </FormControl>
+              ))}
+              </div>
+            </Box>
+          );
+        }
+        // Regular textarea field (non-nested)
+        return (
+          <FormControl className='details_page_inputs' key={field.fieldName} style={formControlStyles} error={!!isError}>
+            <label style={labelStyles}>{label}</label>
+            <TextField
+              className='edit-field-input'
+              {...commonProps}
+              sx={{
+                width: '50%',
+                textAlign: 'left',
+                color: '#666',
+                fontSize: '12px',
+              }}
+              type={field.type || 'text'}
+              inputProps={inputProps}
+            />
+          </FormControl>
+        );
+  
+      case 'select':
+        return (
+          <FormControl className='details_page_inputs' key={field.fieldName} style={formControlStyles} error={!!isError}>
+            <label style={labelStyles}>{label}</label>
+            <Select
+              className='edit-field-input'
+              {...commonProps}
+              value={formData[field.fieldName] || ''} 
+              style={{
+                width: '50%',
+                textAlign: 'left',
+                color: '#666',
+                fontSize: '12px',
+              }}
+              displayEmpty
+            >
+              <MenuItem className='edit-field-input-select' disabled value="">
+                Select an option
               </MenuItem>
-            ))}
-          </Select>
-          {isError && <div style={{ color: 'red', fontSize: '12px' }}>{formErrors[field.fieldName]}</div>}
-        </FormControl>
-      );
+              {Array.isArray(field.options) && field.options.map((option, index) => (
+                <MenuItem className='edit-field-input-select' key={index} value={option}>
+                  {option}
+                </MenuItem>
+              ))}
+            </Select>
+            {isError && <div style={{ color: 'red', fontSize: '12px' }}>{formErrors[field.fieldName]}</div>}
+          </FormControl>
+        );
+  
       case 'checkbox':
         return (
           <FormControlLabel
-          className='details_page_inputs'
+            className='details_page_inputs'
+            
             key={field.fieldName}
             control={
+              <div style={{display:'flex', width:'100%', alignItems:'center'}}>
+              <label style={labelStyles}>{label}</label>
               <Checkbox
+               style={{
+                color: '#666',
+              }}
                 className='edit-field-input'
                 name={field.fieldName}
                 checked={formData[field.fieldName] || false}
-                // onChange={handleInputChange}
                 onChange={(e) => handleInputChange(e, field.fieldName)}
               />
+              </div>
             }
-            label={label}
+            
             style={{
               display: 'flex',
               alignItems: 'center',
@@ -210,20 +280,26 @@ const validateForm = () => {
             }}
           />
         );
+  
       default:
         return (
           <FormControl className='details_page_inputs' key={field.fieldName} style={formControlStyles} error={!!isError}>
             <label style={labelStyles}>{label}</label>
-            <TextField className='edit-field-input' {...commonProps} style={{
-              width: '50%',
-              textAlign: 'left',
-              color: '#666',
-              fontSize: '12px',
-            }} />
+            <TextField
+              className='edit-field-input'
+              {...commonProps}
+              style={{
+                width: '50%',
+                textAlign: 'left',
+                color: '#666',
+                fontSize: '12px',
+              }}
+            />
           </FormControl>
         );
     }
   };
+  
 
   return (
     <Box style={{ display: 'flex', flexWrap: 'wrap' }}>

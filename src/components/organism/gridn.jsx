@@ -92,6 +92,7 @@ const GridComponent = ({ pageName }) => {
   const handleConfirmDelete = async () => {
     if (rowToDelete) {
       const id = rowToDelete._id; // Assuming `_id` is the unique identifier for the row
+
       try {
         await axios.delete(`${config.apiUrl.replace(/\/$/, '')}/appdata/${id}`);
         setGridData((prevData) => prevData.filter((row) => row._id !== id));
@@ -202,39 +203,61 @@ const GridComponent = ({ pageName }) => {
     setPage(1);
   };
   
-  // Fetch grid data based on the selected filter
-const fetchGridData = async (filter) => {
-  try {
-    const response = await axios.post(
-      `${config.apiUrl.replace(/\/$/, "")}${gridEndpoint}`,
-      filter
-    );
-    const dataWithIds = response.data.data.map((item, index) => ({
-      ...item,
-      id: item._id || index,
-    }));
-    setGridData(dataWithIds);
-    setTotalRows(dataWithIds.length);
-
-    if (response.data.data.length > 0) {
-      const dynamicColumns = Object.keys(dataWithIds[0])
-      .filter((key) => key !== "PageId" && key !== "pageName" &&  key !== "_id" && key !== "appdata" && key !== "history" 
-      && key !== "id" && key !== "comments" && key !== "pageID")
-      .map((key) => ({
-        field: key,
-        headerName: key
-          .replace(/_/g, " ")
-          .replace(/\b\w/g, (char) => char.toUpperCase()),
-        width: 150,
-      }));
-      setIsLoading(false);
-      setColumns(dynamicColumns);
-      setAvailableColumns(dynamicColumns); // Set available columns here
+  const flattenObject = (obj, parent = '', res = {}) => {
+    for (let key in obj) {
+      if (typeof obj[key] === 'object' && obj[key] !== null && !Array.isArray(obj[key])) {
+        flattenObject(obj[key], `${parent}${key}.`, res);
+      } else {
+        res[`${key}`] = obj[key];
+      }
     }
-  } catch (error) {
-    console.error("Error fetching grid data:", error);
-  }
-};
+    return res;
+  };
+  
+  const fetchGridData = async (filter) => {
+    try {
+      const response = await axios.post(
+        `${config.apiUrl.replace(/\/$/, "")}${gridEndpoint}`,
+        filter
+      );
+      
+      const dataWithIds = response.data.data.map((item, index) => {
+        const flattenedItem = flattenObject(item); // Flatten the object
+        return {
+          ...flattenedItem,
+          id: item._id || index,
+        };
+      });
+  
+      setGridData(dataWithIds);
+      setTotalRows(dataWithIds.length);
+  
+      if (response.data.data.length > 0) {
+        const dynamicColumns = Object.keys(dataWithIds[0])
+          .filter((key) => key !== "PageId" && key !== "pageName" &&  key !== "_id" && key !== "appdata" && key !== "history" 
+          && key !== "id" && key !== "comments" && key !== "pageID" && key !== "filter" && key !== "formatted_filter" && key !== "selected_columns" 
+          && key !== "profile_img") 
+          .map((key) => ({
+            field: key,
+            headerName: key
+              .replace(/_/g, " ")
+              .replace(/\b\w/g, (char) => char.toUpperCase()),
+            width: 150,
+          }));
+        setIsLoading(false);
+        setColumns(dynamicColumns);
+        setAvailableColumns(dynamicColumns); // Set available columns here
+      } else {
+        setIsLoading(true);
+        setTimeout(() => {
+          setIsLoading(false);
+        }, 2000); // 2000 milliseconds = 2 seconds
+      }
+    } catch (error) {
+      console.error("Error fetching grid data:", error);
+    }
+  };
+  ;
 
 
   // Filter grid data based on the search text
@@ -315,6 +338,49 @@ const fetchGridData = async (filter) => {
     });
 };
 
+const [filteredData, setFilteredData] = useState([]);
+const [convertDialogOpen, setConvertDialogOpen] = useState(false);
+
+
+
+const openConfirmationDialog = () => {
+  setConvertDialogOpen(true);
+};
+
+const handleConfirmconcertToLead = async () => {
+  handleMenuClose(); // Close the menu if needed
+
+  if (selectedRow) {
+    const id = selectedRow._id; // Get the unique ID for the row
+    const updatedRow = { pageName: "leads" }; // Only updating the pageName field
+
+    // Log for debugging purposes
+    console.log('ID:', id);
+    console.log('Updated Data being sent:', updatedRow);
+
+    try {
+      // Send the PUT request with only the pageName field
+      await axios.put(`${config.apiUrl}/appdata/${id}`, updatedRow);
+      setSuccess('Convert To Lead successfully');
+      fetchGridData(); // Refetch the grid data after the update
+      setTimeout(() => setSuccess(''), 3000); // Clear success message after 3 seconds
+    } catch (error) {
+      console.error('Error Converting Data:', error);
+    }
+  }
+
+  // Close the dialog after confirmation
+  setConvertDialogOpen(false);
+};
+
+const handleCancelconcertToLead = () => {
+  setConvertDialogOpen(false); // Close the dialog without doing anything
+};
+
+
+
+
+
 const handleViewReport = async () => {
   if (!selectedRow) return;
 
@@ -332,11 +398,13 @@ const handleViewReport = async () => {
     const selectedColumns = Array.isArray(reportData.selected_columns) ? reportData.selected_columns : [];
     const filters = Array.isArray(reportData.filter) ? reportData.filter : [];
 
-    const pipeline = [
-      { "$match": { "pageName": module } },
-      { "$project": selectedColumns.reduce((acc, column) => ({ ...acc, [column]: 1 }), {}) },
-      { "$match": filters.reduce((acc, filter) => ({ ...acc, [filter.field]: { [filter.condition]: filter.value } }), {}) }
-    ];
+    // const pipeline = [
+    //   { "$match": { "pageName": module } },
+    //   { "$project": selectedColumns.reduce((acc, column) => ({ ...acc, [column]: 1 }), {}) },
+    //   { "$match": filters.reduce((acc, filter) => ({ ...acc, [filter.field]: { [filter.condition]: filter.value } }), {}) }
+    // ];
+
+    const pipeline = reportData.formatted_filter;
 
     console.log('Pipeline array:', pipeline);
 
@@ -349,6 +417,12 @@ const handleViewReport = async () => {
     
     const filteredData_reportId = appDataResponse.data.data; // Store the fetched data
     console.log('Fetched app data:', filteredData_reportId);
+
+    // Update the state with the fetched data
+    setFilteredData(filteredData_reportId);
+
+    // Navigate to the ReportGrid component and pass the filtered data
+    navigate('/view-report', { state: { filteredData: filteredData_reportId } });
 
   } catch (error) {
     console.error('Error fetching report data:', error);
@@ -419,6 +493,9 @@ const handleViewReport = async () => {
         selectedRow={selectedRow}
         pageName={pageName} 
         onViewReport={handleViewReport}
+        convertToLead={openConfirmationDialog}
+        // convertToLead={handleConfirmconcertToLead}
+
       />
         </div>
       ),
@@ -852,6 +929,13 @@ const handleViewReport = async () => {
   onConfirm={handleConfirmDelete}
   onCancel={handleCancelDelete}
 />
+<ConfirmationDialog
+        open={convertDialogOpen}
+        title="Convert To Lead"
+        content={`Are you sure you want to Convert To Lead?`}
+        onConfirm={handleConfirmconcertToLead}
+        onCancel={handleCancelconcertToLead}
+      />
 
     </div>
   );
