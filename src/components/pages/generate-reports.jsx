@@ -1051,53 +1051,68 @@ const GenerateReportPage = () => {
       case 'select':
         return (
           <FormControl className='details_page_inputs' key={field.fieldName} style={formControlStyles}>
-            <label style={labelStyles}>{label}</label>
-            <Select
-              className='edit-field-input'
-              {...commonProps}
-              value={field.fieldName === 'selected_columns' ? selectedFields : (formData[field.fieldName] || '')}
-              style={{
-                width: '50%',
-                textAlign: 'left',
-                color: '#666',
-                fontSize: '12px',
-              }}
-              displayEmpty
-              multiple={field.fieldName === 'selected_columns'}
-              renderValue={(selected) => Array.isArray(selected) ? selected.join(', ') : ''}
-              onChange={(e) => field.fieldName === 'selected_columns' ? setSelectedFields(e.target.value) : handleInputChange(e, field.fieldName)}
-            >
-              <MenuItem className='edit-field-input-select' disabled value="">
-                Select an option
-              </MenuItem>
-              {field.fieldName === 'module' ? (
-                pageNames.map((pageName, index) => (
-                  <MenuItem className='edit-field-input-select' key={index} value={pageName}>
-                    {pageName}
-                  </MenuItem>
-                ))
-              ) : (
-                Array.isArray(field.options) && field.options.map((option, index) => (
-                  <MenuItem className='edit-field-input-select' key={index} value={option}>
-                    {option}
-                  </MenuItem>
-                ))
-              )}
-              {field.fieldName === 'selected_columns' && moduleFields.map((column, index) => (
-                <MenuItem className='edit-field-input-select' key={index} value={column.fieldName}>
-                  <FormControlLabel
-                    control={
-                      <Checkbox
-                        checked={selectedFields.includes(column.fieldName)}
-                        onChange={() => handleFieldSelection(column.fieldName)}
-                      />
-                    }
-                    label={column.label}
-                  />
+          <label style={labelStyles}>{label}</label>
+          <Select
+            className='edit-field-input'
+            {...commonProps}
+            value={field.fieldName === 'selected_columns' ? selectedFields : (formData[field.fieldName] || '')}
+            style={{
+              width: '50%',
+              textAlign: 'left',
+              color: '#666',
+              fontSize: '12px',
+            }}
+            displayEmpty
+            multiple={field.fieldName === 'selected_columns'}
+            renderValue={(selected) => {
+              // Check if field uses multiple values (like checkboxes)
+              if (Array.isArray(selected) && field.fieldName === 'selected_columns') {
+                // Find the labels of the selected columns
+                return selected
+                  .map(sel => moduleFields.find(field => field.fieldName === sel)?.label || sel)
+                  .join(', ');
+              }
+              // For other cases
+              return Array.isArray(selected) ? selected.join(', ') : selected;
+            }}
+            onChange={(e) => 
+              field.fieldName === 'selected_columns' 
+                ? setSelectedFields(e.target.value) 
+                : handleInputChange(e, field.fieldName)
+            }
+          >
+            <MenuItem className='edit-field-input-select' disabled value="">
+              Select an option
+            </MenuItem>
+            {field.fieldName === 'module' ? (
+              pageNames.map((pageName, index) => (
+                <MenuItem className='edit-field-input-select' key={index} value={pageName}>
+                  {pageName}
                 </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
+              ))
+            ) : (
+              Array.isArray(field.options) && field.options.map((option, index) => (
+                <MenuItem className='edit-field-input-select' key={index} value={option}>
+                  {option}
+                </MenuItem>
+              ))
+            )}
+            {field.fieldName === 'selected_columns' && moduleFields.map((column, index) => (
+              <MenuItem className='edit-field-input-select' key={index} value={column.fieldName}>
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={selectedFields.includes(column.fieldName)}
+                      onChange={() => handleFieldSelection(column.fieldName)}
+                    />
+                  }
+                  label={column.label}
+                />
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+        
         );
       case 'checkbox':
         return (

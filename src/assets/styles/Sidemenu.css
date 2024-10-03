@@ -126,7 +126,7 @@
 .expand-button {
   background: #808080;
   border: none;
-  z-index: 0;
+  z-index: 1;
   padding: 35px 3px 50px 7px;
   border-radius: 0px 5px 5px 0px;
   cursor: pointer;
