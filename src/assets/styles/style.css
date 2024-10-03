@@ -46,77 +46,7 @@
     color: white;
     transition: color 0.3s ease;
   } */
-  .btn-loader {
-    width: 2px;
-    height: 10px;
-    border-radius: 4px;
-    display: block;
-    margin: 20px auto;
-    position: relative;
-    background: currentColor;
-    color: #F5BD71;
-    box-sizing: border-box;
-    animation: animloader 0.3s 0.3s linear infinite alternate;
-  }
   
-  .btn-loader::after, .btn-loader::before {
-    content: '';
-    width: 4px;
-    height: 10px;
-    border-radius: 4px;
-    background: currentColor;
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    left: 20px;
-    box-sizing: border-box;
-    animation: animloader 0.3s  0.45s  linear infinite alternate;
-    padding: 0px;
-  }
-  .btn-loader::before {
-    left: -20px;
-    animation-delay: 0s;
-  }
-  
-  @keyframes animloader {
-    0%   { height: 16px} 
-    100% { height: 4px}
-  }
-  .css-1gfh74e-MuiPaper-root-MuiCard-root {
-    padding: 0 !important;
-    box-shadow: none !important;
-
-    
-  }
-  .css-1xvrihl-MuiPaper-root-MuiCard-root {
-    background: #F6F8FA !important;
-  }
-  .css-hbwd1f-MuiCardContent-root:last-child {
-    padding-bottom: 4px !important; 
-    background: #fff !important;
-    box-shadow: none !important;
-}
-  .details-page-post-btns{
-    background-color: #DEDEDE !important;
-    color: black !important;
-    padding: 5px !important;
-    min-width: 70px !important;
-
-  }
-.css-reuvfk-MuiPaper-root-MuiCard-root{
-    box-shadow: none;
-  }
-  .details-updates{
-    font-family: Arial, Helvetica, sans-serif !important;
-  }
-  .comments-content{
-    font-size: 10px !important ;
-    
-  }
-  .comments-title{
-    font-size: 12px !important;
-    font-weight: bold !important;
-  }
   .workiy-logo.max-logo{
      width: 80px;
      height: auto;
@@ -208,26 +138,9 @@
 .valuefield [type="date"], .valuefield [type="datetime-local"]{
   cursor: pointer;
 }
-.css-1xvrihl-MuiPaper-root-MuiCard-root{
-      box-shadow:none !important; 
-}
 .details-page-btns{
   background-color: #DEDEDE !important;
   color: black !important;
   padding: 0 !important;
   min-width: 70px !important;
-}
-.comments-viewMore{
-  background-color: none !important;
-  color: black !important;
-  padding: 0px 15px 10px 15px !important;
-  min-width: 70px !important;
-  font-size: 8px !important;
-  color: #2375f7 !important;
-  /* border:2px solid #c2c2c2 !important;
-  border-radius: 10px !important;
-  padding: 3px 10px !important;
-  margin: 3px !important;
-  font-size: 8px !important;
-color: #8080ff !important; */
 }
