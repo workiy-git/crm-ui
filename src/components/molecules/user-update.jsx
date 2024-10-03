@@ -1,164 +1,16 @@
-// import React from 'react';
-// import { useParams } from 'react-router-dom';
-// import { Box, Typography, List, ListItem, Divider, Avatar } from '@mui/material';
-// import axios from 'axios';
-// import { useState, useEffect } from 'react';
-// import config from '../../config/config';
-// import AccountCircleIcon from '@mui/icons-material/AccountCircle';
-
-// const Updates = () => {
-//   const { id } = useParams();
-//   const [history, setHistory] = useState([]);
-//   const [error, setError] = useState(null);
-//   const [labels, setLabels] = useState([]);
-
-//   useEffect(() => {
-//     const fetchHistory = async () => {
-//       const fetchedId = id;
-//       try {
-//         const response = await axios.get(`${config.apiUrl}/appdata/history/${fetchedId}`);
-//         setHistory(response.data.data);
-//       } catch (error) {
-//         setError(error);
-//       }
-//     };
-
-//     const fetchPageName = async (fetchedId) => {
-//       try {
-//         console.log('Fetching page name for ID:', fetchedId);
-//         const requestBody = { "$match": { "_id": fetchedId } };
-//         console.log('Request Body:', requestBody);
-    
-//         const response = await axios.get(
-//           `${config.apiUrl.replace(/\/$/, '')}/appdata/${fetchedId}`,
-//           requestBody,
-//           {
-//             headers: {
-//               'Content-Type': 'application/json'
-//             }
-//           }
-//         );
-    
-//         console.log('Response:', response.data.data.pageName);
-//         return response.data.data.pageName;
-//       } catch (error) {
-//         console.error('Error fetching page name:', error);
-//         setError(error);
-//       }
-//     };
-
-//     const fetchWebForms = async () => {
-//       try {
-//         const response = await axios.get(`${config.apiUrl}/webforms`);
-//         console.log('Web Forms Data:', response.data); // Debugging line
-//         return response.data;
-//       } catch (error) {
-//         console.error('Error fetching web forms:', error);
-//         setError(error);
-//       }
-//     };
-
-//     const fetchData = async () => {
-//       const fetchedId = id;
-//       const pageName = await fetchPageName(fetchedId);
-//       const webFormsResponse = await fetchWebForms();
-      
-//       if (webFormsResponse && webFormsResponse.status === 'success' && Array.isArray(webFormsResponse.data)) { // Ensure webFormsResponse.data is an array
-//         const webFormsData = webFormsResponse.data;
-//         const matchedForm = webFormsData.find(form => form.pageName === pageName);
-//         if (matchedForm) {
-//           const extractedLabels = matchedForm.fields.map(field => field.label);
-//           setLabels(extractedLabels);
-//         }
-//       } else {
-//         console.error('webFormsData is not an array:', webFormsResponse); // Error handling
-//       }
-//     };
-    
-//     fetchHistory();
-//     fetchData();
-//   }, [id]);
-
-//   const parseHistoryItem = (item) => {
-//     // console.log('Item:', item); // Log the item to verify its format
-  
-//     // Updated regex pattern to correctly capture date, time, and details
-//     const dateRegex = /^On (.*?), (.*?), (.*?)\s+(.+)$/;
-//     const matches = item.match(dateRegex);
-  
-//     // console.log('Matches:', matches); // Log the matches to understand the results
-  
-//     if (matches) {
-//       const [, date, time, , details] = matches;
-//       return { dateTime: `${date}, ${time}`, details };
-//     }
-  
-//     return { dateTime: '', details: item };
-//   };
-
-//   return (
-//     <Box sx={{ margin: 'auto', padding: 2, maxWidth: 800, overflow: 'auto' }}>
-//       {error ? (
-//         <Typography color="error">Failed to load history: {error.message}</Typography>
-//       ) : (
-//         <List>
-//           {history && history.map((item, index) => {
-//             const { dateTime, details } = parseHistoryItem(item);
-//             // console.log('Parsed Details:', details); // Debugging line to see the parsed details
-//             const parts = details.split('made the following changes: ');
-//             const action = parts[0].trim();
-//             const changesString = parts[1] ? parts[1].trim() : '';
-//             const changeList = changesString ? changesString.split(', ').map(change => change.trim()) : [];
-
-//             return (
-//               <React.Fragment key={index}>
-//                 <ListItem alignItems="flex-start" sx={{ padding: 0 }}>
-//                   <Box sx={{ display: 'flex', alignItems: 'center', width: '100%' }}>
-//                     <Typography variant="body2" color="text.primary" sx={{ marginRight: 1 }}>
-//                       {dateTime}
-//                     </Typography>
-//                     <Avatar sx={{ marginRight: 1 }}>
-//                       <AccountCircleIcon />
-//                     </Avatar>
-//                     <Typography variant="body2" color="text.primary" sx={{ marginRight: 1 }}>
-//                       {action} made the following changes:
-//                     </Typography>
-//                   </Box>
-//                 </ListItem>
-//                 {changeList.length > 0 && (
-//                   <ListItem sx={{ paddingLeft: 8, paddingTop: 1 }}>
-//                     <Box component="ul" sx={{ pl: 0, m: 0 }}>
-//                       {changeList.map((change, idx) => (
-//                         <ListItem key={idx} sx={{ padding: 0 }}>
-//                           <Typography component="li" variant="body2">
-//                             {change}
-//                           </Typography>
-//                         </ListItem>
-//                       ))}
-//                     </Box>
-//                   </ListItem>
-//                 )}
-//                 <Divider component="li" />
-//               </React.Fragment>
-//             );
-//           })}
-//           {history.length === 0 && <Typography>No history available</Typography>}
-//         </List>
-//       )}
-//     </Box>
-//   );
-// };
-
-// export default Updates;
-
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { Box, Typography, List, ListItem, Divider, Avatar, Button } from '@mui/material';
+import { Box, Typography, List, Card,CardContent,ListItem, Divider, Avatar, Button } from '@mui/material';
 import axios from 'axios';
 import config from '../../config/config';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import { useNavigate } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
+import Loader from '../atoms/update-loader';
+import '../../assets/styles/style.css';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import ExpandLessIcon from '@mui/icons-material/ExpandLess';
+import HistoryIcon from '@mui/icons-material/History';
 
 const Updates = ({ mode }) => {
   const { id } = useParams();
@@ -269,10 +121,10 @@ const Updates = ({ mode }) => {
   const itemsToShow = showAllHistory ? history.length : 3;
 
   return (
-    <Box sx={{ margin: 'auto', padding: 2, maxWidth: 800, overflow: 'auto' }}>
+    <Box className="details-updates" sx={{ margin: 'auto', padding: 2, maxWidth: 800, overflow: 'auto' }}>
       {/* {error && <Typography color="error">Failed to load history: {error.message}</Typography>} */}
       {loading ? (
-        <Typography>Loading...</Typography> // Display loading indicator while data is being fetched
+        <Loader/>// Display loading indicator while data is being fetched
       ) : mode === 'add' ? (
         <Typography>No history available for new record.</Typography>
       ) : (
@@ -287,7 +139,12 @@ const Updates = ({ mode }) => {
                 const action = parts[0].trim();
                 const changesString = parts[1] ? parts[1].trim() : '';
                 const changeList = changesString ? changesString.split(', ').map(change => change.trim()) : [];        
-                
+                const Stringdate = new Date(date);
+
+const options = { day: '2-digit', month: 'long', year: 'numeric' };
+const formattedDate = new Intl.DateTimeFormat('en-US', options).format(Stringdate );
+
+console.log('Formatted Date:', formattedDate);
                 const currentDate = new Date();
                 const day = String(currentDate.getDate()).padStart(2, '0');
                 const month = String(currentDate.getMonth() + 1).padStart(2, '0'); // January is 0
@@ -313,34 +170,31 @@ const Updates = ({ mode }) => {
 
                 return (
                   <React.Fragment key={index}>
-                    <ListItem alignItems="flex-start" sx={{ padding: 0 }}>
-                      <Box sx={{ display: 'flex', alignItems: 'center', width: '100%' }}>
-                        <div style={{display:'block', textAlign:'center'}}>
-                          <div>
-                            <Typography sx={{ marginRight: 1, fontSize:'10px' }} variant="body2" color="text.primary">
-                              {date} {totalDays > 1 ? `(${totalDays} days ago)` : totalDays === 1 ? '(1 day ago)' : '(today)'}
-                            </Typography>
-                            <Typography sx={{ marginRight: 1, fontSize:'12px' }} variant="body2" color="text.primary">
-                              {time}
-                            </Typography>
-                          </div>
-                          <Avatar
-                            alt="Profile"
-                            src={userData.profile_img}
-                            sx={{ margin: 'auto' }}
-                          />
-                        </div>
-                        {/* <Typography variant="body2" color="text.primary" sx={{ marginRight: 1,fontSize:'13px' }}>
-                          {action} {userData.username} : made the following changes:
-                        </Typography> */}
-                        <Typography variant="body2" color="text.primary" sx={{ marginRight: 1,fontSize:'13px' }}>
-                          <span style={{fontWeight:'bold'}}>{userData.first_name} {userData.last_name} </span>: made the following changes:
-                        </Typography>
-                      </Box>
+                   <Card sx={{ flex: 1, padding: '0', paddingBottom: '0px', marginBottom: '10px' }}>
+                    <ListItem  sx={{ padding: 0 }}>
+                      <Box sx={{ display: 'flex',  alignItems: 'center', width: '100%' }}>
+                      <Card sx={{ display: 'flex', alignItems: 'center', padding: 1, margin: 1 , width:'100%'}}>
+      <Avatar
+        alt="Profile"
+        src={userData.profile_img}
+        sx={{ width: 35, height: 35, marginRight: 2 }}
+      />
+      <CardContent sx={{ flex: 1,padding:'0',paddingBottom: '0px' }}>
+        <Typography  className="comments-title" component="div">
+          {userData.first_name} {userData.last_name}
+        </Typography>
+        <Typography  className="comments-content" variant="body2" color="text.secondary">
+           {formattedDate} {totalDays > 1 ? `(${totalDays} days ago)` : totalDays === 1 ? '(1 day ago)' : '(today)'}
+        </Typography>
+      </CardContent>
+    </Card>
+                        </Box>
                     </ListItem>
                     {changeList.length > 0 && (
                       <>
-                        <ListItem sx={{ paddingLeft: 8, paddingTop: 1 }}>
+                      <Card sx={{ display: 'flex', alignItems: 'center', padding: 2, margin: 1 , width:'100%'}}>
+                        <CardContent sx={{ flex: 1,padding:'0',paddingBottom: '0px' }}>
+                        <ListItem sx={{ paddingLeft: 2, paddingTop: 1, paddingRight: 2}}>
                           <Box component="ul" sx={{ pl: 0, m: 0 }}>
                             {changeList.slice(0, changeItemsToShow).map((change, idx) => {
                               const [fieldName, value] = change.split(': ');
@@ -355,29 +209,56 @@ const Updates = ({ mode }) => {
                             })}
                           </Box>
                         </ListItem>
+                        </CardContent>
+                        </Card>
                         {changeList.length > 3 && (
                           <Box textAlign="center" marginTop={1}>
-                            <Button variant="text" onClick={() => 
-                              setExpandedHistoryItems(prevState => ({
-                                ...prevState,
-                                [index]: !expanded
-                              }))
-                            }>
-                              {expanded ? "Show Less" : "Show More"}
-                            </Button>
+                         <Button
+  variant="text"
+  className='comments-viewMore'
+  onClick={() =>
+    setExpandedHistoryItems(prevState => ({
+      ...prevState,
+      [index]: !expanded
+    }))
+  }
+>
+  {expanded ? (
+    <>
+      Show Less <ExpandLessIcon style={{ color: '#2375f7', height:'16px' }} />
+    </>
+  ) : (
+    <>
+      Show More <ExpandMoreIcon style={{ color: '#2375f7', height:'16px' }} />
+    </>
+  )}
+</Button>
                           </Box>
                         )}
                       </>
                     )}
-                    <Divider style={{margin:'5px'}} component="li" />
+                 
+                    </Card>
                   </React.Fragment>
                 );
               })}
               {history.length > 3 && (
                 <Box textAlign="center" marginTop={2}>
-                  <Button variant="outlined" onClick={() => setShowAllHistory(!showAllHistory)}>
-                    {showAllHistory ? "Show Less History" : "Show More History"}
-                  </Button>
+                <Button
+  className='details-page-post-btns'
+  onClick={() => setShowAllHistory(!showAllHistory)}
+  startIcon={<HistoryIcon />} // Adds the History icon
+>
+  {showAllHistory ? (
+    <>
+Show Less History       <ExpandLessIcon /> 
+    </>
+  ) : (
+    <>
+  Show More History    <ExpandMoreIcon /> 
+    </>
+  )}
+</Button>
                 </Box>
               )}
             </List>

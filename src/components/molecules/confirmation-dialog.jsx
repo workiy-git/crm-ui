@@ -1,6 +1,6 @@
 import React from 'react';
 import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Button } from '@mui/material';
-import { Delete } from '@mui/icons-material'
+
 import '../../assets/styles/style.css';
 const ConfirmationDialog = ({ open, title, content, onConfirm, onCancel }) => {
   return (
