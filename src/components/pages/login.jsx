@@ -78,7 +78,8 @@ function Loginpage() {
       cognitoUser.authenticateUser(authenticationDetails, {
         onSuccess: async (result) => {
           try {
-            const response = await fetch(`${config.apiUrl}appdata/retrieve`, {
+            console.log(result);
+            const response = await fetch(`${config.apiUrl}/appdata/retrieve`, {
               method: "POST",
               headers: {
                 "Content-Type": "application/json",
@@ -158,7 +159,7 @@ function Loginpage() {
 
   useEffect(() => {
     axios
-      .get(`${config.apiUrl}/pages/Login`)
+      .get(`${config.apiUrl}pages/Login`)
       .then((response) => {
         console.log("Data received:", response.data);
         setcompanylogoData(response.data.data);
