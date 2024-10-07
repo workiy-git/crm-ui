@@ -5,6 +5,7 @@ import WidgetsList from '../molecules/WidgetList';
 import { AppBar, Toolbar, IconButton, Button, Box } from '@material-ui/core';
 import '../../assets/styles/MenuComponent.css';
 import config from '../../config/config';  // Ensure the correct path to config file
+import { headers } from '../atoms/Authorization'
 
 const sessionStorageKey = 'selectedTexts';
 const selectedButtonIndexKey = 'selectedButtonIndex';
@@ -23,7 +24,7 @@ const MenuComponent = ({ backgroundColor, onSaveSelectedText }) => {
     setSelectedTexts(storedSelectedTexts);
     setScrollIndex(0);
 
-    axios.get(`${config.apiUrl}/appdata`)
+    axios.get(`${config.apiUrl}/appdata`, {headers})
       .then((response) => {
         console.log('Notification data received:', response.data);
         const { data } = response.data;

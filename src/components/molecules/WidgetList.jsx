@@ -8,6 +8,7 @@ import { experimentalStyled as styled } from "@mui/material/styles";
 import config from "../../config/config";
 import WidgetsIcon from "@mui/icons-material/WidgetsOutlined";
 import "../../assets/styles/style.css";
+import { headers } from '../atoms/Authorization'
 
 const ScrollContainer = styled(Box)({
   overflowY: "auto",
@@ -28,9 +29,7 @@ const retrieveWidgets = async (dashboardName) => {
         },
       ],
       {
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers
       }
     );
 

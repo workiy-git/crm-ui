@@ -31,6 +31,7 @@ import MoreVertIcon from "@mui/icons-material/MoreVert";
 import Loader from "../molecules/loader";
 import Pagination from "@mui/material/Pagination";
 import { useNotifications } from '../atoms/notification'; // Import the hook
+import { headers } from '../atoms/Authorization'
 
 const endpoint = "/controls/retrive";
 const gridEndpoint = "/appdata/retrieve";
@@ -121,12 +122,15 @@ const GridComponent = ({ pageName }) => {
   }, [pageName]);
   
   
+
   // Fetch select options
   useEffect(() => {
     const fetchSelectOptions = async () => {
       try {
+
         const response = await axios.post(
-          `${config.apiUrl.replace(/\/$/, "")}${endpoint}`,
+          
+          `${config.apiUrl.replace(/\/$/, "")}${endpoint}`, {headers},
           {
             pageName: pageName,
             control_type: "dropdown",
@@ -216,8 +220,9 @@ const GridComponent = ({ pageName }) => {
   
   const fetchGridData = async (filter) => {
     try {
+
       const response = await axios.post(
-        `${config.apiUrl.replace(/\/$/, "")}${gridEndpoint}`,
+        `${config.apiUrl.replace(/\/$/, "")}${gridEndpoint}`, {headers},
         filter
       );
       

@@ -10,57 +10,6 @@ const Container = () => {
     return sessionStorage.getItem("backgroundColor") || "#d9d9d9";
   });
 
-  // const [rows, setRows] = useState([]);
-  // const [webformSchema, setWebformSchema] = useState([]);
-  // const [errors, setErrors] = useState("");
-  // const [loading, setLoading] = useState(true); // Manage loading state
-
-  // const fetchData = async (filter = {}) => {
-  //   setLoading(true); // Set loading to true before fetching data
-  //   try {
-  //     const postData = [
-  //       {
-  //         $match: {
-  //           pageName: pageName,
-  //           ...filter,
-  //         },
-  //       },
-  //     ];
-
-  //     const appdataResponse = await axios.post(
-  //       `${config.apiUrl.replace(/\/$/, "")}${endpoint}`,
-  //       postData,
-  //       {
-  //         headers: { "Content-Type": "application/json" },
-  //       }
-  //     );
-
-    //     const webformResponse = await axios.get(
-    //       `${config.apiUrl.replace(/\/$/, "")}/webforms`
-  //     );
-
-  //     const appdata = appdataResponse.data.data;
-  //     const webform = webformResponse.data.data;
-
-  //     setRows(appdata);
-  //     const schemaForPage = webform.find((page) => page.pageName === pageName);
-  //     setWebformSchema(schemaForPage?.fields || []);
-  //   } catch (error) {
-  //     console.error("Error fetching data:", error);
-  //     setErrors("Error fetching data");
-  //   } finally {
-  //     setLoading(false); // Set loading to false after data is fetched
-  //   }
-  // };
-
-  // useEffect(() => {
-  //   fetchData();
-  // }, [endpoint, pageName]);
-
-  // const handleFilterChange = (filter) => {
-  //   fetchData(filter);
-  // };
-
   return (
     <div
       style={{

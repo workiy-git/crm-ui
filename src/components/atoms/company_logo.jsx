@@ -3,6 +3,7 @@ import axios from 'axios';
 import IconButton from '@mui/material/IconButton';
 import Box from '@mui/material/Box';
 import config from '../../config/config'; // Import the configuration file
+import { headers } from '../atoms/Authorization'
 
 function Companylogo() {
     const [companylogoData, setcompanylogoData] = useState([]);
@@ -16,7 +17,8 @@ function Companylogo() {
     }, []);
 
     useEffect(() => {
-        axios.get(`${config.apiUrl}/menus/header`) // Use apiUrl from the configuration file
+
+        axios.get(`${config.apiUrl}/menus/header`, { headers }) // Use apiUrl from the configuration file
             .then((response) => {
                 // console.log('Data received:', response.data);
                 setcompanylogoData(response.data.data.company_logo);

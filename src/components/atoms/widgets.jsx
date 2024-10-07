@@ -46,9 +46,12 @@ const retrieveWidgetCount = async (
   dashboardName
 ) => {
   try {
+    const token = sessionStorage.getItem("accessToken"); 
+    
     const response = await axios.post(apiEndpoint, apiEndpointFilter, {
       headers: {
         "Content-Type": "application/json",
+        "Authorization": token, // Include the JWT token here
       },
       data: {
         dashboardName: dashboardName,

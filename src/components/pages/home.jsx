@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import MenuComponent from "../organism/menu";
@@ -6,6 +5,7 @@ import Submenu from "../organism/submenu";
 import Footer from "../atoms/Footer";
 import config from "../../config/config";
 import Loader from "../molecules/loader";
+import { headers } from '../atoms/Authorization'
 
 function Home() {
   const [backgroundColor, setBackgroundColor] = useState(() => {
@@ -14,20 +14,33 @@ function Home() {
 
   const [selectedWidgets, setSelectedWidgets] = useState([]);
   const [homeData, setHomeData] = useState(null);
-  const [isLoading, setIsLoading] = useState(true); // Add loading state
+  const [isLoading, setIsLoading] = useState(true); // Loading state
 
   useEffect(() => {
     document.title = "Home";
+    
+    // Check if user is logged in
     const isLoggedIn = sessionStorage.getItem("isLoggedIn") === "true";
     const accessToken = sessionStorage.getItem("accessToken");
 
+    console.log("accessToken", accessToken);
+
     if (!isLoggedIn) {
-      // Redirect to login page
+      // Redirect to login page if not logged in
       window.location.href = "/";
+      return; // Stop further execution
     }
 
+    // Set up axios config to include the Authorization header with Bearer token
+    const axiosConfig = {
+      headers: {
+        Authorization: `Bearer ${accessToken}`, // Attach access token
+      },
+    };
+
+    // Make API call to fetch home page data
     axios
-      .get(`${config.apiUrl}/pages`)
+      .get(`${config.apiUrl}/pages`, {headers}) // Add config for authorization
       .then((response) => {
         console.log("Data received:", response.data);
         const pages = response.data.data;
@@ -35,11 +48,11 @@ function Home() {
         if (homeDoc) {
           setHomeData(homeDoc);
         }
-        setIsLoading(false); // Stop loading when data is fetched
+        setIsLoading(false); // Stop loading once data is fetched
       })
       .catch((error) => {
         console.error("Error fetching data:", error);
-        setIsLoading(false); // Stop loading even if there's an error
+        setIsLoading(false); // Stop loading even on error
       });
 
     return () => {
@@ -51,10 +64,9 @@ function Home() {
     setSelectedWidgets(texts);
   };
 
+  // Show loading spinner until the data is fetched
   if (isLoading) {
-    return (
-      <Loader />
-    );
+    return <Loader />;
   }
 
   return (

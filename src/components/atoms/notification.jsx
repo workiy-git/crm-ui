@@ -119,6 +119,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import config from '../../config/config'; // Import the configuration file
 import { Grid, Badge } from '@mui/material';
+import { headers } from './Authorization'
 
 // Custom Hook for Notifications
 export const useNotifications = () => {
@@ -129,7 +130,7 @@ export const useNotifications = () => {
   const fetchNotifications = async () => {
     console.log("Notification");
     try {
-      const response = await axios.get(`${config.apiUrl}/appdata`);
+      const response = await axios.get(`${config.apiUrl}/appdata`, {headers});
       const a = response.data.data;
       setCount(a.length); // Update the badge count
       if (response.data && response.data.count) {
@@ -142,7 +143,7 @@ export const useNotifications = () => {
   };
 
   const fetchMenuData = () => {
-    axios.get(`${config.apiUrl}/menus/menu_bar`)
+    axios.get(`${config.apiUrl}/menus/menu_bar`, {headers})
       .then((response) => {
         setMenuData(response.data.data.menu_images);
       })

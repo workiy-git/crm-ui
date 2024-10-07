@@ -1,8 +1,8 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Box from "@mui/material/Box";
 import List from "@mui/material/List";
-import Text from "@mui/material/Typography";
+import Typography from "@mui/material/Typography"; // Corrected import for Typography
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
@@ -11,9 +11,7 @@ import { ThemeProvider, createTheme } from "@mui/material/styles";
 import config from "../../config/config";
 import "../../assets/styles/header.css";
 import { jwtDecode } from "jwt-decode";
-import { useLocation, useNavigate } from "react-router-dom";
-import { useParams } from "react-router-dom";
-
+import { useNavigate } from "react-router-dom";
 
 const theme = createTheme({
   components: {
@@ -28,39 +26,46 @@ const theme = createTheme({
 
 export default function Myprofile({ backgroundColor, value }) {
   const [open, setOpen] = useState(false);
-  const menuRef = useRef(null);
   const [myprofileData, setMyprofileData] = useState({});
   const [userData, setUserData] = useState({});
   const navigate = useNavigate();
   const [jwtToken, setJwtToken] = useState("");
   const [userName, setUserName] = useState("");
 
-  // console.log("userData ID", userData._id);
-
   useEffect(() => {
-    const token = sessionStorage.getItem("accessToken"); // Use sessionStorage instead of sessionStorage
+    const token = sessionStorage.getItem("accessToken");
     if (token) {
       setJwtToken(token);
       const decodedToken = jwtDecode(token);
-      const user = decodedToken.username; // Assuming the username is stored in the token
+      const user = decodedToken.username;
+
       axios
-  .post(`${config.apiUrl}appdata/retrieve`, [
-    {
-      "$match": {
-        "pageName": "users",
-        "username": user
-      }
+        .post(`${config.apiUrl}appdata/retrieve`, [
+          {
+            "$match": {
+              "pageName": "users",
+              "username": user,
+            }
+          },
+        ], {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: token,
+            Access:'true'
+          },
+        })
+        .then((response) => {
+          setUserData(response.data.data[0]);
+          setUserName(user);
+        })
+        .catch((error) => {
+          console.error("Error fetching user data:", error);
+        });
+    } else {
+      // Redirect or handle the absence of the token as needed
+      navigate("/login"); // Redirect to login if no token found
     }
-  ])
-  .then((response) => {
-    setUserData(response.data.data[0]); // Update with the fetched user data
-  })
-  .catch((error) => {
-    console.error("Error fetching user data:", error);
-  });
-      setUserName(user);
-    }
-  }, []);
+  }, [navigate]);
 
   useEffect(() => {
     axios
@@ -69,59 +74,38 @@ export default function Myprofile({ backgroundColor, value }) {
         setMyprofileData(response.data.data.myprofile);
       })
       .catch((error) => {
-        console.error("Error fetching data:", error);
+        console.error("Error fetching menu data:", error);
       });
   }, []);
 
-  useEffect(() => {
-    function handleClickOutside(event) {
-      if (open && menuRef.current && !menuRef.current.contains(event.target)) {
-        setOpen(false);
-      }
-    }
-    document.body.addEventListener("click", handleClickOutside);
-    return () => {
-      document.body.removeEventListener("click", handleClickOutside);
-    };
-  }, [open]);
-
   const handleToggle = () => {
-    setOpen(!open);
+    setOpen((prev) => !prev);
   };
 
   const handleMenuItemClick = (path) => {
-    if (path === "/") { // Assuming "/" is the logout path
-      sessionStorage.clear(); // Clear the session storage
-      localStorage.clear();  // Clear local storage
-      window.location.href = path; // Navigate to the logout path
+    if (path === "/") {
+      sessionStorage.clear();
+      localStorage.clear();
+      window.location.href = path;
     } else {
-      window.location.href = path; // Navigate to other paths
+      window.location.href = path;
     }
   };
 
-  const handleProfileClick = () => {
-    const url = `/underconstruction`;
-    window.location.href = url;
-  };
-  const pageName = "users";
-
   const handleNavigate = (mode) => {
     if (userData) {
-        setOpen(false); // Close the popup
-        navigate(`/${pageName}/${mode}/${userData._id}`, {
-          state: { rowData: userData, pageName, mode },
-        });
+      setOpen(false);
+      navigate(`/users/${mode}/${userData._id}`, {
+        state: { rowData: userData, pageName: "users", mode },
+      });
     }
   };
 
   return (
     <Box sx={{ display: "flex", justifyContent: "left" }}>
       <ThemeProvider theme={theme}>
-        <div
-          elevation={0}
-          sx={{ maxWidth: 256, backgroundColor: "transparent" }}
-        >
-          <List component="nav" disablePadding ref={menuRef}>
+        <div elevation={0} sx={{ maxWidth: 256, backgroundColor: "transparent" }}>
+          <List component="nav" disablePadding>
             <ListItemButton
               alignItems="flex-start"
               onClick={handleToggle}
@@ -139,15 +123,12 @@ export default function Myprofile({ backgroundColor, value }) {
                 sx={{ width: 30, height: 30, outline: "white 2px solid" }}
               />
               <div className="myprofile-username-main">
-                <Text className={`myprofile-username  ${value}`}>
-                  {/* {userData.username} */}
+                <Typography className={`myprofile-username  ${value}`}>
                   {userData.first_name} {userData.last_name}
-                </Text>
-                <Text
-                  className={`myprofile-username myprofile-username-role ${value}`}
-                >
+                </Typography>
+                <Typography className={`myprofile-username myprofile-username-role ${value}`}>
                   {userData.job_role}
-                </Text>
+                </Typography>
               </div>
             </ListItemButton>
             {open && (
@@ -166,7 +147,6 @@ export default function Myprofile({ backgroundColor, value }) {
               >
                 <Box style={{ display: "grid", padding: "15px" }}>
                   <ListItemButton
-                    // onClick={() => handleProfileClick()}
                     onClick={() => handleNavigate("profile")}
                     style={{
                       borderBottom: "1px dashed black",
@@ -179,13 +159,11 @@ export default function Myprofile({ backgroundColor, value }) {
                         minWidth: "fit-content",
                         marginRight: "15px",
                       }}
-                     
                     >
                       <img
-                         style={{ height: "40px", width: "40px", padding: "0px", borderRadius:'100px' }}
-                        // sx={{ width: 30, height: 30, outline: "white 2px solid" }}
+                        style={{ height: "40px", width: "40px", borderRadius: '100px' }}
                         src={userData.profile_img}
-                        alt={userData.profile_img}
+                        alt={userData.username}
                       />
                     </ListItemIcon>
                     <ListItemText
@@ -207,9 +185,7 @@ export default function Myprofile({ backgroundColor, value }) {
                           minHeight: 32,
                           color: "rgba(255,255,255,.8)",
                         }}
-                        onClick={() =>
-                          handleMenuItemClick(myprofileData[key].path)
-                        }
+                        onClick={() => handleMenuItemClick(myprofileData[key].path)}
                       >
                         <ListItemIcon
                           sx={{

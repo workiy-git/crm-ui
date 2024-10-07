@@ -9,6 +9,7 @@ import config from '../../config/config'; // Import the configuration file
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useTheme } from '@mui/material/styles';
 import "../../assets/styles/header.css";
+import { headers } from '../atoms/Authorization'
 
 const FireNav = styled(List)({
   '& .MuiListItemIcon-root': {
@@ -34,7 +35,7 @@ export default function Hamburger() {
   };
 
   useEffect(() => {
-    axios.get(`${config.apiUrl}/menus/header`)
+    axios.get(`${config.apiUrl}/menus/header`, {headers})
       .then((response) => {
         // console.log('Data received:', response.data.data.hamburger);
         setHamburgerData(response.data.data.hamburger);
