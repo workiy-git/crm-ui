@@ -12,6 +12,7 @@ import Dayin from '../atoms/dayin';
 import config from '../../config/config';
 import '../../assets/styles/header.css'
 import HamburgerMobile from '../molecules/hamburger-mobile';
+import { headers } from '../atoms/Authorization'
 
 
 const Header = () => {
@@ -20,7 +21,7 @@ const Header = () => {
   const [headerData, setHeaderData] = useState(null);
 
   useEffect(() => {
-    axios.get(`${config.apiUrl}/menus`)
+    axios.get(`${config.apiUrl}/menus`,{headers})
       .then(response => {
         const headerData = response.data.data.find(menu => menu.menu === 'header');
         setHeaderData(headerData);

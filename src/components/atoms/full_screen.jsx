@@ -3,6 +3,7 @@ import axios from 'axios';
 import _ from 'lodash';
 import { Button } from '@mui/material';
 import config from '../../config/config'; // Import the configuration file
+import { headers } from '../atoms/Authorization'
 
 const FullScreen = () => {
   const [isFullScreen, setIsFullScreen] = useState(false);
@@ -66,7 +67,8 @@ const FullScreen = () => {
   }, [handleResize]);
 
   useEffect(() => {
-    axios.get(`${config.apiUrl}/menus/header`) // Use apiUrl from the configuration file
+
+    axios.get(`${config.apiUrl}/menus/header`, {headers}) // Use apiUrl from the configuration file
       .then((response) => {
         // console.log('Data received:', response.data);
         setLogoData(response.data.data.full_screen);

@@ -21,6 +21,7 @@ import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import config from '../../config/config';
 import axios from 'axios';
 import '../../assets/styles/Sidemenu.css';
+import { headers } from '../atoms/Authorization'
 
 const SideMenu = () => {
   const navigate = useNavigate();
@@ -44,7 +45,7 @@ const SideMenu = () => {
       
       const fetchMenuData = async () => {
         try {
-          const response = await axios.get(`${config.apiUrl}/menus`);
+          const response = await axios.get(`${config.apiUrl}/menus`, {headers});
           const menuDataArray = response.data.data;
           const menuData = menuDataArray.find((menu) => menu.menu === 'sidemenu');
           if (menuData) {
@@ -83,7 +84,7 @@ const SideMenu = () => {
 
       const fetchMenuExpanderIcon = async () => {
         try {
-          const response = await axios.get(`${config.apiUrl}/menus/menu_bar`);
+          const response = await axios.get(`${config.apiUrl}/menus/menu_bar`, {headers});
           
           // Set the expander icon
           setexpandicon(response.data.data.menu_expander.icon);

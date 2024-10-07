@@ -5,6 +5,7 @@ import DataSaverOnTwoToneIcon from '@mui/icons-material/DataSaverOnTwoTone';
 import axios from 'axios';
 import config from '../../config/config';
 import '../../assets/styles/AddFeature.css'; // Import the CSS file
+import { headers } from '../atoms/Authorization'
 
 const AddFeature = ({ onSaveSelectedText, storedSelectedTexts }) => {
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -22,7 +23,8 @@ const AddFeature = ({ onSaveSelectedText, storedSelectedTexts }) => {
 
   const fetchMenuData = async () => {
     try {
-      const response = await axios.get(`${config.apiUrl}/menus`);
+
+      const response = await axios.get(`${config.apiUrl}/menus`, {headers});
       const menus = response.data.data;
 
       const menuBar = menus.find(menu => menu.menu === 'menu_bar');
