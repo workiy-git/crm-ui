@@ -31,7 +31,7 @@ import MoreVertIcon from "@mui/icons-material/MoreVert";
 import Loader from "../molecules/loader";
 import Pagination from "@mui/material/Pagination";
 import { useNotifications } from '../atoms/notification'; // Import the hook
-import { headers } from '../atoms/Authorization'
+import { headers } from '../atoms/Authorization';
 
 const endpoint = "/controls/retrive";
 const gridEndpoint = "/appdata/retrieve";
@@ -253,9 +253,9 @@ const GridComponent = ({ pageName }) => {
   
       if (response.data.data.length > 0) {
         const dynamicColumns = Object.keys(dataWithIds[0])
-          .filter((key) => key !== "PageId" && key !== "pageName" &&  key !== "_id" && key !== "appdata" && key !== "history" 
+          .filter((key) => key !== "pageId" && key !== "pageName" &&  key !== "_id" && key !== "appdata" && key !== "history" 
           && key !== "id" && key !== "comments" && key !== "pageID" && key !== "filter" && key !== "formatted_filter" && key !== "selected_columns" 
-          && key !== "profile_img") 
+          && key !== "profile_img" && key !== "roles") 
           .map((key) => ({
             field: key,
             headerName: key

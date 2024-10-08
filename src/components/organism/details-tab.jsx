@@ -8,6 +8,8 @@ import Updates from '../molecules/user-update';
 import Comments from '../molecules/user-comments';
 import SiteVisits from '../molecules/user-sitevisits';
 import '../../assets/styles/style.css';
+import { headers } from '../atoms/Authorization';
+
 
 export default function TabComponent({ mode }) {
   const [value, setValue] = useState(0);
@@ -19,7 +21,7 @@ export default function TabComponent({ mode }) {
   };
 
   useEffect(() => {
-    axios.get(`${config.apiUrl}/pages/detailspage`)
+    axios.get(`${config.apiUrl}/pages/detailspage`, {headers})
       .then((response) => {
         // console.log('tab Data received:', response.data.data);
         setCompanylogoData(response.data.data.Tab);

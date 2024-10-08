@@ -4,6 +4,7 @@ import axios from 'axios';
 import Header from '../organism/header';
 import SideMenu from '../organism/sidemenu';
 import config from '../../config/config';
+import { headers } from '../atoms/Authorization';
 
 const UserForm = () => {
   const [formData, setFormData] = useState({});
@@ -32,7 +33,7 @@ const UserForm = () => {
     e.preventDefault();
     console.log('Submitting form data:', formData); // Added for debugging
     try {
-      const response = await axios.post(`${config.apiUrl}/users`, formData);
+      const response = await axios.post(`${config.apiUrl}/users`, formData, {headers: headers});
       console.log('User Data saved:', response.data);
       setSuccessMessage('User successfully created!');
     } catch (error) {

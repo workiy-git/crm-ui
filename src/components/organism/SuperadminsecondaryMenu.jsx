@@ -4,6 +4,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import Logo from '../atoms/CRMLogo';
 import config from '../../config/config';
 import axios from 'axios';
+import { headers } from '../atoms/Authorization';
 
 const SideMenu = () => {
   const navigate = useNavigate();
@@ -13,7 +14,7 @@ const SideMenu = () => {
   const [selectedOptionIndex, setSelectedOptionIndex] = useState(null);
 
   useEffect(() => {
-    axios.get(`${config.apiUrl}/pagesdata`)
+    axios.get(`${config.apiUrl}/pagesdata`, {headers})
       .then(response => {
         const pagesData = response.data[0];
         if (pagesData && pagesData.dashboard && pagesData.dashboard.sidemenu) {

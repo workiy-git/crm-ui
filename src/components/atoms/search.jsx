@@ -10,6 +10,7 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 import TextField from '@mui/material/TextField';
+import { headers } from '../atoms/Authorization';
 
 const Search = () => {
   const [menuData, setMenuData] = useState([]);
@@ -18,7 +19,7 @@ const Search = () => {
   const [searchResult, setSearchResult] = useState(null);
 
   useEffect(() => {
-    axios.get(`${config.apiUrl}/menus/menu_bar`) // Use apiUrl from the configuration file
+    axios.get(`${config.apiUrl}/menus/menu_bar`, {headers}) // Use apiUrl from the configuration file
       .then((response) => {
         // console.log('Search Data received:', response.data.data.menu_images);
         setMenuData(response.data.data.menu_images || []);
@@ -43,7 +44,7 @@ const Search = () => {
   };
 
   const handleSearchSubmit = () => {
-    axios.get(`${config.apiUrl}/appdata`, { params: { query: searchValue } })
+    axios.get(`${config.apiUrl}/appdata`, { params: { query: searchValue }, headers: headers })
       .then((response) => {
         setSearchResult(response.data);
       })

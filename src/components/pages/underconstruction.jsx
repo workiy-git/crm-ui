@@ -3,6 +3,7 @@ import axios from 'axios';
 import Footer from '../atoms/Footer';
 import config from '../../config/config';
 import Icon from '../../assets/underconstruction.png';
+import { headers } from '../atoms/Authorization';
 
 function Underconstruction() {
   const [backgroundColor] = useState(() => {
@@ -13,7 +14,7 @@ function Underconstruction() {
   useEffect(() => {
     document.title = 'Home';
 
-    axios.get(`${config.apiUrl}/pages`)
+    axios.get(`${config.apiUrl}/pages`, {headers})
       .then((response) => {
         console.log('Data received:', response.data);
         const pages = response.data.data;

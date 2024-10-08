@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Container } from '@mui/material';
 import config from '../../config/config'; // Import the configuration file
+import { headers } from '../atoms/Authorization';
 
 const Search = () => {
   const [appData, setappData] = useState([]);
@@ -9,7 +10,7 @@ const Search = () => {
 
 
   useEffect(() => {
-    axios.get(`${config.apiUrl}/appdata`)
+    axios.get(`${config.apiUrl}/appdata`, {headers})
       .then((response) => {
         console.log('Data received:', response.data);
         setappData(response.data);
@@ -20,7 +21,7 @@ const Search = () => {
   }, []);
 
   useEffect(() => {
-    axios.get(`${config.apiUrl}/webformdata`)
+    axios.get(`${config.apiUrl}/webformdata`, {headers})
       .then((response) => {
         console.log('Data received:', response.data);
         setwebformData(response.data);

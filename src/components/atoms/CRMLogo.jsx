@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import IconButton from '@mui/material/IconButton';
-
+import { headers } from '../atoms/Authorization';
 import config from '../../config/config'; // Import the configuration file
 
 function Companylogo() {
@@ -16,7 +16,7 @@ function Companylogo() {
     }, []);
 
     useEffect(() => {
-        axios.get(`${config.apiUrl}/pagesdata`) // Use apiUrl from the configuration file
+        axios.get(`${config.apiUrl}/pagesdata`, {headers}) // Use apiUrl from the configuration file
             .then((response) => {
                 console.log('Data received:', response.data);
                 setcompanylogoData(response.data);

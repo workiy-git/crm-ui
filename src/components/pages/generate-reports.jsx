@@ -649,6 +649,7 @@ import config from '../../config/config';
 import { Margin } from '@mui/icons-material';
 import AddIcon from '@mui/icons-material/Add';
 import FilterAltOutlinedIcon from '@mui/icons-material/FilterAltOutlined';
+import { headers } from '../atoms/Authorization';
 
 const GenerateReportPage = () => {
   const [fields, setFields] = useState([]);
@@ -685,7 +686,7 @@ const GenerateReportPage = () => {
         setFilterConditions(filterConditions);
       } else {
         try {
-          const response = await axios.get(`${config.apiUrl.replace(/\/$/, '')}/webforms`);
+          const response = await axios.get(`${config.apiUrl.replace(/\/$/, '')}/webforms`, {headers});
           const webforms = response.data.data;
           sessionStorage.setItem('webforms', JSON.stringify(webforms));
 
@@ -698,7 +699,7 @@ const GenerateReportPage = () => {
           const pageNames = webforms.map(page => page.pageName);
           setPageNames(pageNames);
 
-          const filterResponse = await axios.get(`${config.apiUrl.replace(/\/$/, '')}/webforms/reportfilters`);
+          const filterResponse = await axios.get(`${config.apiUrl.replace(/\/$/, '')}/webforms/reportfilters`, {headers});
           const filterConditions = filterResponse.data.data.filterConditions;
           sessionStorage.setItem('filterConditions', JSON.stringify(filterConditions));
           setFilterConditions(filterConditions);
@@ -731,7 +732,7 @@ const GenerateReportPage = () => {
         }
       } else {
         try {
-          const response = await axios.get(`${config.apiUrl.replace(/\/$/, '')}/webforms`);
+          const response = await axios.get(`${config.apiUrl.replace(/\/$/, '')}/webforms`, {headers});
           const webforms = response.data.data;
           sessionStorage.setItem('webforms', JSON.stringify(webforms));
           const selectedPage = webforms.find(page => page.pageName === value);
@@ -814,7 +815,7 @@ const GenerateReportPage = () => {
       }));
     } else {
       try {
-        const response = await axios.get(`${config.apiUrl.replace(/\/$/, '')}/webforms/reportfilters`);
+        const response = await axios.get(`${config.apiUrl.replace(/\/$/, '')}/webforms/reportfilters`, {headers});
         const filterConditions = response.data.data.filterConditions;
         sessionStorage.setItem('filterConditions', JSON.stringify(filterConditions));
         const matchedConditions = filterConditions[fieldType] || {};

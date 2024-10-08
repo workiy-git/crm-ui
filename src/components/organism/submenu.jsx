@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Container, Grid, CircularProgress, Button, Dialog, DialogTitle, DialogContent, DialogActions, Checkbox, FormControlLabel, Box } from '@mui/material';
 import config from '../../config/config';
+import { headers } from '../atoms/Authorization';
 
 const SubMenu = ({ onSaveSelectedText, storedSelectedTexts }) => {
   const [menuData, setMenuData] = useState([]);
@@ -13,7 +14,7 @@ const SubMenu = ({ onSaveSelectedText, storedSelectedTexts }) => {
   useEffect(() => {
     const fetchMenuData = async () => {
       try {
-        const response = await axios.get(`${config.apiUrl}/menus`);
+        const response = await axios.get(`${config.apiUrl}/menus`, {headers});
         const menuData = response.data.data.find(menu => menu.menu === 'addfeatures');
         if (menuData) {
           setMenuData(Object.entries(menuData).filter(([key]) => key !== 'menu' && key !== '_id').map(([key, menuItem]) => ({

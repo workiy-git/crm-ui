@@ -5,6 +5,7 @@ import MuiAlert from '@mui/material/Alert';
 import axios from 'axios';
 import config from '../../config/config';
 import { Avatar, Typography } from '@mui/material';
+import { headers } from '../atoms/Authorization';
 
 const Alert = React.forwardRef(function Alert(props, ref) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
@@ -15,7 +16,7 @@ function PushAPP() {
   const [alertOpen, setAlertOpen] = useState(false);
 
   useEffect(() => {
-    axios.get(`${config.apiUrl}/pagesdata`)
+    axios.get(`${config.apiUrl}/pagesdata`, {headers})
       .then((response) => {
         console.log('Data received:', response.data);
         setCompanylogoData(response.data.data);

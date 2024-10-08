@@ -6,6 +6,7 @@ import Select from '@mui/material/Select';
 import config from '../../config/config';
 import axios from 'axios';
 import '../../assets/styles/callsgrid.css';
+import { headers } from '../atoms/Authorization';
 
 function Dropdown({ onOptionSelected, pageName, filter, storedFilterKey }) {
   const theme = useTheme();
@@ -15,7 +16,7 @@ function Dropdown({ onOptionSelected, pageName, filter, storedFilterKey }) {
   useEffect(() => {
     const fetchControls = async () => {
       try {
-        const response = await axios.get(`${config.apiUrl}/controls`);
+        const response = await axios.get(`${config.apiUrl}/controls`, {headers});
         const controlsData = response.data.data;
 
         const control = controlsData.find(

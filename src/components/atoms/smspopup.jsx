@@ -13,6 +13,8 @@ import {
 } from '@material-ui/core';
 import axios from 'axios';
 import config from '../../config/config';
+import { headers } from '../atoms/Authorization';
+
 
 function MyDialog() {
   const [isOpen, setIsOpen] = useState(false);
@@ -22,7 +24,7 @@ function MyDialog() {
   const [companylogoData, setCompanylogoData] = useState([]);
 
   useEffect(() => {
-    axios.get(`${config.apiUrl}/popupdata`)
+    axios.get(`${config.apiUrl}/popupdata`, {headers})
       .then((response) => {
         console.log('Data received:', response.data);
         setCompanylogoData(response.data);

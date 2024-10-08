@@ -4,6 +4,7 @@ import axios from 'axios';
 import config from '../../config/config';
 import { Box, Button, TextField, Typography } from '@mui/material';
 import DetailsPages from "../pages/details";
+import { headers } from '../atoms/Authorization';
 
 
 const DetailsPage = ({ endpoint }) => {
@@ -18,7 +19,7 @@ const DetailsPage = ({ endpoint }) => {
       // Fetch data if it's not passed via state
       const fetchData = async () => {
         try {
-          const response = await axios.get(`${config.apiUrl}${endpoint}/${id}`);
+          const response = await axios.get(`${config.apiUrl}${endpoint}/${id}`, {headers});
           setFormState(response.data);
         } catch (error) {
           console.error('Error fetching user data:', error);
@@ -35,7 +36,7 @@ const DetailsPage = ({ endpoint }) => {
   const handleSave = async (e) => {
     e.preventDefault();
     try {
-      await axios.put(`${config.apiUrl}${endpoint}/${id}`, formState);
+      await axios.put(`${config.apiUrl}${endpoint}/${id}`, formState , {headers: headers});
       navigate('/'); // Navigate back to the grid page after saving
     } catch (error) {
       console.error('Error saving user data:', error);

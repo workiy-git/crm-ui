@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 import CircularProgress from "@mui/material/CircularProgress";
 import WidgetsIcon from "@mui/icons-material/WidgetsOutlined";
 import config from "../../config/config";
+import {headers} from "../atoms/Authorization";
 
 const CreateWidgetItem = styled(Paper)(({ theme }) => ({
   backgroundColor: "#EAEAEA !important",
@@ -46,13 +47,8 @@ const retrieveWidgetCount = async (
   dashboardName
 ) => {
   try {
-    const token = sessionStorage.getItem("accessToken"); 
-    
     const response = await axios.post(apiEndpoint, apiEndpointFilter, {
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": token, // Include the JWT token here
-      },
+      headers: {headers},
       data: {
         dashboardName: dashboardName,
       },

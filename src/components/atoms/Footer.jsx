@@ -3,6 +3,7 @@ import axios from 'axios';
 import Link from '@mui/material/Link';
 import { Typography } from '@mui/material';
 import config from '../../config/config';
+import { headers } from '../atoms/Authorization';
 
 
 function Footer() {
@@ -12,7 +13,7 @@ function Footer() {
     let timeoutId;
 
     useEffect(() => {
-        axios.get(`${config.apiUrl}/menudata`)
+        axios.get(`${config.apiUrl}/menudata`, {headers})
             .then((response) => {
                 console.log('Data received:', response.data);
                 setcompanylogoData(response.data);
