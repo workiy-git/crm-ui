@@ -95,7 +95,13 @@ const GridComponent = ({ pageName }) => {
       const id = rowToDelete._id; // Assuming `_id` is the unique identifier for the row
 
       try {
-        await axios.delete(`${config.apiUrl.replace(/\/$/, '')}/appdata/${id}`);
+        await axios.delete(
+          `${config.apiUrl.replace(/\/$/, '')}/appdata/${id}`, 
+          {
+            headers: headers // The configuration object where headers are passed
+          }
+        );
+        
         setGridData((prevData) => prevData.filter((row) => row._id !== id));
         setSuccess('Data deleted successfully');
         fetchNotifications();
@@ -130,10 +136,14 @@ const GridComponent = ({ pageName }) => {
 
         const response = await axios.post(
           
-          `${config.apiUrl.replace(/\/$/, "")}${endpoint}`, {headers},
+          `${config.apiUrl.replace(/\/$/, "")}${endpoint}`,
           {
             pageName: pageName,
             control_type: "dropdown",
+          },
+          {
+            // This is the config object where headers should go
+            headers: headers, // Pass the headers here
           }
         );
         const options = response.data.data[0].value.map((option) => ({
@@ -222,9 +232,13 @@ const GridComponent = ({ pageName }) => {
     try {
 
       const response = await axios.post(
-        `${config.apiUrl.replace(/\/$/, "")}${gridEndpoint}`, {headers},
-        filter
+        `${config.apiUrl.replace(/\/$/, "")}${gridEndpoint}`, 
+        filter, // This is the body (data you are sending)
+        {
+          headers: headers, // This is the config object where headers go
+        }
       );
+      
       
       const dataWithIds = response.data.data.map((item, index) => {
         const flattenedItem = flattenObject(item); // Flatten the object

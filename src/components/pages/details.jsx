@@ -17,6 +17,7 @@ import KeyboardReturnIcon from '@mui/icons-material/KeyboardReturn';
 import '../../assets/styles/style.css';
 // import { Notification } from '../atoms/notification'
 import { useNotifications } from '../atoms/notification'; // Import the hook
+import { headers } from '../atoms/Authorization'
 
 const DetailsPage = () => {
   const { id } = useParams();
@@ -55,8 +56,12 @@ const DetailsPage = () => {
     const fetchWebformsData = async () => {
       try {
         const response = await axios.get(
-          `${config.apiUrl.replace(/\/$/, "")}/webforms`
+          `${config.apiUrl.replace(/\/$/, "")}/webforms`, 
+          {
+            headers: headers // Pass headers inside the config object
+          }
         );
+        
         const fetchedWebformsData = response.data.data;
         setWebformsData(fetchedWebformsData || []);
 
@@ -78,7 +83,9 @@ const DetailsPage = () => {
           setInitialFormData(initialFormData);
         } else if (id) {
           const apiUrl = `${config.apiUrl.replace(/\/$/, "")}/appdata/${id}`;
-          const response = await axios.get(apiUrl);
+          const response = await axios.get(apiUrl, {
+            headers: headers // Add your headers here
+          });
           const fetchedData = response.data;
 
           const initialFormData = initializeFormData(fetchedData, pageSchema);
@@ -120,7 +127,13 @@ const DetailsPage = () => {
     
       try {
         // Fetch the updated data after saving
-        const updatedData = await axios.get(`${config.apiUrl}/appdata/${id}`);
+        const updatedData = await axios.get(
+          `${config.apiUrl}/appdata/${id}`, 
+          {
+            headers: headers // Configuration object with headers
+          }
+        );
+        
         console.log("updatedData", updatedData.data.data);
     
         // Navigate to the updated view
@@ -175,7 +188,9 @@ const DetailsPage = () => {
   const handleConfirmDelete = async () => {
     try {
       const apiUrl = `${config.apiUrl.replace(/\/$/, "")}/appdata/${id}`;
-      await axios.delete(apiUrl);
+      await axios.delete(apiUrl, {
+        headers: headers // Add your headers here
+      });
       fetchNotifications();
       handleDeleteSuccess();
     } catch (error) {
@@ -225,7 +240,14 @@ if (isAdding && Object.values(formData).every(value => value === "")) {
     console.log("dataToSend",dataToSend)
     console.log("rowData",rowData)
     if (isAdding) {
-      await axios.post(`${config.apiUrl}/appdata/create`, dataToSend);
+      await axios.post(
+        `${config.apiUrl}/appdata/create`, 
+        dataToSend, // The request body
+        {
+          headers: headers // The configuration object where headers are passed
+        }
+      );
+      
       handleSaveSuccess("Data Added successfully!");
     
       // Use setTimeout with a callback function to navigate after 2000ms
@@ -233,7 +255,13 @@ if (isAdding && Object.values(formData).every(value => value === "")) {
         navigate(`/container/${pageName}`);
       }, 2000); // 2000ms delay
     } else {
-      await axios.put(`${config.apiUrl}/appdata/${id}`, dataToSend);
+      await axios.put(
+        `${config.apiUrl}/appdata/${id}`, 
+        dataToSend, // Request body
+        {
+          headers: headers, // Configuration object, including headers
+        }
+      );
       // const updatedData = await axios.get(`${config.apiUrl}/appdata/${id}`);
       // console.log("updatedData",updatedData.data.data)
       // console.log("rowData",rowData)
