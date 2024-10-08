@@ -2,6 +2,7 @@ import React, { useState, useEffect, useImperativeHandle, forwardRef } from 'rea
 import { Box, TextField, Select, MenuItem, FormControl, Checkbox, FormControlLabel } from '@mui/material';
 import axios from 'axios';
 import config from '../../config/config';
+import { headers } from '../atoms/Authorization';
 
 const AddComponent = forwardRef(({ formData, setFormData, pageSchema, onSaveSuccess, onSaveError, pageName, pageId }, ref) => {
   const [validationError, setValidationError] = useState('');
@@ -38,7 +39,7 @@ const AddComponent = forwardRef(({ formData, setFormData, pageSchema, onSaveSucc
 
   const fetchWebforms = async () => {
     try {
-      const response = await axios.get(`${config.apiUrl.replace(/\/$/, '')}/webforms`);
+      const response = await axios.get(`${config.apiUrl.replace(/\/$/, '')}/webforms`, {headers});
       const webforms = response.data;
 
       // Find the webform with the matching pageName
@@ -119,7 +120,7 @@ const AddComponent = forwardRef(({ formData, setFormData, pageSchema, onSaveSucc
 
     try {
       const dataToSend = { pageName, pageId, ...formData };
-      await axios.post(`${config.apiUrl}/appdata/create`, dataToSend);
+      await axios.post(`${config.apiUrl}/appdata/create`, dataToSend , {headers: headers});
       onSaveSuccess('Data added successfully!');
     } catch (error) {
       onSaveError('Error adding data.');

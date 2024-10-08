@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import config from '../../config/config'; // Import the configuration file
+import { headers } from '../atoms/Authorization';
 
 const Refresh = ({ onClick }) => {
   const [menuData, setMenuData] = useState(null);
 
   useEffect(() => {
     // Fetch notification icon
-    axios.get(`${config.apiUrl}/menus/menu_bar`)
+    axios.get(`${config.apiUrl}/menus/menu_bar`, {headers})
       .then((response) => {
         console.log('Data received:', response.data);
         setMenuData(response.data.data.menu_images);

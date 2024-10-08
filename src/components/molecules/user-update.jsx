@@ -159,6 +159,7 @@ import config from '../../config/config';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import { useNavigate } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
+import { headers } from '../atoms/Authorization';
 
 const Updates = ({ mode }) => {
   const { id } = useParams();
@@ -180,7 +181,7 @@ const Updates = ({ mode }) => {
       const decodedToken = jwtDecode(token);
       const user = decodedToken.username; // Assuming the username is stored in the token
       axios
-        .get(`${config.apiUrl}/users/${user}`)
+        .get(`${config.apiUrl}/users/${user}`, {headers})
         .then((response) => {
           setUserData(response.data.data); // Update with the fetched user data
         })
@@ -200,7 +201,7 @@ const Updates = ({ mode }) => {
 
     const fetchHistory = async () => {
       try {
-        const response = await axios.get(`${config.apiUrl}/appdata/history/${id}`);
+        const response = await axios.get(`${config.apiUrl}/appdata/history/${id}`, {headers});
         setHistory(response.data.data || []);
       } catch (error) {
         setError(error);
@@ -211,7 +212,7 @@ const Updates = ({ mode }) => {
 
     const fetchPageName = async (id) => {
       try {
-        const response = await axios.get(`${config.apiUrl.replace(/\/$/, '')}/appdata/${id}`);
+        const response = await axios.get(`${config.apiUrl.replace(/\/$/, '')}/appdata/${id}`, {headers});
         return response.data.data.pageName;
       } catch (error) {
         setError(error);
@@ -220,7 +221,7 @@ const Updates = ({ mode }) => {
 
     const fetchWebForms = async () => {
       try {
-        const response = await axios.get(`${config.apiUrl}/webforms`);
+        const response = await axios.get(`${config.apiUrl}/webforms`, {headers});
         return response.data;
       } catch (error) {
         setError(error);

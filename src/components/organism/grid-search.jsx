@@ -4,6 +4,7 @@ import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import axios from 'axios';
 import config from '../../config/config';
+import { headers } from '../atoms/Authorization';
 
 const GridSearch = ({ field, value, onChange }) => {
   const [dropdownOptions, setDropdownOptions] = useState([]);
@@ -13,7 +14,7 @@ const GridSearch = ({ field, value, onChange }) => {
       const fetchOptions = async () => {
         const apiUrl = `${config.apiUrl.replace(/\/$/, '')}/options/${field.fieldName}`;
         try {
-          const response = await axios.get(apiUrl);
+          const response = await axios.get(apiUrl, {headers: headers});
           setDropdownOptions(response.data.options || []);
         } catch (error) {
           console.error('Error fetching dropdown options:', error);

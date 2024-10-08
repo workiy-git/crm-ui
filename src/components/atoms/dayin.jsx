@@ -3,13 +3,14 @@ import axios from 'axios';
 import { Container, Grid, Dialog, DialogContent, Button, Typography } from '@mui/material';
 import config from '../../config/config'; // Import the configuration file
 import '../../assets/styles/header.css';
+import { headers } from '../atoms/Authorization';
 
 const Dayin = () => {
   const [menuData, setMenuData] = useState(null); // Initialize as null to handle loading state
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   useEffect(() => {
-    axios.get(`${config.apiUrl}/menus/menu_bar`) // Use apiUrl from the configuration file
+    axios.get(`${config.apiUrl}/menus/menu_bar`, {headers}) // Use apiUrl from the configuration file
       .then((response) => {
         // console.log('dayData received:', response.data.data.menu_text);
         setMenuData(response.data.data.menu_text);

@@ -17,6 +17,7 @@ import {
   CognitoUser,
 } from "amazon-cognito-identity-js";
 import { useAuth } from "../../AuthContext";
+import { headers } from '../atoms/Authorization';
 
 function Loginpage() {
   const { login } = useAuth();
@@ -159,7 +160,7 @@ function Loginpage() {
 
   useEffect(() => {
     axios
-      .get(`${config.apiUrl}pages/Login`)
+      .get(`${config.apiUrl}pages/Login`, {headers})
       .then((response) => {
         console.log("Data received:", response.data);
         setcompanylogoData(response.data.data);

@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import config from '../../config/config';
 import { TextField, Button, Box, Paper, List, ListItem, ListItemText, Avatar, Typography } from '@mui/material';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import { headers } from '../atoms/Authorization';
 
 const Comment = () => {
   const [comments, setComments] = useState([]);
@@ -13,9 +14,7 @@ const Comment = () => {
     try {
       const response = await fetch(`${config.apiUrl.replace(/\/$/, "")}/appdata/comments/${id}`, {
         method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: headers,
       });
 
       if (response.ok) {
@@ -42,9 +41,7 @@ const Comment = () => {
         console.log('ID', id);
         const response = await fetch(`${config.apiUrl.replace(/\/$/, "")}/appdata/comments/${id}`, {
           method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-          },
+          headers: headers,
           body: JSON.stringify({
             comments: {
               comments: comment,
