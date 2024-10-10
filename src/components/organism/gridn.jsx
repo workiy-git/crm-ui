@@ -407,7 +407,7 @@ const handleViewReport = async () => {
     // Fetch the app data using the ID from the selected row
     const reportId = selectedRow._id;
     const reportResponse = await axios.get(
-      `${config.apiUrl.replace(/\/$/, "")}/appdata/${reportId}`
+      `${config.apiUrl.replace(/\/$/, "")}/appdata/${reportId}`, {headers}
     );
     
     const reportData = reportResponse.data.data;
@@ -431,7 +431,7 @@ const handleViewReport = async () => {
     const appDataResponse = await axios.post(
       `${config.apiUrl.replace(/\/$/, "")}/appdata/retrieve`,
       pipeline,  // Send the pipeline array directly
-      { headers: { 'Content-Type': 'application/json' } }
+      { headers: headers }
     );
     
     const filteredData_reportId = appDataResponse.data.data; // Store the fetched data
