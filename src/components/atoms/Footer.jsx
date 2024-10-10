@@ -13,13 +13,13 @@ function Footer() {
     let timeoutId;
 
     useEffect(() => {
-        axios.get(`${config.apiUrl}/menudata`, {headers})
+        axios.get(`${config.apiUrl}/menus`, {headers})
             .then((response) => {
-                console.log('Data received:', response.data);
-                setcompanylogoData(response.data);
+                console.log('companylogoData received:', response.data.data);
+                setcompanylogoData(response.data.data);
             })
             .catch((error) => {
-                console.error('Error fetching data:', error);
+                console.error('Error fetching companylogoData data:', error);
             });
     }, []);
 
