@@ -12,6 +12,7 @@ import config from "../../config/config";
 import "../../assets/styles/header.css";
 import { jwtDecode } from "jwt-decode";
 import { useNavigate } from "react-router-dom";
+import {headers} from '../atoms/Authorization'
 
 const theme = createTheme({
   components: {
@@ -69,7 +70,7 @@ export default function Myprofile({ backgroundColor, value }) {
 
   useEffect(() => {
     axios
-      .get(`${config.apiUrl}/menus/header`)
+      .get(`${config.apiUrl}/menus/header`, {headers})
       .then((response) => {
         setMyprofileData(response.data.data.myprofile);
       })
