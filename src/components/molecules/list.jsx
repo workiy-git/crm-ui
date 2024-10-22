@@ -34,11 +34,25 @@ export default function Hamburger() {
     window.location.href = url;
   };
 
+  // useEffect(() => {
+  //   axios.get(`${config.apiUrl}/menus/header`, {headers})
+  //     .then((response) => {
+  //       // console.log('Data received:', response.data.data.hamburger);
+  //       setHamburgerData(response.data.data.hamburger);
+  //     })
+  //     .catch((error) => {
+  //       // console.error('Error fetching data:', error);
+  //     });
+  // }, []);
+
   useEffect(() => {
-    axios.get(`${config.apiUrl}/menus/header`, {headers})
+    axios.get(`${config.apiUrl}/menus`, {headers}) // Use apiUrl from the configuration file
       .then((response) => {
-        // console.log('Data received:', response.data.data.hamburger);
-        setHamburgerData(response.data.data.hamburger);
+        // console.log('dayData received:', response.data.data.menu_text);
+        const tabData = response.data.data.find(menu => menu.menu === 'header');
+
+        setHamburgerData(tabData.hamburger);
+        
       })
       .catch((error) => {
         // console.error('Error fetching data:', error);
