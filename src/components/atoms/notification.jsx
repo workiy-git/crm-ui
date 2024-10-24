@@ -270,8 +270,8 @@ const Notification = () => {
       <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
         <DialogTitle>Notifications</DialogTitle>
         <Tabs value={tabValue} onChange={handleTabChange}>
-          <Tab style={{padding:'10px'}} label="Newly Come Leads" />
-          <Tab style={{padding:'10px'}} label="Today Follow-Up" />
+          <Tab label="Newly Come Leads" />
+          <Tab label="Today Follow-Up" />
         </Tabs>
 
         {/* Tab Panel for New Leads */}
