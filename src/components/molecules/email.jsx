@@ -28,16 +28,37 @@
 // export default Email;
 
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, MenuItem, Select, FormControl, InputLabel } from "@material-ui/core";
 import MailOutlineIcon from '@mui/icons-material/MailOutline';
 import Typography from '@mui/material/Typography';
 import '../../assets/styles/style.css';
+import { headers } from '../atoms/Authorization'
+import axios from 'axios';
+import config from '../../config/config';
 
 
 const Email = ({ formData }) => {
     const [open, setOpen] = useState(false);
     const [selectedTemplate, setSelectedTemplate] = useState("");
+    const [menuData, setMenuData] = useState([]); 
+
+
+    useEffect(() => {
+        axios.get(`${config.apiUrl}/menus`, {headers}) // Use apiUrl from the configuration file
+          .then((response) => {
+            // console.log('dayData received:', response.data.data.menu_text);
+            const containerData = response.data.data.find(menu => menu.menu === 'container');
+    
+            setMenuData(containerData);
+            console.log("menusss", response.data.data)
+            
+          })
+          .catch((error) => {
+            // console.error('Error fetching data:', error);
+          });
+      }, []);
+
 
     const handleClickOpen = () => {
         setOpen(true);
@@ -84,7 +105,14 @@ const Email = ({ formData }) => {
     return (
         <>
             <Button className="Details_hover_btn" onClick={handleClickOpen} style={{ display: 'flex', alignItems: 'center', color:'white' }}>
-                <MailOutlineIcon style={{ color: 'black', marginRight:'10px' }} /><Typography className="Details_btn_txt">Email</Typography>   
+                
+            {menuData.email && menuData.email.title ? (
+            <>
+                <MailOutlineIcon style={{ color: 'black', marginRight: '10px' }} />
+                <Typography className="Details_btn_txt">Email</Typography>
+            </>
+            ) : ""}
+  
             </Button>
             <Dialog open={open} onClose={handleClose}>
                 <DialogTitle>Select Email Template</DialogTitle>

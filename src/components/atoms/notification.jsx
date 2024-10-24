@@ -227,9 +227,9 @@ const Notification = () => {
   const [tabValue, setTabValue] = useState(0);
 
   // Fetch notifications when the component mounts
-  useEffect(() => {
-    fetchNotifications(); // Fetch notifications when the component mounts
-  }, [fetchNotifications]);
+  // useEffect(() => {
+  //   fetchNotifications(); // Fetch notifications when the component mounts
+  // }, [fetchNotifications]);
 
   const handleNotificationClick = () => {
     setOpen(true); // Open the popup dialog
@@ -259,7 +259,7 @@ const Notification = () => {
                   cursor: 'pointer',
                   filter: "brightness(0) invert(1)"
                 }}
-                onClick={handleNotificationClick} // Open popup on click
+                onClick={handleNotificationClick} //Open popup on click
               />
             </Badge>
           )}
@@ -270,8 +270,8 @@ const Notification = () => {
       <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
         <DialogTitle>Notifications</DialogTitle>
         <Tabs value={tabValue} onChange={handleTabChange}>
-          <Tab label="Newly Come Leads" />
-          <Tab label="Today Follow-Up" />
+          <Tab style={{padding:'10px'}} label="Newly Come Leads" />
+          <Tab style={{padding:'10px'}} label="Today Follow-Up" />
         </Tabs>
 
         {/* Tab Panel for New Leads */}
