@@ -20,28 +20,14 @@ export default function TabComponent({ mode }) {
     setValue(newValue);
   };
 
-  // useEffect(() => {
-  //   axios.get(`${config.apiUrl}/pages/detailspage`, {headers})
-  //     .then((response) => {
-  //       // console.log('tab Data received:', response.data.data);
-  //       setCompanylogoData(response.data.data.Tab);
-  //     })
-  //     .catch((error) => {
-  //       // console.error('Tab Error fetching data:', error);
-  //     });
-  // }, []);
   useEffect(() => {
-    axios.get(`${config.apiUrl}/pages`, {headers}) // Use apiUrl from the configuration file
+    axios.get(`${config.apiUrl}/pages/detailspage`, {headers})
       .then((response) => {
-        // console.log('dayData received:', response.data.data.menu_text);
-        const tabData = response.data.data.find(title => title.title === 'detailspage');
-
-        setCompanylogoData(tabData.Tab);
-        console.log("menusss", response.data.data)
-        
+        // console.log('tab Data received:', response.data.data);
+        setCompanylogoData(response.data.data.Tab);
       })
       .catch((error) => {
-        // console.error('Error fetching data:', error);
+        // console.error('Tab Error fetching data:', error);
       });
   }, []);
   

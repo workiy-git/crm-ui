@@ -40,7 +40,6 @@ const DetailsPage = () => {
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [isCancelDialogOpen, setIsCancelDialogOpen] = useState(false);
   const editComponentRef = useRef(null);
-  const [menuData, setMenuData] = useState([]); 
   const [currentPage, setCurrentPage] = useState([]);
 
 
@@ -51,21 +50,6 @@ const DetailsPage = () => {
       initialData[field.fieldName] = data[field.fieldName] || "";
     });
     return initialData;
-  }, []);
-
-  useEffect(() => {
-    axios.get(`${config.apiUrl}/menus`, {headers}) // Use apiUrl from the configuration file
-      .then((response) => {
-        // console.log('dayData received:', response.data.data.menu_text);
-        const containerData = response.data.data.find(menu => menu.menu === 'container');
-
-        setMenuData(containerData);
-        console.log("menusss", response.data.data)
-        
-      })
-      .catch((error) => {
-        // console.error('Error fetching data:', error);
-      });
   }, []);
 
   useEffect(() => {
@@ -305,7 +289,6 @@ if (isAdding && Object.values(formData).every(value => value === "")) {
   };  
   
   const handleAdd = () => {
-    console.log(menuData.add.title)
     if (hasUnsavedChanges) {
       setIsCancelDialogOpen(true);
     } else {
@@ -442,7 +425,7 @@ if (isAdding && Object.values(formData).every(value => value === "")) {
                 onClick={handleAdd}
                   style={{margin:'5px'}}
                 >
-                   {menuData.add && menuData.add.title ? menuData.add.title : ""}
+                  Add
                 </Button>
                 )}
              
@@ -457,7 +440,7 @@ if (isAdding && Object.values(formData).every(value => value === "")) {
                 style={{margin:'5px'}}
 
                 >
-                  {menuData.edit && menuData.edit.title ? menuData.edit.title : ""}
+                  Edit
                 </Button>
               )}
               {(isEditing || isAdding) && (
@@ -469,7 +452,7 @@ if (isAdding && Object.values(formData).every(value => value === "")) {
                 style={{margin:'5px'}}
 
                 >
-                  {menuData.save && menuData.save.title ? menuData.save.title : ""}
+                  Save
                 </Button>
               )}
               {(!isAdding)  && pageName !== 'users' &&(
@@ -480,7 +463,7 @@ if (isAdding && Object.values(formData).every(value => value === "")) {
                 onClick={handleOpenDialog}
                 style={{margin:'5px'}}
               >
-                  {menuData.delete && menuData.delete.title ? menuData.delete.title : ""}
+                Delete
               </Button>
               )}
               {(isAdding || isEditing)  && (
@@ -492,7 +475,7 @@ if (isAdding && Object.values(formData).every(value => value === "")) {
                 onClick={handleCancel}
                 style={{margin:'5px'}}
               >
-                  {menuData.cancel && menuData.cancel.title ? menuData.cancel.title : ""}
+                Cancel
               </Button>
               )}
             </Box>
