@@ -396,9 +396,27 @@ const handleCancelconcertToLead = () => {
   setConvertDialogOpen(false); // Close the dialog without doing anything
 };
 
+const handleEditReport = async () => {
+  if (!selectedRow) return;
 
+  try {
+    // Fetch the app data using the ID from the selected row
+    const reportId = selectedRow._id;
+    const reportResponse = await axios.get(
+      `${config.apiUrl.replace(/\/$/, "")}/appdata/${reportId}`, { headers }
+    );
+  
+    const selectedReportData = reportResponse.data.data;
+    console.log('Fetched report data:', selectedReportData);
 
-
+    // Navigate to the edit report page and pass the selectedReportData
+    navigate(`/edit-report/${reportId}`, { 
+      state: { selectedReportData }  // Pass the selectedReportData in the state
+    });
+  } catch (error) {
+    console.error('Error fetching report data:', error);
+  }
+};
 
 const handleViewReport = async () => {
   if (!selectedRow) return;
@@ -412,16 +430,6 @@ const handleViewReport = async () => {
     
     const reportData = reportResponse.data.data;
     console.log('Fetched report data:', reportData);
-
-    const module = reportData.module || 'defaultModule';
-    const selectedColumns = Array.isArray(reportData.selected_columns) ? reportData.selected_columns : [];
-    const filters = Array.isArray(reportData.filter) ? reportData.filter : [];
-
-    // const pipeline = [
-    //   { "$match": { "pageName": module } },
-    //   { "$project": selectedColumns.reduce((acc, column) => ({ ...acc, [column]: 1 }), {}) },
-    //   { "$match": filters.reduce((acc, filter) => ({ ...acc, [filter.field]: { [filter.condition]: filter.value } }), {}) }
-    // ];
 
     const pipeline = reportData.formatted_filter;
 
@@ -512,6 +520,7 @@ const handleViewReport = async () => {
         selectedRow={selectedRow}
         pageName={pageName} 
         onViewReport={handleViewReport}
+        onEditReport={handleEditReport}
         convertToLead={openConfirmationDialog}
         // convertToLead={handleConfirmconcertToLead}
 

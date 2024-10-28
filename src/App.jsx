@@ -53,6 +53,7 @@ const App = () => {
           <Route path="/users/profile/:id" element={ <ProtectedRoute> <DetailsPage mode="profile" /> </ProtectedRoute> } />
           <Route path="/generate-report" element={ <ProtectedRoute> <GenerateReportPage /> </ProtectedRoute> } />
           <Route path="/view-report" element={ <ProtectedRoute> <ReportGrid /> </ProtectedRoute> } />
+          <Route path="/edit-report/:id" element={ <ProtectedRoute> <GenerateReportPage /> </ProtectedRoute> } />
           <Route path="/underconstruction" element={ <ProtectedRoute> <Underconstruction /> </ProtectedRoute> } />
         </Routes>
       </Layout>
