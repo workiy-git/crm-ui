@@ -41,7 +41,7 @@ export default function Myprofile({ backgroundColor, value }) {
       const user = decodedToken.username;
 
       axios
-        .post(`${config.apiUrl}appdata/retrieve`, [
+        .post(`${config.apiUrl}/appdata/retrieve`, [
           {
             "$match": {
               "pageName": "users",
