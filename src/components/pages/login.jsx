@@ -160,7 +160,7 @@ function Loginpage() {
 
   useEffect(() => {
     axios
-      .get(`${config.apiUrl}pages/Login`, {headers})
+      .get(`${config.apiUrl}/pages/Login`, {headers})
       .then((response) => {
         console.log("Data received:", response.data);
         setcompanylogoData(response.data.data);
