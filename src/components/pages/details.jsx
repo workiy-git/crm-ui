@@ -12,7 +12,7 @@ import AlertWrapper from '../organism/alert';
 import Tab from '../organism/details-tab';
 import Whatsapp from '../molecules/whatsapp';
 import Email from '../molecules/email';
-import Sms from '../molecules/sms';
+// import Sms from '../molecules/sms';
 import KeyboardReturnIcon from '@mui/icons-material/KeyboardReturn';
 import '../../assets/styles/style.css';
 // import { Notification } from '../atoms/notification'
@@ -52,6 +52,71 @@ const DetailsPage = () => {
     });
     return initialData;
   }, []);
+ 
+ // Memoized helper function with useCallback
+const fetchDataWithRetry = useCallback(
+  async (url, retryCount = 3) => {
+    try {
+      const response = await axios.get(url, { headers });
+      return response.data;
+    } catch (error) {
+      if (retryCount > 0) {
+        console.warn("Retrying request, attempts left:", retryCount);
+        return fetchDataWithRetry(url, retryCount - 1);
+      } else {
+        throw error;
+      }
+    }
+  },
+  [] // No dependencies, so it's memoized only once
+);
+
+useEffect(() => {
+  const fetchWebformsData = async () => {
+    try {
+      const apiUrl = `${config.apiUrl.replace(/\/$/, "")}/webforms`;
+      const response = await fetchDataWithRetry(apiUrl);
+      const fetchedWebformsData = response.data || [];
+      setWebformsData(fetchedWebformsData);
+
+      const currentPage = fetchedWebformsData.find((page) => page.pageName === pageName);
+      setCurrentPage(currentPage);
+
+      if (!currentPage) {
+        setError(`Page ${pageName} not found in webforms collection.`);
+        return;
+      }
+
+      const pageSchema = currentPage.fields;
+      setPageSchema(pageSchema);
+
+      if (rowData) {
+        const initialData = initializeFormData(rowData, pageSchema);
+        setFormData(initialData);
+        setInitialFormData(initialData);
+      } else if (id) {
+        const appDataUrl = `${config.apiUrl.replace(/\/$/, "")}/appdata/${id}`;
+        const appDataResponse = await fetchDataWithRetry(appDataUrl);
+        const fetchedData = appDataResponse.data;
+
+        const initialData = initializeFormData(fetchedData, pageSchema);
+        setFormData(initialData);
+        setInitialFormData(initialData);
+      }
+    } catch (error) {
+      if (error.code === "ERR_NETWORK") {
+        setError("Network error, please check your internet connection or try again later.");
+      } else {
+        setError("Error fetching webforms data");
+      }
+      console.error("Error fetching webforms data:", error);
+    }
+  };
+
+  fetchWebformsData();
+}, [id, rowData, pageName, initializeFormData, fetchDataWithRetry]); // Include fetchDataWithRetry here
+
+
 
   useEffect(() => {
     axios.get(`${config.apiUrl}/menus`, {headers}) // Use apiUrl from the configuration file
@@ -68,54 +133,7 @@ const DetailsPage = () => {
       });
   }, []);
 
-  useEffect(() => {
-    const fetchWebformsData = async () => {
-      try {
-        const response = await axios.get(
-          `${config.apiUrl.replace(/\/$/, "")}/webforms`, 
-          {
-            headers: headers // Pass headers inside the config object
-          }
-        );
-        
-        const fetchedWebformsData = response.data.data;
-        setWebformsData(fetchedWebformsData || []);
-
-        const currentPage = fetchedWebformsData.find(
-          (page) => page.pageName === pageName
-        );
-        setCurrentPage(currentPage)
-        if (!currentPage) {
-          setError(`Page ${pageName} not found in webforms collection.`);
-          return;
-        }
-
-        const pageSchema = currentPage.fields;
-        setPageSchema(pageSchema);
-
-        if (rowData) {
-          const initialFormData = initializeFormData(rowData, pageSchema);
-          setFormData(initialFormData);
-          setInitialFormData(initialFormData);
-        } else if (id) {
-          const apiUrl = `${config.apiUrl.replace(/\/$/, "")}/appdata/${id}`;
-          const response = await axios.get(apiUrl, {
-            headers: headers // Add your headers here
-          });
-          const fetchedData = response.data;
-
-          const initialFormData = initializeFormData(fetchedData, pageSchema);
-          setFormData(initialFormData);
-          setInitialFormData(initialFormData);
-        }
-      } catch (error) {
-        setError("Error fetching webforms data");
-      }
-    };
-
-    fetchWebformsData();
-  }, [id, rowData, pageName, initializeFormData]);
-
+ 
 
   useEffect(() => {
     const hasChanges = JSON.stringify(formData) !== JSON.stringify(initialFormData);
