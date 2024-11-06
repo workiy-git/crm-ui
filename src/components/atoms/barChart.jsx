@@ -68,7 +68,7 @@
 
 import * as React from 'react';
 import { BarChart } from '@mui/x-charts/BarChart';
-import { Box, Typography, Paper } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 
 const chartSetting = {
   width: 500,

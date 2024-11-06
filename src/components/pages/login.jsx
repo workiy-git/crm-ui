@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+// import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import {
   Button,
@@ -32,7 +32,7 @@ function Loginpage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleClickShowPassword = () => setShowPassword((show) => !show);
-  let navigate = useNavigate();
+  // let navigate = useNavigate();
 
   const handleMouseDownPassword = (event) => {
     event.preventDefault();
@@ -79,7 +79,7 @@ function Loginpage() {
       cognitoUser.authenticateUser(authenticationDetails, {
         onSuccess: async (result) => {
           try {
-            console.log(result);
+            console.log("resules",result);
             const response = await fetch(`${config.apiUrl}/appdata/retrieve`, {
               method: "POST",
               headers: {
@@ -95,6 +95,7 @@ function Loginpage() {
                 },
               ]),
             });
+            console.log("user Responce",response)
 
             const userData = await response.json();
             if (userData && userData.data[0].company === companyName) {
@@ -162,7 +163,7 @@ function Loginpage() {
     axios
       .get(`${config.apiUrl}/pages/Login`, {headers})
       .then((response) => {
-        console.log("Data received:", response.data);
+        console.log("Login  Data received:", response.data);
         setcompanylogoData(response.data.data);
       })
       .catch((error) => {
