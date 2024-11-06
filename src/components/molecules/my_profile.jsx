@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import Box from "@mui/material/Box";
 import List from "@mui/material/List";
@@ -12,7 +12,7 @@ import config from "../../config/config";
 import "../../assets/styles/header.css";
 import { jwtDecode } from "jwt-decode";
 import { useNavigate } from "react-router-dom";
-import {headers} from '../atoms/Authorization'
+import { headers } from "../atoms/Authorization";
 
 const theme = createTheme({
   components: {
@@ -32,6 +32,7 @@ export default function Myprofile({ backgroundColor, value }) {
   const navigate = useNavigate();
   const [jwtToken, setJwtToken] = useState("");
   const [userName, setUserName] = useState("");
+  const profileRef = useRef(null); // Create a reference for the popup
 
   useEffect(() => {
     const token = sessionStorage.getItem("accessToken");
@@ -41,20 +42,24 @@ export default function Myprofile({ backgroundColor, value }) {
       const user = decodedToken.username;
 
       axios
-        .post(`${config.apiUrl}/appdata/retrieve`, [
+        .post(
+          `${config.apiUrl}/appdata/retrieve`,
+          [
+            {
+              $match: {
+                pageName: "users",
+                username: user,
+              },
+            },
+          ],
           {
-            "$match": {
-              "pageName": "users",
-              "username": user,
-            }
-          },
-        ], {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: token,
-            Access:'true'
-          },
-        })
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: token,
+              Access: "true",
+            },
+          }
+        )
         .then((response) => {
           setUserData(response.data.data[0]);
           setUserName(user);
@@ -70,7 +75,7 @@ export default function Myprofile({ backgroundColor, value }) {
 
   useEffect(() => {
     axios
-      .get(`${config.apiUrl}/menus/header`, {headers})
+      .get(`${config.apiUrl}/menus/header`, { headers })
       .then((response) => {
         setMyprofileData(response.data.data.myprofile);
       })
@@ -102,6 +107,20 @@ export default function Myprofile({ backgroundColor, value }) {
     }
   };
 
+  // Function to close the menu if clicked outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (profileRef.current && !profileRef.current.contains(event.target)) {
+        setOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [profileRef]);
+
   return (
     <Box sx={{ display: "flex", justifyContent: "left" }}>
       <ThemeProvider theme={theme}>
@@ -127,13 +146,16 @@ export default function Myprofile({ backgroundColor, value }) {
                 <Typography className={`myprofile-username  ${value}`}>
                   {userData.first_name} {userData.last_name}
                 </Typography>
-                <Typography className={`myprofile-username myprofile-username-role ${value}`}>
+                <Typography
+                  className={`myprofile-username myprofile-username-role ${value}`}
+                >
                   {userData.job_role}
                 </Typography>
               </div>
             </ListItemButton>
             {open && (
               <Box
+                ref={profileRef} // Reference the popup box
                 sx={{
                   bgcolor: "white",
                   borderRadius: "10px",
@@ -162,7 +184,7 @@ export default function Myprofile({ backgroundColor, value }) {
                       }}
                     >
                       <img
-                        style={{ height: "40px", width: "40px", borderRadius: '100px' }}
+                        style={{ height: "40px", width: "40px", borderRadius: "100px" }}
                         src={userData.profile_img}
                         alt={userData.username}
                       />
