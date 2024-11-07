@@ -163,7 +163,6 @@ function Loginpage() {
     axios
       .get(`${config.apiUrl}/pages/Login`, {headers})
       .then((response) => {
-        console.log("Login  Data received:", response.data);
         setcompanylogoData(response.data.data);
       })
       .catch((error) => {

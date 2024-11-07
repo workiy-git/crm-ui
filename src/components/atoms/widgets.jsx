@@ -47,7 +47,7 @@ const retrieveWidgetCount = async (
   dashboardName
 ) => {
   try {
-    const response = await axios.post(apiEndpoint, apiEndpointFilter, {
+    const response = await axios.post(apiEndpoint, apiEndpointFilter,{headers}, {
       headers: {headers},
       data: {
         dashboardName: dashboardName,
