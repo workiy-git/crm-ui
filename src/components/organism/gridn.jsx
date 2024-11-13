@@ -136,7 +136,7 @@ const GridComponent = ({ pageName }) => {
 
         const response = await axios.post(
           
-          `${config.apiUrl.replace(/\/$/, "")}${endpoint}`,
+          `${config.apiUrl.replace(/\/$/, "")}/${endpoint}`,
           {
             pageName: pageName,
             control_type: "dropdown",
@@ -232,7 +232,7 @@ const GridComponent = ({ pageName }) => {
     try {
 
       const response = await axios.post(
-        `${config.apiUrl.replace(/\/$/, "")}${gridEndpoint}`, 
+        `${config.apiUrl.replace(/\/$/, "")}/${gridEndpoint}`, 
         filter, // This is the body (data you are sending)
         {
           headers: headers, // This is the config object where headers go
