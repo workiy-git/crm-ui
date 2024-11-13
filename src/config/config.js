@@ -1,14 +1,18 @@
 import devConfig from "./config.development";
-import prodConfig from "./config.production";
+import localConfig from "./config.local";
 import stageConfig from "./config.staging";
+import prodConfig from "./config.production";
+
 
 const configMap = {
-  production: prodConfig,
-  staging: stageConfig,
   development: devConfig,
+  local: localConfig,
+  staging: stageConfig,
+  production: prodConfig,
 };
 
-const environment = process.env.NODE_ENV || "development";
+const environment = "staging"; // Change this to switch environment
+console.log(`Running in ${environment} mode`); 
 const config = configMap[environment];
 
 export default config;
