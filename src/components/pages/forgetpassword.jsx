@@ -23,29 +23,29 @@ const ForgetPassword = () => {
   const userPool = new CognitoUserPool(poolData);
 
   // Step 1: Request reset password (send code)
-  const handleRequestReset = (event) => {
-    event.preventDefault();
-    setIsSubmitting(true);
+const handleRequestReset = (event) => {
+  event.preventDefault();
+  setIsSubmitting(true);
 
-    const cognitoUser = new CognitoUser({
-      Username: username,
-      Pool: userPool,
-    });
+  const cognitoUser = new CognitoUser({
+    Username: username,
+    Pool: userPool,
+  });
 
-    cognitoUser.forgotPassword({
-      onSuccess: (data) => {
-        console.log("Code sent to:", data.CodeDeliveryDetails.Destination);
-        setSuccessMessage("A verification code has been sent to your mobile.");
-        setStep(2); // Move to the next step to enter verification code & new password
-        setIsSubmitting(false);
-      },
-      onFailure: (err) => {
-        console.error(err);
-        setErrorMessage(err.message || "Failed to send verification code.");
-        setIsSubmitting(false);
-      },
-    });
-  };
+  cognitoUser.forgotPassword({
+    onSuccess: (data) => {
+      console.log("Code sent to:", data.CodeDeliveryDetails.Destination);
+      setSuccessMessage("A verification code has been sent to your mobile.");
+      setStep(2); // Move to the next step to enter verification code & new password
+      setIsSubmitting(false);
+    },
+    onFailure: (err) => {
+      console.error("Error during password reset:", err);
+      setErrorMessage("Failed to send verification code. Please try again.");
+      setIsSubmitting(false);
+    },
+  });
+};
 
   // Step 2: Confirm the new password
   const handleResetPassword = (event) => {
