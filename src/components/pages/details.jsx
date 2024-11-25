@@ -47,11 +47,28 @@ const DetailsPage = () => {
 
   const initializeFormData = useCallback((data, schema) => {
     const initialData = {};
+  
     schema.forEach((field) => {
-      initialData[field.fieldName] = data[field.fieldName] || "";
+      const fieldName = field.fieldName;
+      let value = data[fieldName] || "";
+  
+      // Handle date/time fields specifically
+      if (fieldName === "created_time" || fieldName === "updated_time") {
+        if (value) {
+          const utcDate = new Date(value); // Parse UTC date
+          const timezoneOffset = utcDate.getTimezoneOffset(); // Get offset in minutes
+          const localDate = new Date(utcDate.getTime() - timezoneOffset * 60000); // Adjust to local time
+          value = localDate.toLocaleString(); // Format as a readable string
+        }
+      }
+  
+      // Assign processed value
+      initialData[fieldName] = value;
     });
+  
     return initialData;
   }, []);
+  
  
  // Memoized helper function with useCallback
 const fetchDataWithRetry = useCallback(
@@ -98,11 +115,12 @@ useEffect(() => {
         const appDataUrl = `${config.apiUrl.replace(/\/$/, "")}/appdata/${id}`;
         const appDataResponse = await fetchDataWithRetry(appDataUrl);
         const fetchedData = appDataResponse.data;
-
+      
         const initialData = initializeFormData(fetchedData, pageSchema);
         setFormData(initialData);
         setInitialFormData(initialData);
       }
+      
     } catch (error) {
       if (error.code === "ERR_NETWORK") {
         setError("Network error, please check your internet connection or try again later.");
@@ -171,7 +189,7 @@ useEffect(() => {
         console.log("updatedData", updatedData.data.data);
     
         // Navigate to the updated view
-        navigate(`/${pageName}/view/${updatedData.data._id}`, {
+        navigate(`/${pageName}/view/${id}`, {
           state: { rowData: updatedData.data.data, pageName, mode: 'view' },
         });
       } catch (error) {
