@@ -33,8 +33,8 @@ import Pagination from "@mui/material/Pagination";
 import { useNotifications } from '../atoms/notification'; // Import the hook
 import { headers } from '../atoms/Authorization';
 
-const endpoint = "/controls/retrive";
-const gridEndpoint = "/appdata/retrieve";
+const endpoint = "controls/retrive";
+const gridEndpoint = "appdata/retrieve";
 
 const GridComponent = ({ pageName }) => {
   const [columns, setColumns] = useState([]);
