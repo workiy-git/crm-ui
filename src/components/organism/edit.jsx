@@ -158,8 +158,9 @@ const validateForm = () => {
                 color: '#666',
                 fontSize: '12px',
               }}
-              type={field.type || 'text'}
+              type={field.type === 'datetime-local' ? 'text' : (field.type || 'text')} // Use "text" for datetime-local
               inputProps={inputProps}
+              disabled={field.dataType === 'Date'}
             />
           </FormControl>
         );

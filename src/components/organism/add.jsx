@@ -223,7 +223,7 @@ const AddComponent = forwardRef(({ formData, setFormData, pageSchema, onSaveSucc
         return (
           <FormControl className='details_page_inputs' key={field.fieldName} style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', width: '50%' }} error={!!isError}>
             <label style={{ width: '40%', textAlign: 'left' }}>{label}</label>
-            <TextField className='valuefield edit-field-input' {...commonProps} type={field.type || 'text'} />
+            <TextField className='valuefield edit-field-input' {...commonProps} type={field.type || 'text'} disabled={field.dataType === 'Date'} />
           </FormControl>
         );
       case 'select':
