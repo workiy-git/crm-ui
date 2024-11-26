@@ -256,13 +256,37 @@ const GridComponent = ({ pageName }) => {
           .filter((key) => key !== "pageId" && key !== "pageName" &&  key !== "_id" && key !== "appdata" && key !== "history" 
           && key !== "id" && key !== "comments" && key !== "pageID" && key !== "filter" && key !== "formatted_filter" && key !== "selected_columns" 
           && key !== "profile_img" && key !== "roles") 
-          .map((key) => ({
-            field: key,
-            headerName: key
-              .replace(/_/g, " ")
-              .replace(/\b\w/g, (char) => char.toUpperCase()),
-            width: 150,
-          }));
+          .map((key) => {
+            if (key === "created_time") {
+              return {
+                field: key,
+                headerName: "Created Time",
+                width: 200,
+                renderCell: (params) => {
+                  const utcDate = new Date(params.value); // Convert to Date object (UTC time)
+      
+                  // Get the offset in minutes for local time relative to UTC
+                  const timezoneOffset = utcDate.getTimezoneOffset(); 
+      
+                  // Adjust the UTC time based on the offset (getTimezoneOffset is in minutes, so multiply by 60000 to get milliseconds)
+                  const localTime = new Date(utcDate.getTime() - timezoneOffset * 60000); 
+      
+                  // Format the local time
+                  const formattedLocalTime = localTime.toLocaleString();
+      
+                  return formattedLocalTime;
+                }
+              };
+            }
+            return {
+              field: key,
+              headerName: key
+                .replace(/_/g, " ")
+                .replace(/\b\w/g, (char) => char.toUpperCase()),
+              width: 150,
+            };
+          });
+      
         setIsLoading(false);
         setColumns(dynamicColumns);
         setAvailableColumns(dynamicColumns); // Set available columns here
@@ -272,6 +296,7 @@ const GridComponent = ({ pageName }) => {
           setIsLoading(false);
         }, 2000); // 2000 milliseconds = 2 seconds
       }
+      
     } catch (error) {
       console.error("Error fetching grid data:", error);
     }
