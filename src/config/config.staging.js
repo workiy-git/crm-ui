@@ -1,6 +1,6 @@
 // config.Staging.js
 const stageConfig = {
-  apiUrl: "https://6g35yrrz56.execute-api.ap-south-1.amazonaws.com/crm-server-staging",
+  apiUrl: "https://6g35yrrz56.execute-api.ap-south-1.amazonaws.com/crm-server-staging/api",
 };
 
 export default stageConfig;
