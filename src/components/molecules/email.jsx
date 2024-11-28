@@ -104,7 +104,7 @@ const Email = ({ formData }) => {
 
     return (
         <>
-            <Button className="Details_hover_btn" onClick={handleClickOpen} style={{ display: 'flex', alignItems: 'center', color:'white' }}>
+            <Button className="Details_hover_btn" onClick={handleClickOpen} style={{ display: 'flex', margin:'auto 5px', alignItems: 'center', color:'white' }}>
                 
             {menuData.email && menuData.email.title ? (
             <>

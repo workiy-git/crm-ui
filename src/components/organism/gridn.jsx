@@ -59,6 +59,23 @@ const GridComponent = ({ pageName }) => {
 
   // const [filteredRows, setFilteredRows] = useState(gridData);
   //not confirmed
+  const [menuData, setMenuData] = useState([]); 
+
+  useEffect(() => {
+    axios.get(`${config.apiUrl}/menus`, {headers}) // Use apiUrl from the configuration file
+      .then((response) => {
+        // console.log('dayData received:', response.data.data.menu_text);
+        const containerData = response.data.data.find(menu => menu.menu === 'container');
+
+        setMenuData(containerData);
+        console.log("menusss", response.data.data)
+        
+      })
+      .catch((error) => {
+        // console.error('Error fetching data:', error);
+      });
+  }, []);
+
   const navigate = useNavigate();
   const closeColumnModal = () => setShowColumnModal(false);
   const modalStyle = {
@@ -661,13 +678,26 @@ const handleViewReport = async () => {
 
     if (link.download !== undefined) {
       const url = URL.createObjectURL(blob);
+      
+      // Get the current date and format it as DD-MM-YYYY
+      const now = new Date();
+      const day = String(now.getDate()).padStart(2, '0'); // Add leading zero for single-digit days
+      const month = String(now.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed, add 1
+      const year = now.getFullYear();
+      const formattedDate = `${day}-${month}-${year}`; // Format as DD-MM-YYYY
+    
+      // Set the filename with the formatted date
+      const fileName = `exported_data_${formattedDate}.csv`;
+    
       link.setAttribute("href", url);
-      link.setAttribute("download", "exported_data.csv");
+      link.setAttribute("download", fileName);
       link.style.visibility = "hidden";
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
     }
+    
+    
   };
   const openColumnModal = () => {
     setTempVisibleColumns(columns);
@@ -818,9 +848,16 @@ const handleViewReport = async () => {
         <Button onClick={openMenu} className='Action-btn' sx={{ color:'white', background:'#212529' }} >
           Actions
         </Button>
-        <Button onClick={() => handleadd("add")}  className='Action-btn' sx={{ color:'white', background:'#212529' }} >
-          Add
-        </Button>
+        {menuData.add && menuData.add.title && pageName !== 'reports' && pageName !== 'calls' && (
+          <Button 
+            onClick={() => handleadd("add")} 
+            className='Action-btn' 
+            sx={{ color: 'white', background: '#212529' }}
+          >
+            {menuData.add.title}
+          </Button>
+        )}
+
         {pageName === 'reports' && (
             <Button 
               onClick={handleGenerateReportClick}  
