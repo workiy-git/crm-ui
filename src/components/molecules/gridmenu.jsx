@@ -133,10 +133,10 @@ const GridMenu = ({ anchorEl, handleMenuClose, handleNavigate, handleDeleteClick
       {pageName === 'reports' && reportmenu.editReport && reportmenu.editReport.title && (
         <MenuItem onClick={onEditReport}>{ reportmenu.editReport.title }</MenuItem>
       )}
-      {reportmenu.details && reportmenu.details.title && (
+      {reportmenu.details && reportmenu.details.title &&  pageName !== 'reports' &&(
       <MenuItem onClick={() => handleNavigate("view")}>{ reportmenu.details.title }</MenuItem>
       )}
-      {reportmenu.edit && reportmenu.edit.title && (
+      {reportmenu.edit && reportmenu.edit.title && pageName !== 'reports' &&(
       <MenuItem onClick={() => handleNavigate("edit")}>{reportmenu.edit.title }</MenuItem>
       )}
       {pageName === 'calls' &&  reportmenu.convertToLead && reportmenu.convertToLead.title && (

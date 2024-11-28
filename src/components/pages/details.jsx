@@ -409,7 +409,7 @@ if (isAdding && Object.values(formData).every(value => value === "")) {
               >
                 <KeyboardReturnIcon /> Back
               </Button> */}
-              <Button onClick={() => navigate(`/container/${pageName}`)} style={{ display: 'flex', alignItems: 'center', color:'black', background: 'rgba(255, 255, 255, 0.4)' }}>
+              <Button onClick={() => navigate(`/container/${pageName}`)} style={{ display: 'flex', margin:'auto 5px', alignItems: 'center', color:'black', background: 'rgba(255, 255, 255, 0.4)' }}>
                 <KeyboardReturnIcon style={{ color: 'black', marginRight:'10px' }} /><Typography >Back</Typography>   
             </Button>
             </Box>

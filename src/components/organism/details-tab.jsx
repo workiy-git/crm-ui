@@ -78,8 +78,8 @@ export default function TabComponent({ mode }) {
             </Tabs>
         </Box>
         {value === 0 && <Box class="overflow-a" style={{background:'white', borderBottomLeftRadius:'5px', borderBottomRightRadius:'5px', height:'85%'}}><Updates mode= {mode}/></Box>}
-        {value === 1 && <Box class="overflow-a" style={{background:'white', borderBottomLeftRadius:'5px', borderBottomRightRadius:'5px', height:'85%'}}><Comments /></Box>}
-        {value === 2 && <Box class="overflow-a" style={{background:'white', borderBottomLeftRadius:'5px', borderBottomRightRadius:'5px', height:'85%'}}><SiteVisits /></Box>}
+        {value === 1 && <Box class="overflow-a" style={{background:'white', borderBottomLeftRadius:'5px', borderBottomRightRadius:'5px', height:'85%'}}><Comments mode= {mode}/></Box>}
+        {/* {value === 2 && <Box class="overflow-a" style={{background:'white', borderBottomLeftRadius:'5px', borderBottomRightRadius:'5px', height:'85%'}}><SiteVisits /></Box>} */}
         {/* Add similar conditional rendering for other tabs */}
       </Box>
     </div>

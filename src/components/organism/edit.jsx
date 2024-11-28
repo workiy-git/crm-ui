@@ -247,12 +247,13 @@ const validateForm = () => {
         return (
           <FormControl className='details_page_inputs' key={field.fieldName} style={formControlStyles} error={!!isError}>
             <label style={labelStyles}>{label}</label>
+            <div style={{ width: '50%'}}>
             <Select
               className='edit-field-input'
               {...commonProps}
               value={formData[field.fieldName] || ''} 
               style={{
-                width: '50%',
+                width: '100% !important',
                 textAlign: 'left',
                 color: '#666',
                 fontSize: '12px',
@@ -268,7 +269,8 @@ const validateForm = () => {
                 </MenuItem>
               ))}
             </Select>
-            {isError && <div style={{ color: 'red', fontSize: '12px' }}>{formErrors[field.fieldName]}</div>}
+            {/* {isError && <div style={{ color: 'red', fontSize: '12px' }}>{formErrors[field.fieldName]}</div>} */}
+            </div>
           </FormControl>
         );
   

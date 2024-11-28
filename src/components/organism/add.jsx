@@ -191,7 +191,8 @@ const AddComponent = forwardRef(({ formData, setFormData, pageSchema, onSaveSucc
         return (
           <FormControl className='details_page_inputs' key={field.fieldName} style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', width: '50%' }} error={!!isError}>
             <label style={{ width: '40%', textAlign: 'left' }}>{label}</label>
-            <Select className='valuefield edit-field-input' {...commonProps} displayEmpty>
+            <div style={{ width: '50%'}}>
+            <Select style={{width:'100% !important'}} className='edit-field-input' {...commonProps} displayEmpty>
               <MenuItem value="">
                 <em>{field.placeholder || 'Select an option'}</em>
               </MenuItem>
@@ -202,6 +203,7 @@ const AddComponent = forwardRef(({ formData, setFormData, pageSchema, onSaveSucc
               ))}
             </Select>
             {isError && <div style={{ color: 'red', fontSize: '12px' }}>{formErrors[field.fieldName]}</div>}
+            </div>
           </FormControl>
         );
       case 'checkbox':
