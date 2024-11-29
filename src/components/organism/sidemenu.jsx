@@ -175,7 +175,15 @@ const SideMenu = () => {
       </div>
       <div className="sidemenu-profile-container">
         {displayedMenuItems.map((menuItem, index) => {
-          const isSelected = selectedOptionIndex === index || (location.pathname === '/' && index === 0);
+          
+          const pathname = location.pathname; // e.g., '/enquiry/view/'
+          const parts = pathname.split('/').filter(Boolean); // Filter removes empty strings from split result
+          const pathofthePageName = parts[0];
+          const PageLowerCaseTitle = menuItem.title.toLowerCase();
+          const isSelected = selectedOptionIndex === index || (location.pathname === '/' && index === 0 ) || pathofthePageName === PageLowerCaseTitle;
+
+
+
           return (
             <div
               key={menuItem.title}
