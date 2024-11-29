@@ -186,7 +186,7 @@ const validateForm = () => {
               }}
               type={field.type === 'datetime-local' ? 'text' : (field.type || 'text')} // Use "text" for datetime-local
               inputProps={inputProps}
-              disabled={field.dataType === 'Date'}
+              disabled={field.dataType === 'Date' || field.display === 'disable'}
             />
           </FormControl>
         );
@@ -249,6 +249,7 @@ const validateForm = () => {
             <label style={labelStyles}>{label}</label>
             <div style={{ width: '50%'}}>
             <Select
+              disabled={ field.display === 'disable'}
               className='edit-field-input'
               {...commonProps}
               value={formData[field.fieldName] || ''} 

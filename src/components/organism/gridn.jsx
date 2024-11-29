@@ -582,7 +582,7 @@ const handleViewReport = async () => {
             flexDirection: "column",
             alignItems: "center",
             padding: "0",
-            height: "40px",
+            // height: "40px",
             width: "100%",
             boxSizing: "border-box",
             // color: "white",
@@ -606,7 +606,7 @@ const handleViewReport = async () => {
             value={filterText[params.field] || ""}
             onClick={(e) => e.stopPropagation()} // Stop propagation to prevent sorting
             onChange={(e) => handleFilterChange(params.field, e.target.value)}
-            style={{ width: "80%", background: "#ffffff", borderRadius:'10px', height:'20px' }}
+            style={{ width: "80%", background: "#ffffff", borderRadius:'10px' }}
             className="grid_search"
           />
         </div>
