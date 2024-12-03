@@ -85,6 +85,7 @@ function Loginpage() {
               headers: {
                 "Content-Type": "application/json",
                 Authorization: result.getAccessToken().getJwtToken(),
+                pageName: "login",
               },
               body: JSON.stringify([
                 {

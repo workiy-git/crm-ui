@@ -7,6 +7,7 @@ import ConfirmationDialog from '../molecules/confirmation-dialog';
 import "../../assets/styles/callsgrid.css";
 import GridMenu from "../molecules/gridmenu";
 import Papa from 'papaparse';
+import CsvImporter from "../molecules/csvImpoter";
 
 
 
@@ -25,7 +26,8 @@ import {
   Modal,
   Typography,
   Stack,
-  Alert
+  Alert,
+  Dialog, DialogTitle, DialogContent, DialogActions 
 } from "@mui/material";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import Loader from "../molecules/loader";
@@ -56,6 +58,7 @@ const GridComponent = ({ pageName }) => {
   const [anchorEl, setAnchorEl] = useState(null);
   const [selectedRow, setSelectedRow] = useState(null);
   const { fetchNotifications } = useNotifications();
+  const [isImportModalOpen, setIsImportModalOpen] = useState(false);
 
 
   // const [filteredRows, setFilteredRows] = useState(gridData);
@@ -76,6 +79,17 @@ const GridComponent = ({ pageName }) => {
         // console.error('Error fetching data:', error);
       });
   }, []);
+
+    // Open the Import Data Modal
+    const handleOpenImportModal = () => {
+      setIsImportModalOpen(true);
+      closeMenu(); // Close the menu when opening the modal
+    };
+  
+    // Close the Import Data Modal
+    const handleCloseImportModal = () => {
+      setIsImportModalOpen(false);
+    };
 
   const navigate = useNavigate();
   const closeColumnModal = () => setShowColumnModal(false);
@@ -122,6 +136,7 @@ const GridComponent = ({ pageName }) => {
         
         setGridData((prevData) => prevData.filter((row) => row._id !== id));
         setSuccess('Data deleted successfully');
+        setTimeout(() => setSuccess(''), 3000);
         fetchNotifications();
         setDeleteDialogOpen(false); // Close the dialog
         setRowToDelete(null); // Clear the selected row
@@ -214,15 +229,6 @@ const GridComponent = ({ pageName }) => {
   useEffect(() => {
     if (pageName) {
       setIsLoading(true); // Set the loader to true when pageName changes
-  
-      // if (selectedValue) {
-      //   const filter = JSON.parse(selectedValue);
-      //   fetchGridData(filter).finally(() => {
-      //     setIsLoading(false);
-      //   });
-      // } else {
-      //   setIsLoading(false); // Set the loader to false if there's no selectedValue
-      // }
     }
   }, [pageName]);
   
@@ -321,18 +327,6 @@ const GridComponent = ({ pageName }) => {
   };
   ;
 
-
-  // Filter grid data based on the search text
-  // useEffect(() => {
-  //   setFilteredRows(
-  //     gridData.filter((row) =>
-  //       Object.values(row).some((value) =>
-  //         String(value).toLowerCase().includes(filterText.toLowerCase())
-  //       )
-  //     )
-  //   );
-  // }, [filterText, gridData]);
-
   const handleFilterChange = (field, value) => {
     setPage(1);
     setFilterText((prev) => ({ ...prev, [field]: value }));
@@ -347,31 +341,6 @@ const GridComponent = ({ pageName }) => {
     })
   );
 
-  // const columnsWithFilter = columns.map((column) => ({
-  //   ...column,
-  //   renderHeader: (params) => (
-  //     <div
-  //       style={{
-  //         display: "flex",
-  //         flexDirection: "column",
-  //         alignItems: "center",
-  //         padding: "8px",
-  //         width: "100%",
-  //         boxSizing: "border-box",
-  //       }}
-  //     >
-  //       <div>{column.headerName}</div>
-  //       <TextField
-  //         variant="outlined"
-  //         size="small"
-  //         value={filterText[column.field] || ""}
-  //         onClick={(e) => e.stopPropagation()} // Stop propagation to prevent sorting
-  //         onChange={(e) => handleFilterChange(column.field, e.target.value)}
-  //         style={{ width: "100%" }}
-  //       />
-  //     </div>
-  //   ),
-  // }));
 
   const handleMenuOpen = (event, row) => {
     event.preventDefault();
@@ -863,6 +832,17 @@ const handleViewReport = async () => {
         <Button onClick={openMenu} className='Action-btn' sx={{ color:'white', background:'#212529' }} >
           Actions
         </Button>
+        <Dialog open={isImportModalOpen} onClose={handleCloseImportModal} fullWidth maxWidth="sm">
+        <DialogTitle>Import CSV Data</DialogTitle>
+        <DialogContent>
+          <CsvImporter />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseImportModal} color="secondary">
+            Close
+          </Button>
+        </DialogActions>
+      </Dialog>
         {menuData.add && menuData.add.title && pageName !== 'reports' && pageName !== 'calls' && (
           <Button 
             onClick={() => handleadd("add")} 
@@ -887,9 +867,9 @@ const handleViewReport = async () => {
         anchorEl={menuAnchor}
         open={Boolean(menuAnchor)}
         onClose={closeMenu}>
+            <MenuItem onClick={handleOpenImportModal}>Import Data</MenuItem>
             <MenuItem onClick={handleExportClick}>Export Data</MenuItem>
             {/* <MenuItem onClick={handleEmailClick}>Send Email</MenuItem> */}
-            {/* <MenuItem onClick={handleImportClick}>Import Data</MenuItem> */}
 
         </Menu>
         
