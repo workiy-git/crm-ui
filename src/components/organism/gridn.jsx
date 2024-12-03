@@ -57,6 +57,7 @@ const GridComponent = ({ pageName }) => {
   const [selectedRow, setSelectedRow] = useState(null);
   const { fetchNotifications } = useNotifications();
 
+
   // const [filteredRows, setFilteredRows] = useState(gridData);
   //not confirmed
   const [menuData, setMenuData] = useState([]); 
@@ -393,6 +394,16 @@ const GridComponent = ({ pageName }) => {
         handleMenuClose();
     }
   };
+  const handleDoubleClick = (mode, params) => {
+    handleMenuClose();
+  if (params) {
+      navigate(`/${pageName}/${mode}/${ params.row._id}`, {
+          state: { rowData:  params.row, pageName, mode },
+      });
+      console.log("rowdata", params.row)
+      handleMenuClose();
+  }
+};
   const handleadd = (mode) => {
     navigate(`/${pageName}/${mode}`, {
         state: { pageName, mode },
@@ -541,19 +552,23 @@ const handleViewReport = async () => {
         
         <div>
           <IconButton
-            onClick={(event) => {
-              event.stopPropagation(); // Prevent checkbox selection
-              handleMenuOpen(event, params.row); // Open the menu
-              
-            }}
-            onContextMenu={(event) => {
-              event.stopPropagation(); // Prevent checkbox selection
-              handleMenuOpen(event, params.row); // Open the menu
-            }}
-            className="morevet-icon"
-          >
-            <MoreVertIcon />
-          </IconButton>
+  onClick={(event) => {
+    event.stopPropagation(); // Prevents triggering row navigation
+    handleMenuOpen(event, params.row);
+  }}
+  onDoubleClick={(event) => {
+    event.stopPropagation(); // Prevents triggering row navigation
+    handleMenuOpen(event, params.row);
+  }}
+  onContextMenu={(event) => {
+    event.stopPropagation(); // Prevents triggering row navigation
+    handleMenuOpen(event, params.row);
+  }}
+  className="morevet-icon"
+>
+  <MoreVertIcon />
+</IconButton>
+
           <GridMenu 
         anchorEl={anchorEl} 
         handleMenuClose={handleMenuClose} 
@@ -954,13 +969,16 @@ const handleViewReport = async () => {
             onPageChange={handlePageChange}
             page={page - 1}
             disableSelectionOnClick
-            // columnHeaderHeight={35}
-            className="custom-data-grid-main"
             getRowHeight={() => 35}
+            className="custom-data-grid-main"
             onRowDoubleClick={(params) => {
-              handleNavigate("view", params.row); // Calls handleNavigate with "view" mode
+              console.log("Row double-clicked:", params.row);
+              // handleNavigate("view", params.row);
+              handleDoubleClick("view", params)
             }}
+            
           />
+
         </div>
       )}
       <Modal open={showColumnModal} onClose={closeColumnModal} aria-labelledby="modal-title" aria-describedby="modal-description">
