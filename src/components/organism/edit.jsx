@@ -164,7 +164,7 @@ const validateForm = () => {
             }}
             value={formattedLocalTime}
             type={field.type === 'datetime-local' ? 'text' : (field.type || 'text')} // Use "text" for datetime-local
-            disabled={field.dataType === 'Date'}
+            disabled={field.display === 'disable'}
           />
         </FormControl>
       );
@@ -184,9 +184,9 @@ const validateForm = () => {
                 color: '#666',
                 fontSize: '12px',
               }}
-              type={field.type === 'datetime-local' ? 'text' : (field.type || 'text')} // Use "text" for datetime-local
+              type={field.type || 'text'} // Use "text" for datetime-local
               inputProps={inputProps}
-              disabled={field.dataType === 'Date' || field.display === 'disable'}
+              disabled={field.display === 'disable'}
             />
           </FormControl>
         );
@@ -208,6 +208,7 @@ const validateForm = () => {
                     fullWidth
                     value={formData[field.fieldName]?.[subField.fieldName] || ''}
                     onChange={(e) => handleInputChange(e, `${field.fieldName}.${subField.fieldName}`)}
+                    disabled={field.display === 'disable'}
                     sx={{
                       width: '50%',
                       textAlign: 'left',
@@ -239,6 +240,7 @@ const validateForm = () => {
               }}
               type={field.type || 'text'}
               inputProps={inputProps}
+              disabled={field.display === 'disable'}
             />
           </FormControl>
         );
@@ -279,7 +281,7 @@ const validateForm = () => {
         return (
           <FormControlLabel
             className='details_page_inputs'
-            
+            disabled={field.display === 'disable'}
             key={field.fieldName}
             control={
               <div style={{display:'flex', width:'100%', alignItems:'center'}}>
@@ -316,6 +318,7 @@ const validateForm = () => {
           <FormControl className='details_page_inputs' key={field.fieldName} style={formControlStyles} error={!!isError}>
             <label style={labelStyles}>{label}</label>
             <TextField
+              disabled={field.display === 'disable'}
               className='edit-field-input'
               {...commonProps}
               style={{
