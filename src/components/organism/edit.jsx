@@ -281,7 +281,6 @@ const validateForm = () => {
         return (
           <FormControlLabel
             className='details_page_inputs'
-            disabled={field.display === 'disable'}
             key={field.fieldName}
             control={
               <div style={{display:'flex', width:'100%', alignItems:'center'}}>
@@ -290,6 +289,8 @@ const validateForm = () => {
                style={{
                 color: '#666',
               }}
+              disabled={field.display === 'disable'}
+
                 className='edit-field-input'
                 name={field.fieldName}
                 checked={formData[field.fieldName] || false}
