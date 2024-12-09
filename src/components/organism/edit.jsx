@@ -28,7 +28,6 @@ const EditComponent = forwardRef(({ current, id, pageSchema, formData, setFormDa
     if (fieldSchema.pattern && value) {
       const regex = new RegExp(fieldSchema.pattern);
       const validationMessage = (fieldSchema.validationMessage);
-      console.log("asdf",fieldSchema)
       if (!regex.test(value)) {
         error = `${validationMessage}`;
       }
@@ -143,6 +142,33 @@ const validateForm = () => {
       color: '#333',
       fontSize: '12px',
     };
+    
+    // Handle created_time field (for display in local timezone)
+    if (field.fieldName === 'created_time' && formData[field.fieldName]) {
+      const utcDate = new Date(formData[field.fieldName]); // Convert to Date object (UTC time)
+      const timezoneOffset = utcDate.getTimezoneOffset(); // Get the offset in minutes
+      const localTime = new Date(utcDate.getTime() - timezoneOffset * 60000); // Adjust to local time
+      const formattedLocalTime = localTime.toLocaleString(); // Format to local time string
+  
+      return (
+        <FormControl className='details_page_inputs' key={field.fieldName} style={formControlStyles} error={!!isError}>
+          <label style={labelStyles}>{label}</label>
+          <TextField
+            className='edit-field-input'
+            {...commonProps}
+            sx={{
+              width: '50%',
+              textAlign: 'left',
+              color: '#666',
+              fontSize: '12px',
+            }}
+            value={formattedLocalTime}
+            type={field.type === 'datetime-local' ? 'text' : (field.type || 'text')} // Use "text" for datetime-local
+            disabled={field.display === 'disable'}
+          />
+        </FormControl>
+      );
+    }
   
     switch (field.htmlControl) {
       case 'input':
@@ -158,9 +184,9 @@ const validateForm = () => {
                 color: '#666',
                 fontSize: '12px',
               }}
-              type={field.type === 'datetime-local' ? 'text' : (field.type || 'text')} // Use "text" for datetime-local
+              type={field.type || 'text'} // Use "text" for datetime-local
               inputProps={inputProps}
-              disabled={field.dataType === 'Date'}
+              disabled={field.display === 'disable'}
             />
           </FormControl>
         );
@@ -182,6 +208,7 @@ const validateForm = () => {
                     fullWidth
                     value={formData[field.fieldName]?.[subField.fieldName] || ''}
                     onChange={(e) => handleInputChange(e, `${field.fieldName}.${subField.fieldName}`)}
+                    disabled={field.display === 'disable'}
                     sx={{
                       width: '50%',
                       textAlign: 'left',
@@ -213,6 +240,7 @@ const validateForm = () => {
               }}
               type={field.type || 'text'}
               inputProps={inputProps}
+              disabled={field.display === 'disable'}
             />
           </FormControl>
         );
@@ -221,12 +249,14 @@ const validateForm = () => {
         return (
           <FormControl className='details_page_inputs' key={field.fieldName} style={formControlStyles} error={!!isError}>
             <label style={labelStyles}>{label}</label>
+            <div style={{ width: '50%'}}>
             <Select
+              disabled={ field.display === 'disable'}
               className='edit-field-input'
               {...commonProps}
               value={formData[field.fieldName] || ''} 
               style={{
-                width: '50%',
+                width: '100% !important',
                 textAlign: 'left',
                 color: '#666',
                 fontSize: '12px',
@@ -242,7 +272,8 @@ const validateForm = () => {
                 </MenuItem>
               ))}
             </Select>
-            {isError && <div style={{ color: 'red', fontSize: '12px' }}>{formErrors[field.fieldName]}</div>}
+            {/* {isError && <div style={{ color: 'red', fontSize: '12px' }}>{formErrors[field.fieldName]}</div>} */}
+            </div>
           </FormControl>
         );
   
@@ -250,7 +281,6 @@ const validateForm = () => {
         return (
           <FormControlLabel
             className='details_page_inputs'
-            
             key={field.fieldName}
             control={
               <div style={{display:'flex', width:'100%', alignItems:'center'}}>
@@ -259,6 +289,8 @@ const validateForm = () => {
                style={{
                 color: '#666',
               }}
+              disabled={field.display === 'disable'}
+
                 className='edit-field-input'
                 name={field.fieldName}
                 checked={formData[field.fieldName] || false}
@@ -287,6 +319,7 @@ const validateForm = () => {
           <FormControl className='details_page_inputs' key={field.fieldName} style={formControlStyles} error={!!isError}>
             <label style={labelStyles}>{label}</label>
             <TextField
+              disabled={field.display === 'disable'}
               className='edit-field-input'
               {...commonProps}
               style={{

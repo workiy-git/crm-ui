@@ -7,6 +7,7 @@ import ConfirmationDialog from '../molecules/confirmation-dialog';
 import "../../assets/styles/callsgrid.css";
 import GridMenu from "../molecules/gridmenu";
 import Papa from 'papaparse';
+import CsvImporter from "../molecules/csvImpoter";
 
 
 
@@ -25,7 +26,8 @@ import {
   Modal,
   Typography,
   Stack,
-  Alert
+  Alert,
+  Dialog, DialogTitle, DialogContent, DialogActions 
 } from "@mui/material";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import Loader from "../molecules/loader";
@@ -33,8 +35,8 @@ import Pagination from "@mui/material/Pagination";
 import { useNotifications } from '../atoms/notification'; // Import the hook
 import { headers } from '../atoms/Authorization';
 
-const endpoint = "/controls/retrive";
-const gridEndpoint = "/appdata/retrieve";
+const endpoint = "controls/retrive";
+const gridEndpoint = "appdata/retrieve";
 
 const GridComponent = ({ pageName }) => {
   const [columns, setColumns] = useState([]);
@@ -42,6 +44,7 @@ const GridComponent = ({ pageName }) => {
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(25); // Adjust this value as needed
   const [totalRows, setTotalRows] = useState(0);
+  const [totalRecord, setTotalRecord] = useState(0);
   const [selectOptions, setSelectOptions] = useState([]);
   const [selectedValue, setSelectedValue] = useState("");
   const [gridData, setGridData] = useState([]);
@@ -56,9 +59,40 @@ const GridComponent = ({ pageName }) => {
   const [anchorEl, setAnchorEl] = useState(null);
   const [selectedRow, setSelectedRow] = useState(null);
   const { fetchNotifications } = useNotifications();
+  const [isImportModalOpen, setIsImportModalOpen] = useState(false);
+  const [inputPage, setInputPage] = useState("");
+
 
   // const [filteredRows, setFilteredRows] = useState(gridData);
   //not confirmed
+  const [menuData, setMenuData] = useState([]); 
+
+  useEffect(() => {
+    axios.get(`${config.apiUrl}/menus`, {headers}) // Use apiUrl from the configuration file
+      .then((response) => {
+        // console.log('dayData received:', response.data.data.menu_text);
+        const containerData = response.data.data.find(menu => menu.menu === 'container');
+
+        setMenuData(containerData);
+        console.log("menusss", response.data.data)
+        
+      })
+      .catch((error) => {
+        // console.error('Error fetching data:', error);
+      });
+  }, []);
+
+    // Open the Import Data Modal
+    const handleOpenImportModal = () => {
+      setIsImportModalOpen(true);
+      closeMenu(); // Close the menu when opening the modal
+    };
+  
+    // Close the Import Data Modal
+    const handleCloseImportModal = () => {
+      setIsImportModalOpen(false);
+    };
+
   const navigate = useNavigate();
   const closeColumnModal = () => setShowColumnModal(false);
   const modalStyle = {
@@ -104,6 +138,7 @@ const GridComponent = ({ pageName }) => {
         
         setGridData((prevData) => prevData.filter((row) => row._id !== id));
         setSuccess('Data deleted successfully');
+        setTimeout(() => setSuccess(''), 3000);
         fetchNotifications();
         setDeleteDialogOpen(false); // Close the dialog
         setRowToDelete(null); // Clear the selected row
@@ -111,6 +146,7 @@ const GridComponent = ({ pageName }) => {
       } catch (error) {
         console.error('Error deleting data:', error);
         setError(error)
+        setTimeout(() => setError(''), 3000);
       }
     }
   };
@@ -124,6 +160,7 @@ const GridComponent = ({ pageName }) => {
     if (pageName) {
       setIsLoading(true); // Set the loader to true when pageName changes
       setPage(1); // Reset to the first page when the pageName changes
+      setInputPage(1); // Reset the input page number when the pageName changes
     }
   }, [pageName]);
   
@@ -181,8 +218,15 @@ const GridComponent = ({ pageName }) => {
   // Handle page change
   const [key, setKey] = useState(0);
   const handlePageChange = (event, value) => {
-    setKey(prevKey => prevKey + 1);
+    // setKey(prevKey => prevKey + 1);
+    const currentPage = value;
+    const currentpageSize = pageSize;
+    setLoading(true);
+    handleChange({ target: { value: selectedValue } }, currentPage, currentpageSize);
     setPage(value);
+    setInputPage(value);
+    console.log("current page", value);
+    // fetchGridData();
   };
 
   // Fetch grid data based on the selected filter
@@ -196,25 +240,19 @@ const GridComponent = ({ pageName }) => {
   useEffect(() => {
     if (pageName) {
       setIsLoading(true); // Set the loader to true when pageName changes
-  
-      // if (selectedValue) {
-      //   const filter = JSON.parse(selectedValue);
-      //   fetchGridData(filter).finally(() => {
-      //     setIsLoading(false);
-      //   });
-      // } else {
-      //   setIsLoading(false); // Set the loader to false if there's no selectedValue
-      // }
     }
   }, [pageName]);
   
   //Drop Down Change
-  const handleChange = (event) => {
+  const handleChange = (event, currentPage, currentpageSize) => {
     const filter = JSON.parse(event.target.value);
     setSelectedValue(event.target.value);
-    // console.log("filter", filter);
-    fetchGridData(filter); // Fetch grid data for the selected option
-    setPage(1);
+    console.log("current PAges", currentPage);
+    console.log("current PAges Size", currentpageSize);
+
+    const currentPageNumber = currentPage || 1;
+    const currentNumberofRow = currentpageSize || 25;
+    fetchGridData(filter, currentPageNumber, currentNumberofRow); // Fetch grid data for the selected option
   };
   
   const flattenObject = (obj, parent = '', res = {}) => {
@@ -228,12 +266,13 @@ const GridComponent = ({ pageName }) => {
     return res;
   };
   
-  const fetchGridData = async (filter) => {
+  const fetchGridData = async (filter, currentPageNumber, currentNumberofRow) => {
     try {
 
       const response = await axios.post(
-        `${config.apiUrl.replace(/\/$/, "")}/${gridEndpoint}`, 
+        `${config.apiUrl.replace(/\/$/, "")}/${gridEndpoint}?page=${currentPageNumber}&pageSize=${currentNumberofRow}`, 
         filter, // This is the body (data you are sending)
+        
         {
           headers: headers, // This is the config object where headers go
         }
@@ -247,6 +286,7 @@ const GridComponent = ({ pageName }) => {
           id: item._id || index,
         };
       });
+      setTotalRecord(response.data.pagination.totalCount);
   
       setGridData(dataWithIds);
       setTotalRows(dataWithIds.length);
@@ -288,12 +328,15 @@ const GridComponent = ({ pageName }) => {
           });
       
         setIsLoading(false);
+        setLoading(false);
         setColumns(dynamicColumns);
         setAvailableColumns(dynamicColumns); // Set available columns here
       } else {
         setIsLoading(true);
+        setLoading(true);
         setTimeout(() => {
           setIsLoading(false);
+          setLoading(false);
         }, 2000); // 2000 milliseconds = 2 seconds
       }
       
@@ -303,20 +346,9 @@ const GridComponent = ({ pageName }) => {
   };
   ;
 
-
-  // Filter grid data based on the search text
-  // useEffect(() => {
-  //   setFilteredRows(
-  //     gridData.filter((row) =>
-  //       Object.values(row).some((value) =>
-  //         String(value).toLowerCase().includes(filterText.toLowerCase())
-  //       )
-  //     )
-  //   );
-  // }, [filterText, gridData]);
-
   const handleFilterChange = (field, value) => {
     setPage(1);
+    setInputPage(1);
     setFilterText((prev) => ({ ...prev, [field]: value }));
   };
 
@@ -329,31 +361,6 @@ const GridComponent = ({ pageName }) => {
     })
   );
 
-  // const columnsWithFilter = columns.map((column) => ({
-  //   ...column,
-  //   renderHeader: (params) => (
-  //     <div
-  //       style={{
-  //         display: "flex",
-  //         flexDirection: "column",
-  //         alignItems: "center",
-  //         padding: "8px",
-  //         width: "100%",
-  //         boxSizing: "border-box",
-  //       }}
-  //     >
-  //       <div>{column.headerName}</div>
-  //       <TextField
-  //         variant="outlined"
-  //         size="small"
-  //         value={filterText[column.field] || ""}
-  //         onClick={(e) => e.stopPropagation()} // Stop propagation to prevent sorting
-  //         onChange={(e) => handleFilterChange(column.field, e.target.value)}
-  //         style={{ width: "100%" }}
-  //       />
-  //     </div>
-  //   ),
-  // }));
 
   const handleMenuOpen = (event, row) => {
     event.preventDefault();
@@ -376,6 +383,16 @@ const GridComponent = ({ pageName }) => {
         handleMenuClose();
     }
   };
+  const handleDoubleClick = (mode, params) => {
+    handleMenuClose();
+  if (params) {
+      navigate(`/${pageName}/${mode}/${ params.row._id}`, {
+          state: { rowData:  params.row, pageName, mode },
+      });
+      console.log("rowdata", params.row)
+      handleMenuClose();
+  }
+};
   const handleadd = (mode) => {
     navigate(`/${pageName}/${mode}`, {
         state: { pageName, mode },
@@ -524,19 +541,23 @@ const handleViewReport = async () => {
         
         <div>
           <IconButton
-            onClick={(event) => {
-              event.stopPropagation(); // Prevent checkbox selection
-              handleMenuOpen(event, params.row); // Open the menu
-              
-            }}
-            onContextMenu={(event) => {
-              event.stopPropagation(); // Prevent checkbox selection
-              handleMenuOpen(event, params.row); // Open the menu
-            }}
-            className="morevet-icon"
-          >
-            <MoreVertIcon />
-          </IconButton>
+  onClick={(event) => {
+    event.stopPropagation(); // Prevents triggering row navigation
+    handleMenuOpen(event, params.row);
+  }}
+  onDoubleClick={(event) => {
+    event.stopPropagation(); // Prevents triggering row navigation
+    handleMenuOpen(event, params.row);
+  }}
+  onContextMenu={(event) => {
+    event.stopPropagation(); // Prevents triggering row navigation
+    handleMenuOpen(event, params.row);
+  }}
+  className="morevet-icon"
+>
+  <MoreVertIcon />
+</IconButton>
+
           <GridMenu 
         anchorEl={anchorEl} 
         handleMenuClose={handleMenuClose} 
@@ -565,7 +586,7 @@ const handleViewReport = async () => {
             flexDirection: "column",
             alignItems: "center",
             padding: "0",
-            height: "40px",
+            // height: "40px",
             width: "100%",
             boxSizing: "border-box",
             // color: "white",
@@ -589,7 +610,7 @@ const handleViewReport = async () => {
             value={filterText[params.field] || ""}
             onClick={(e) => e.stopPropagation()} // Stop propagation to prevent sorting
             onChange={(e) => handleFilterChange(params.field, e.target.value)}
-            style={{ width: "80%", background: "#ffffff", borderRadius:'10px', height:'20px' }}
+            style={{ width: "80%", background: "#ffffff", borderRadius:'10px' }}
             className="grid_search"
           />
         </div>
@@ -661,13 +682,26 @@ const handleViewReport = async () => {
 
     if (link.download !== undefined) {
       const url = URL.createObjectURL(blob);
+      
+      // Get the current date and format it as DD-MM-YYYY
+      const now = new Date();
+      const day = String(now.getDate()).padStart(2, '0'); // Add leading zero for single-digit days
+      const month = String(now.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed, add 1
+      const year = now.getFullYear();
+      const formattedDate = `${day}-${month}-${year}`; // Format as DD-MM-YYYY
+    
+      // Set the filename with the formatted date
+      const fileName = `exported_data_${formattedDate}.csv`;
+    
       link.setAttribute("href", url);
-      link.setAttribute("download", "exported_data.csv");
+      link.setAttribute("download", fileName);
       link.style.visibility = "hidden";
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
     }
+    
+    
   };
   const openColumnModal = () => {
     setTempVisibleColumns(columns);
@@ -770,9 +804,33 @@ const handleViewReport = async () => {
 
   const handlePageSizeChange = (event) => {
     setPageSize(event.target.value);
-    setPage(1); // Reset to the first page when the page size changes
+    const currentPage = 1;
+    const currentpageSize = event.target.value;
+    handleChange({ target: { value: selectedValue } }, currentPage, currentpageSize);
+    // handleChange({ target: { value: selectedValue } });
+    // fetchGridData(); // Fetch grid data when the page size changes
+    console.log("page size", event.target.value);
+    // setPage(1); // Reset to the first page when the page size changes
   };
   
+  const handlePageInputChange = (e) => {
+    setInputPage(e.target.value); // Update the input value
+    
+  };
+  const handleKeyPress = (e) => {
+    if (e.key === "Enter") {
+      const pageNum = parseInt(inputPage, 10);
+      if (!isNaN(pageNum) && pageNum >= 1 && pageNum <= Math.ceil(totalRecord / pageSize)) {
+        const currentPage = pageNum;
+        handleChange({ target: { value: selectedValue } }, currentPage);
+        setPage(pageNum); // Set the page if valid
+      } else {
+        setError("Please enter a valid page number.");
+        setTimeout(() => setError(''), 3000);
+      }
+    }
+  };
+
   // Add some CSS to increase the header height
   const [isBoxVisible, setIsBoxVisible] = useState(true);
 
@@ -791,6 +849,7 @@ const handleViewReport = async () => {
   if (isLoading) {
     return <Loader />; // Use the Loader component here
   }
+
   return (
     <div className="CallsGrid">
       {(error || success) && (
@@ -818,9 +877,27 @@ const handleViewReport = async () => {
         <Button onClick={openMenu} className='Action-btn' sx={{ color:'white', background:'#212529' }} >
           Actions
         </Button>
-        <Button onClick={() => handleadd("add")}  className='Action-btn' sx={{ color:'white', background:'#212529' }} >
-          Add
-        </Button>
+        <Dialog open={isImportModalOpen} onClose={handleCloseImportModal} fullWidth maxWidth="sm">
+        <DialogTitle>Import CSV Data</DialogTitle>
+        <DialogContent>
+          <CsvImporter />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseImportModal} color="secondary">
+            Close
+          </Button>
+        </DialogActions>
+      </Dialog>
+        {menuData.add && menuData.add.title && pageName !== 'reports' && pageName !== 'calls' && (
+          <Button 
+            onClick={() => handleadd("add")} 
+            className='Action-btn' 
+            sx={{ color: 'white', background: '#212529' }}
+          >
+            {menuData.add.title}
+          </Button>
+        )}
+
         {pageName === 'reports' && (
             <Button 
               onClick={handleGenerateReportClick}  
@@ -835,9 +912,9 @@ const handleViewReport = async () => {
         anchorEl={menuAnchor}
         open={Boolean(menuAnchor)}
         onClose={closeMenu}>
+            <MenuItem onClick={handleOpenImportModal}>Import Data</MenuItem>
             <MenuItem onClick={handleExportClick}>Export Data</MenuItem>
             {/* <MenuItem onClick={handleEmailClick}>Send Email</MenuItem> */}
-            {/* <MenuItem onClick={handleImportClick}>Import Data</MenuItem> */}
 
         </Menu>
         
@@ -863,12 +940,60 @@ const handleViewReport = async () => {
             ))}
           </select>
         </div>
-        <div style={{fontSize:'12px'}}>
+        <div style={{fontSize:'12px', display: 'flex', alignItems:'center'}}>
+        {/* <span style={{ marginLeft: "16px" }}>
+          Page {page} of {Math.ceil(totalRecord / pageSize)}
+        </span> */}
+        <div style={{ display: 'flex', alignItems: 'center' }}>
+  <div>Page</div>
+  <div style={{ width: '40px', margin: '0 7px' }}> {/* Increased width to give more space */}
+  <input
+  type="text"
+  value={inputPage}
+  onChange={handlePageInputChange}
+  onKeyDown={(e) => {
+    // Allow only numeric keys and control keys like Backspace, Delete, and arrow keys
+    if (!/^\d*$/.test(e.key) && 
+        e.key !== 'Backspace' && 
+        e.key !== 'Delete' && 
+        e.key !== 'ArrowLeft' && 
+        e.key !== 'ArrowRight' && 
+        e.key !== 'Enter') {
+      e.preventDefault(); // Prevent invalid key press
+    }
+
+    // Handle Enter key press for page validation
+    if (e.key === 'Enter') {
+      const pageNum = parseInt(inputPage, 10);
+      
+      // Ensure the page number is numeric and within the valid range
+      if (!isNaN(pageNum) && pageNum >= 1 && pageNum <= Math.ceil(totalRecord / pageSize)) {
+        const currentPage = pageNum;
+        handleChange({ target: { value: selectedValue } }, currentPage);
+        setPage(pageNum); // Set the page if valid
+      } else {
+        setError("Please enter a valid page number.");
+        setTimeout(() => setError(''), 3000); // Clear error after 3 seconds
+      }
+    }
+  }}
+  placeholder="Go to page"
+  style={{
+    width: '100%',
+    padding: '3px 7px',
+    borderRadius: '4px',
+    border: '1px solid #ced4da',
+    boxSizing: 'border-box', // Ensures padding doesn't affect width
+  }}
+/>
+
+  </div>
+  <div>of</div>
+  <div  style={{ margin: '0 7px' }}>{Math.ceil(totalRecord / pageSize)}</div>
+</div>
+
         <span style={{ marginLeft: "16px" }}>
-          Page {page} of {Math.ceil(totalRows / pageSize)}
-        </span>
-        <span style={{ marginLeft: "16px" }}>
-          Total Rows: {totalRows}
+          Total Rows: {totalRecord}
         </span>
         
         <Select
@@ -883,49 +1008,43 @@ const handleViewReport = async () => {
           <MenuItem value={75}>75</MenuItem>
         </Select>
         </div>
+       
         <Box>
-        <Pagination
-          count={Math.ceil(totalRows / pageSize)}
-          siblingCount={0}
-          page={page}
-          style={{justifyContent:'center', display:'flex', width:'200px'}}
-          onChange={handlePageChange}
-          className="pagination_main"
-        />
+      <Pagination
+        count={Math.ceil(totalRecord / pageSize)}
+        siblingCount={0}
+        page={page}
+        onChange={handlePageChange}
+        className="pagination_main"
+        style={{ justifyContent: "center", display: "flex" }}
+      />
         
         </Box>
       </Box>
       )}
-      {loading ? (
-        <Box
-          display="flex"
-          justifyContent="center"
-          alignItems="center"
-          height="100%"
-        >
-          <CircularProgress />
-        </Box>
-      ) : (
         
         <div style={{height:'calc(100vh - 140px)'}}>
           <DataGrid
-            rows={filteredRows.slice((page - 1) * pageSize, page * pageSize)}
+            // rows={filteredRows}
+            rows={loading ? [] : filteredRows}
             columns={columnsWithFilter}
-            pageSize={pageSize}
+            // pageSize={pageSize}
             paginationMode="server"
-            rowCount={totalRows}
-            onPageChange={handlePageChange}
-            page={page - 1}
+            // rowCount={totalRows}
+            // onPageChange={handlePageChange}
+            // page={page - 1}
             disableSelectionOnClick
-            // columnHeaderHeight={35}
-            className="custom-data-grid-main"
             getRowHeight={() => 35}
+            className="custom-data-grid-main"
             onRowDoubleClick={(params) => {
-              handleNavigate("view", params.row); // Calls handleNavigate with "view" mode
+              console.log("Row double-clicked:", params.row);
+              // handleNavigate("view", params.row);
+              handleDoubleClick("view", params)
             }}
+            
           />
+
         </div>
-      )}
       <Modal open={showColumnModal} onClose={closeColumnModal} aria-labelledby="modal-title" aria-describedby="modal-description">
   <Box sx={{ ...modalStyle, width: 500 }}>
     <Typography id="modal-title" variant="h6" component="h2">

@@ -259,16 +259,42 @@ const Updates = ({ mode }) => {
     const matches = item.match(dateRegex);
   
     if (matches) {
-      const [, date, time, , details] = matches;
-      return { dateTime: `${date}, ${time}`, details, date: `${date}`, time: `${time}` };
+      const [, date, time, , details, name] = matches;
+      return { dateTime: `${date}, ${time}`, details, date: `${date}`, time: `${time}`, name: `${name}` };
     }
   
-    return { dateTime: '', details: item, date: '', time: '' };
+    return { dateTime: '', details: item, date: '', time: '', name: '' };
   };
+  const parseHistoryItemname = (item) => {
+    // Updated regex to match the full history item format
+    const dateRegex = /^On (.*?), (.*?), (.*?)(?=\s+\(ID:)/; 
+    const detailsRegex = /made the following changes: (.+)$/;  // Capture changes after 'made the following changes:'
+    
+    const matches = item.match(dateRegex);
+    
+    if (matches) {
+      const [, date, time, user_name] = matches;
+      const detailsMatch = item.match(detailsRegex);
+      const details = detailsMatch ? detailsMatch[1] : '';  // Extract the change details
+      
+      // Return all the parts including date, time, name, and details
+      return { 
+        dateTime: `${date}, ${time}`, 
+        details: details, 
+        date: `${date}`, 
+        time: `${time}`, 
+        user_name: user_name || 'Unknown'  // If no name is provided, default to 'Unknown'
+      };
+    }
+    
+    return { name: 'Unknown' };
+  };
+  
 
   // Determine the number of items to display initially
   const itemsToShow = showAllHistory ? history.length : 3;
 
+  console.log("history", history)
   return (
     <Box sx={{ margin: 'auto', padding: 2, maxWidth: 800, overflow: 'auto' }}>
       {/* {error && <Typography color="error">Failed to load history: {error.message}</Typography>} */}
@@ -283,7 +309,8 @@ const Updates = ({ mode }) => {
           ) : (
             <List>
               {history.slice(0, itemsToShow).map((item, index) => {
-                const { dateTime, details, date, time } = parseHistoryItem(item);
+                const { dateTime, details, date, time, name } = parseHistoryItem(item);
+                const { user_name } = parseHistoryItemname(item);
                 const parts = details.split('made the following changes: ');
                 const action = parts[0].trim();
                 const changesString = parts[1] ? parts[1].trim() : '';
@@ -335,7 +362,7 @@ const Updates = ({ mode }) => {
                           {action} {userData.username} : made the following changes:
                         </Typography> */}
                         <Typography variant="body2" color="text.primary" sx={{ marginRight: 1,fontSize:'13px' }}>
-                          <span style={{fontWeight:'bold'}}>{userData.first_name} {userData.last_name} </span>: made the following changes:
+                          <span style={{fontWeight:'bold'}}>{user_name} </span>: made the following changes:
                         </Typography>
                       </Box>
                     </ListItem>

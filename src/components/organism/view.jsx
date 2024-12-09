@@ -2,26 +2,38 @@ import React from 'react';
 import { Box, Typography } from '@mui/material';
 
 const ViewComponent = ({ formData, pageSchema }) => {
-  // Debugging log for formData
-  console.log('View Component Form Data:', formData);
-
   // Function to format field data
   const formatFieldData = (fieldName, value) => {
-    if (typeof value === 'object' && value !== null) {
-      // Handle object fields like "address" by joining their properties
-      return Object.values(value).join(', ');
+    if (fieldName === 'created_time' && value) {
+      // Convert UTC value to Date object
+      const utcDate = new Date(value);
+
+      // Get the local time zone offset in minutes
+      const timezoneOffset = utcDate.getTimezoneOffset(); 
+
+      // Adjust the UTC time based on the local timezone offset
+      const localTime = new Date(utcDate.getTime() - timezoneOffset * 60000); // Adjust in milliseconds
+
+      // Format the local time to a human-readable format (e.g., using `toLocaleString`)
+      const formattedLocalTime = localTime.toLocaleString(); // This will give you a localized date string
+
+      return formattedLocalTime;
     }
-    return value || 'N/A';
+
+    // Handle other fields, such as object fields (if needed)
+    if (typeof value === 'object' && value !== null) {
+      return Object.values(value).join(', '); // Join object values
+    }
+
+    return value || 'N/A'; // Return 'N/A' if value is null or undefined
   };
-
-
-
+console.log("formData", formData)
   return (
-    <Box sx={{ padding: 2, backgroundColor: '#fff', }}>
+    <Box sx={{ padding: 2, backgroundColor: '#fff' }}>
       <Box sx={{ display: 'flex', flexWrap: 'wrap' }}>
         {pageSchema.map((field) => (
           <Box
-          className='details_page_inputs'
+            className="details_page_inputs"
             key={field.fieldName}
             sx={{
               display: 'flex',

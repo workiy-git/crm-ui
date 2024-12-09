@@ -128,78 +128,10 @@ const AddComponent = forwardRef(({ formData, setFormData, pageSchema, onSaveSucc
     }
   };
 
-  // const renderInputField = (field) => {
-  //   const isFileInput = field.type === 'file';
-  //   const value = !isFileInput && (formData[field.fieldName] === 'N/A' ? '' : formData[field.fieldName] || '');
-  //   const isError = formErrors[field.fieldName];
-  //   const label = `${field.label || field.fieldName}${field.required ? ' *' : ''}`;
-  //   const isRequired = field.required === 'true';
-
-  //   const commonProps = {
-  //     name: field.fieldName,
-  //     placeholder: field.placeholder || 'Not Specified',
-  //     fullWidth: true,
-  //     onChange: handleInputChange,
-  //     error: !!isError,
-  //     helperText: isError && formErrors[field.fieldName],
-  //     ...(isRequired && { required: true }) // Add the required property if isRequired is true
-  //   };
-
-  //   if (!isFileInput) {
-  //     commonProps.value = value;
-  //   }
-
-  //   switch (field.htmlControl) {
-  //     case 'input':
-  //       return (
-  //         <FormControl className='details_page_inputs' key={field.fieldName} style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', width: '50%' }} error={!!isError}>
-  //           <label style={{ width: '40%', textAlign: 'left' }}>{label}</label>
-  //           <TextField className='valuefield edit-field-input' {...commonProps} type={field.type || 'text'} />
-  //         </FormControl>
-  //       );
-  //     case 'select':
-  //       return (
-  //         <FormControl className='details_page_inputs' key={field.fieldName} style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', width: '50%' }} error={!!isError}>
-  //           <label style={{ width: '40%', textAlign: 'left' }}>{label}</label>
-  //           <Select className='valuefield edit-field-input' {...commonProps} displayEmpty>
-  //             <MenuItem value="">
-  //               <em>{field.placeholder || 'Select an option'}</em>
-  //             </MenuItem>
-  //             {field.options.map((option, index) => (
-  //               <MenuItem className='edit-field-input-select' key={index} value={option}>
-  //                 {option}
-  //               </MenuItem>
-  //             ))}
-  //           </Select>
-  //           {isError && <div style={{ color: 'red', fontSize: '12px' }}>{formErrors[field.fieldName]}</div>}
-  //         </FormControl>
-  //       );
-  //     case 'checkbox':
-  //       return (
-  //         <FormControlLabel
-  //         className='details_page_inputs'
-  //           key={field.fieldName}
-  //           control={
-  //             <Checkbox className='edit-field-input' name={field.fieldName} checked={formData[field.fieldName] || false} onChange={handleInputChange} />
-  //           }
-  //           label={label}
-  //           style={{ width: '50%', margin: '0' }}
-  //         />
-  //       );
-  //     default:
-  //       return (
-  //         <FormControl className='details_page_inputs' key={field.fieldName} style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', width: '50%' }} error={!!isError}>
-  //           <label style={{ width: '40%', textAlign: 'left' }}>{label}</label>
-  //           <TextField className='valuefield edit-field-input' {...commonProps} />
-  //         </FormControl>
-  //       );
-  //   }
-  // };
-
   const renderInputField = (field) => {
     const isFileInput = field.type === 'file';
     let value = !isFileInput && (formData[field.fieldName] === 'N/A' ? '' : formData[field.fieldName] || '');
-
+  
     const isError = formErrors[field.fieldName];
     const label = `${field.label || field.fieldName}${field.required ? ' *' : ''}`;
     const isRequired = field.required === 'true';
@@ -213,6 +145,35 @@ const AddComponent = forwardRef(({ formData, setFormData, pageSchema, onSaveSucc
       helperText: isError && formErrors[field.fieldName],
       ...(isRequired && { required: true }) // Add the required property if isRequired is true
     };
+  
+    if (field.type === 'datetime-local') {
+      // Convert UTC time to local time for display
+      const utcValue = formData[field.fieldName];
+      console.log("utc", utcValue)
+      const localValue = utcValue ? new Date(utcValue + 'Z').getTime() + (5.5 * 60 * 60 * 1000) : ''; 
+      const formattedLocalValue = localValue ? new Date(localValue).toISOString().slice(0, 16) : '';
+      console.log("formattedLocalValue", formattedLocalValue)
+
+      console.log("local", localValue)
+
+  
+      return (
+        <FormControl
+          className='details_page_inputs'
+          key={field.fieldName}
+          style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', width: '50%' }}
+          error={!!isError}
+        >
+          <label style={{ width: '40%', textAlign: 'left' }}>{label}</label>
+          <TextField
+            className='valuefield edit-field-input'
+            {...commonProps}
+            value={formattedLocalValue}
+            type="datetime-local"
+          />
+        </FormControl>
+      );
+    }
   
     if (!isFileInput) {
       commonProps.value = value;
@@ -230,7 +191,8 @@ const AddComponent = forwardRef(({ formData, setFormData, pageSchema, onSaveSucc
         return (
           <FormControl className='details_page_inputs' key={field.fieldName} style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', width: '50%' }} error={!!isError}>
             <label style={{ width: '40%', textAlign: 'left' }}>{label}</label>
-            <Select className='valuefield edit-field-input' {...commonProps} displayEmpty>
+            <div style={{ width: '50%'}}>
+            <Select style={{width:'100% !important'}} className='edit-field-input' {...commonProps} displayEmpty>
               <MenuItem value="">
                 <em>{field.placeholder || 'Select an option'}</em>
               </MenuItem>
@@ -241,6 +203,7 @@ const AddComponent = forwardRef(({ formData, setFormData, pageSchema, onSaveSucc
               ))}
             </Select>
             {isError && <div style={{ color: 'red', fontSize: '12px' }}>{formErrors[field.fieldName]}</div>}
+            </div>
           </FormControl>
         );
       case 'checkbox':
