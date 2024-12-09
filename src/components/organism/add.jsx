@@ -170,6 +170,7 @@ const AddComponent = forwardRef(({ formData, setFormData, pageSchema, onSaveSucc
             {...commonProps}
             value={formattedLocalValue}
             type="datetime-local"
+            disabled={field.fieldName === 'created_time'}
           />
         </FormControl>
       );
