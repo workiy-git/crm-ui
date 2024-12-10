@@ -44,6 +44,7 @@ const GridComponent = ({ pageName }) => {
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(25); // Adjust this value as needed
   const [totalRows, setTotalRows] = useState(0);
+  const [totalRecord, setTotalRecord] = useState(0);
   const [selectOptions, setSelectOptions] = useState([]);
   const [selectedValue, setSelectedValue] = useState("");
   const [gridData, setGridData] = useState([]);
@@ -59,6 +60,7 @@ const GridComponent = ({ pageName }) => {
   const [selectedRow, setSelectedRow] = useState(null);
   const { fetchNotifications } = useNotifications();
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
+  const [inputPage, setInputPage] = useState("");
 
 
   // const [filteredRows, setFilteredRows] = useState(gridData);
@@ -144,6 +146,7 @@ const GridComponent = ({ pageName }) => {
       } catch (error) {
         console.error('Error deleting data:', error);
         setError(error)
+        setTimeout(() => setError(''), 3000);
       }
     }
   };
@@ -157,6 +160,7 @@ const GridComponent = ({ pageName }) => {
     if (pageName) {
       setIsLoading(true); // Set the loader to true when pageName changes
       setPage(1); // Reset to the first page when the pageName changes
+      setInputPage(1); // Reset the input page number when the pageName changes
     }
   }, [pageName]);
   
@@ -214,8 +218,15 @@ const GridComponent = ({ pageName }) => {
   // Handle page change
   const [key, setKey] = useState(0);
   const handlePageChange = (event, value) => {
-    setKey(prevKey => prevKey + 1);
+    // setKey(prevKey => prevKey + 1);
+    const currentPage = value;
+    const currentpageSize = pageSize;
+    setLoading(true);
+    handleChange({ target: { value: selectedValue } }, currentPage, currentpageSize);
     setPage(value);
+    setInputPage(value);
+    console.log("current page", value);
+    // fetchGridData();
   };
 
   // Fetch grid data based on the selected filter
@@ -233,12 +244,15 @@ const GridComponent = ({ pageName }) => {
   }, [pageName]);
   
   //Drop Down Change
-  const handleChange = (event) => {
+  const handleChange = (event, currentPage, currentpageSize) => {
     const filter = JSON.parse(event.target.value);
     setSelectedValue(event.target.value);
-    // console.log("filter", filter);
-    fetchGridData(filter); // Fetch grid data for the selected option
-    setPage(1);
+    console.log("current PAges", currentPage);
+    console.log("current PAges Size", currentpageSize);
+
+    const currentPageNumber = currentPage || 1;
+    const currentNumberofRow = currentpageSize || 25;
+    fetchGridData(filter, currentPageNumber, currentNumberofRow); // Fetch grid data for the selected option
   };
   
   const flattenObject = (obj, parent = '', res = {}) => {
@@ -252,12 +266,13 @@ const GridComponent = ({ pageName }) => {
     return res;
   };
   
-  const fetchGridData = async (filter) => {
+  const fetchGridData = async (filter, currentPageNumber, currentNumberofRow) => {
     try {
 
       const response = await axios.post(
-        `${config.apiUrl.replace(/\/$/, "")}/${gridEndpoint}`, 
+        `${config.apiUrl.replace(/\/$/, "")}/${gridEndpoint}?page=${currentPageNumber}&pageSize=${currentNumberofRow}`, 
         filter, // This is the body (data you are sending)
+        
         {
           headers: headers, // This is the config object where headers go
         }
@@ -271,6 +286,7 @@ const GridComponent = ({ pageName }) => {
           id: item._id || index,
         };
       });
+      setTotalRecord(response.data.pagination.totalCount);
   
       setGridData(dataWithIds);
       setTotalRows(dataWithIds.length);
@@ -312,12 +328,15 @@ const GridComponent = ({ pageName }) => {
           });
       
         setIsLoading(false);
+        setLoading(false);
         setColumns(dynamicColumns);
         setAvailableColumns(dynamicColumns); // Set available columns here
       } else {
         setIsLoading(true);
+        setLoading(true);
         setTimeout(() => {
           setIsLoading(false);
+          setLoading(false);
         }, 2000); // 2000 milliseconds = 2 seconds
       }
       
@@ -329,6 +348,7 @@ const GridComponent = ({ pageName }) => {
 
   const handleFilterChange = (field, value) => {
     setPage(1);
+    setInputPage(1);
     setFilterText((prev) => ({ ...prev, [field]: value }));
   };
 
@@ -784,9 +804,33 @@ const handleViewReport = async () => {
 
   const handlePageSizeChange = (event) => {
     setPageSize(event.target.value);
-    setPage(1); // Reset to the first page when the page size changes
+    const currentPage = 1;
+    const currentpageSize = event.target.value;
+    handleChange({ target: { value: selectedValue } }, currentPage, currentpageSize);
+    // handleChange({ target: { value: selectedValue } });
+    // fetchGridData(); // Fetch grid data when the page size changes
+    console.log("page size", event.target.value);
+    // setPage(1); // Reset to the first page when the page size changes
   };
   
+  const handlePageInputChange = (e) => {
+    setInputPage(e.target.value); // Update the input value
+    
+  };
+  const handleKeyPress = (e) => {
+    if (e.key === "Enter") {
+      const pageNum = parseInt(inputPage, 10);
+      if (!isNaN(pageNum) && pageNum >= 1 && pageNum <= Math.ceil(totalRecord / pageSize)) {
+        const currentPage = pageNum;
+        handleChange({ target: { value: selectedValue } }, currentPage);
+        setPage(pageNum); // Set the page if valid
+      } else {
+        setError("Please enter a valid page number.");
+        setTimeout(() => setError(''), 3000);
+      }
+    }
+  };
+
   // Add some CSS to increase the header height
   const [isBoxVisible, setIsBoxVisible] = useState(true);
 
@@ -805,6 +849,7 @@ const handleViewReport = async () => {
   if (isLoading) {
     return <Loader />; // Use the Loader component here
   }
+
   return (
     <div className="CallsGrid">
       {(error || success) && (
@@ -895,12 +940,60 @@ const handleViewReport = async () => {
             ))}
           </select>
         </div>
-        <div style={{fontSize:'12px'}}>
+        <div style={{fontSize:'12px', display: 'flex', alignItems:'center'}}>
+        {/* <span style={{ marginLeft: "16px" }}>
+          Page {page} of {Math.ceil(totalRecord / pageSize)}
+        </span> */}
+        <div style={{ display: 'flex', alignItems: 'center' }}>
+  <div>Page</div>
+  <div style={{ width: '40px', margin: '0 7px' }}> {/* Increased width to give more space */}
+  <input
+  type="text"
+  value={inputPage}
+  onChange={handlePageInputChange}
+  onKeyDown={(e) => {
+    // Allow only numeric keys and control keys like Backspace, Delete, and arrow keys
+    if (!/^\d*$/.test(e.key) && 
+        e.key !== 'Backspace' && 
+        e.key !== 'Delete' && 
+        e.key !== 'ArrowLeft' && 
+        e.key !== 'ArrowRight' && 
+        e.key !== 'Enter') {
+      e.preventDefault(); // Prevent invalid key press
+    }
+
+    // Handle Enter key press for page validation
+    if (e.key === 'Enter') {
+      const pageNum = parseInt(inputPage, 10);
+      
+      // Ensure the page number is numeric and within the valid range
+      if (!isNaN(pageNum) && pageNum >= 1 && pageNum <= Math.ceil(totalRecord / pageSize)) {
+        const currentPage = pageNum;
+        handleChange({ target: { value: selectedValue } }, currentPage);
+        setPage(pageNum); // Set the page if valid
+      } else {
+        setError("Please enter a valid page number.");
+        setTimeout(() => setError(''), 3000); // Clear error after 3 seconds
+      }
+    }
+  }}
+  placeholder="Go to page"
+  style={{
+    width: '100%',
+    padding: '3px 7px',
+    borderRadius: '4px',
+    border: '1px solid #ced4da',
+    boxSizing: 'border-box', // Ensures padding doesn't affect width
+  }}
+/>
+
+  </div>
+  <div>of</div>
+  <div  style={{ margin: '0 7px' }}>{Math.ceil(totalRecord / pageSize)}</div>
+</div>
+
         <span style={{ marginLeft: "16px" }}>
-          Page {page} of {Math.ceil(totalRows / pageSize)}
-        </span>
-        <span style={{ marginLeft: "16px" }}>
-          Total Rows: {totalRows}
+          Total Rows: {totalRecord}
         </span>
         
         <Select
@@ -915,39 +1008,31 @@ const handleViewReport = async () => {
           <MenuItem value={75}>75</MenuItem>
         </Select>
         </div>
+       
         <Box>
-        <Pagination
-          count={Math.ceil(totalRows / pageSize)}
-          siblingCount={0}
-          page={page}
-          style={{justifyContent:'center', display:'flex', width:'200px'}}
-          onChange={handlePageChange}
-          className="pagination_main"
-        />
+      <Pagination
+        count={Math.ceil(totalRecord / pageSize)}
+        siblingCount={0}
+        page={page}
+        onChange={handlePageChange}
+        className="pagination_main"
+        style={{ justifyContent: "center", display: "flex" }}
+      />
         
         </Box>
       </Box>
       )}
-      {loading ? (
-        <Box
-          display="flex"
-          justifyContent="center"
-          alignItems="center"
-          height="100%"
-        >
-          <CircularProgress />
-        </Box>
-      ) : (
         
         <div style={{height:'calc(100vh - 140px)'}}>
           <DataGrid
-            rows={filteredRows.slice((page - 1) * pageSize, page * pageSize)}
+            // rows={filteredRows}
+            rows={loading ? [] : filteredRows}
             columns={columnsWithFilter}
-            pageSize={pageSize}
+            // pageSize={pageSize}
             paginationMode="server"
-            rowCount={totalRows}
-            onPageChange={handlePageChange}
-            page={page - 1}
+            // rowCount={totalRows}
+            // onPageChange={handlePageChange}
+            // page={page - 1}
             disableSelectionOnClick
             getRowHeight={() => 35}
             className="custom-data-grid-main"
@@ -960,7 +1045,6 @@ const handleViewReport = async () => {
           />
 
         </div>
-      )}
       <Modal open={showColumnModal} onClose={closeColumnModal} aria-labelledby="modal-title" aria-describedby="modal-description">
   <Box sx={{ ...modalStyle, width: 500 }}>
     <Typography id="modal-title" variant="h6" component="h2">
