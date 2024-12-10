@@ -75,7 +75,6 @@
 
 .sidemenu-menu-item:hover {
   transform: scale(1.1);
-  font-size: 10px;
 }
 .sidemenu-menu-item-popup:hover{
   background-color: black !important;
