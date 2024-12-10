@@ -222,6 +222,7 @@ const GridComponent = ({ pageName }) => {
     const currentPage = value;
     const currentpageSize = pageSize;
     setLoading(true);
+    
     handleChange({ target: { value: selectedValue } }, currentPage, currentpageSize);
     setPage(value);
     setInputPage(value);
@@ -252,6 +253,7 @@ const GridComponent = ({ pageName }) => {
 
     const currentPageNumber = currentPage || 1;
     const currentNumberofRow = currentpageSize || 25;
+    setLoading(true);
     fetchGridData(filter, currentPageNumber, currentNumberofRow); // Fetch grid data for the selected option
   };
   
@@ -865,6 +867,20 @@ const handleViewReport = async () => {
       <Box
         className="Appbar"
         sx={{  
+          width: '100%', 
+          display: {
+          xs: "block",
+          sm: "flex", 
+          }, 
+          justifyContent: "space-around",
+          textAlign: {
+            xs: "center",
+          },}}
+      >
+        <Box
+        className="Appbar"
+        sx={{  
+          width: '50%', 
           display: {
           xs: "block",
           sm: "flex", 
@@ -940,61 +956,76 @@ const handleViewReport = async () => {
             ))}
           </select>
         </div>
+        </Box>
+        <Box
+        className="Appbar"
+        sx={{ 
+          width: '50%', 
+          display: {
+          xs: "block",
+          sm: "flex", 
+          }, 
+          justifyContent: "space-around",
+          textAlign: {
+            xs: "center",
+          },}}
+      >
         <div style={{fontSize:'12px', display: 'flex', alignItems:'center'}}>
         {/* <span style={{ marginLeft: "16px" }}>
           Page {page} of {Math.ceil(totalRecord / pageSize)}
         </span> */}
         <div style={{ display: 'flex', alignItems: 'center' }}>
-  <div>Page</div>
-  <div style={{ width: '40px', margin: '0 7px' }}> {/* Increased width to give more space */}
-  <input
-  type="text"
-  value={inputPage}
-  onChange={handlePageInputChange}
-  onKeyDown={(e) => {
-    // Allow only numeric keys and control keys like Backspace, Delete, and arrow keys
-    if (!/^\d*$/.test(e.key) && 
-        e.key !== 'Backspace' && 
-        e.key !== 'Delete' && 
-        e.key !== 'ArrowLeft' && 
-        e.key !== 'ArrowRight' && 
-        e.key !== 'Enter') {
-      e.preventDefault(); // Prevent invalid key press
-    }
+          <div>Page</div>
+          <div style={{ width: '40px', margin: '0 15px' }}> {/* Increased width to give more space */}
+          <input
+          type="text"
+          value={inputPage}
+          onChange={handlePageInputChange}
+          onKeyDown={(e) => {
+            // Allow only numeric keys and control keys like Backspace, Delete, and arrow keys
+            if (!/^\d*$/.test(e.key) && 
+                e.key !== 'Backspace' && 
+                e.key !== 'Delete' && 
+                e.key !== 'ArrowLeft' && 
+                e.key !== 'ArrowRight' && 
+                e.key !== 'Enter') {
+              e.preventDefault(); // Prevent invalid key press
+            }
 
-    // Handle Enter key press for page validation
-    if (e.key === 'Enter') {
-      const pageNum = parseInt(inputPage, 10);
-      
-      // Ensure the page number is numeric and within the valid range
-      if (!isNaN(pageNum) && pageNum >= 1 && pageNum <= Math.ceil(totalRecord / pageSize)) {
-        const currentPage = pageNum;
-        handleChange({ target: { value: selectedValue } }, currentPage);
-        setPage(pageNum); // Set the page if valid
-      } else {
-        setError("Please enter a valid page number.");
-        setTimeout(() => setError(''), 3000); // Clear error after 3 seconds
-      }
-    }
-  }}
-  placeholder="Go to page"
-  style={{
-    width: '100%',
-    padding: '3px 7px',
-    borderRadius: '4px',
-    border: '1px solid #ced4da',
-    boxSizing: 'border-box', // Ensures padding doesn't affect width
-  }}
-/>
+              // Handle Enter key press for page validation
+              if (e.key === 'Enter') {
+                const pageNum = parseInt(inputPage, 10);
+                
+                // Ensure the page number is numeric and within the valid range
+                if (!isNaN(pageNum) && pageNum >= 1 && pageNum <= Math.ceil(totalRecord / pageSize)) {
+                  const currentPage = pageNum;
+                  handleChange({ target: { value: selectedValue } }, currentPage);
+                  setPage(pageNum); // Set the page if valid
+                } else {
+                  setError("Please enter a valid page number.");
+                  setTimeout(() => setError(''), 3000); // Clear error after 3 seconds
+                }
+              }
+            }}
+            placeholder="Go to page"
+            style={{
+              width: '100%',
+              padding: '3px 3px',
+              borderRadius: '4px',
+              border: '1px solid #ced4da',
+              boxSizing: 'border-box', // Ensures padding doesn't affect width
+            }}
+          />
 
-  </div>
-  <div>of</div>
-  <div  style={{ margin: '0 7px' }}>{Math.ceil(totalRecord / pageSize)}</div>
-</div>
-
+        </div>
+        <div>of</div>
+        <div  style={{ margin: '0 7px', width: '50px' }}>{Math.ceil(totalRecord / pageSize)}</div>
+      </div>
         <span style={{ marginLeft: "16px" }}>
-          Total Rows: {totalRecord}
-        </span>
+          Total Rows:
+        </span> 
+        <span style={{width: '50px'}}>{totalRecord}</span>
+        
         
         <Select
           value={pageSize}
@@ -1018,7 +1049,7 @@ const handleViewReport = async () => {
         className="pagination_main"
         style={{ justifyContent: "center", display: "flex" }}
       />
-        
+        </Box>
         </Box>
       </Box>
       )}

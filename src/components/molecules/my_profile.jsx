@@ -149,7 +149,7 @@ export default function Myprofile({ backgroundColor, value }) {
                 <Typography
                   className={`myprofile-username myprofile-username-role ${value}`}
                 >
-                  {userData.job_role}
+                  {userData.role}
                 </Typography>
               </div>
             </ListItemButton>
