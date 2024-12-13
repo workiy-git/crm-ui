@@ -10,6 +10,7 @@ import Header from "./components/organism/header";
 import SideMenu from "./components/organism/sidemenu";
 import GenerateReportPage from "./components/pages/generate-reports";
 import ReportGrid from "./components/organism/reportGrid";
+import AssignedTo from "./components/pages/assignedTo"
 import ProtectedRoute from "./protectedRoute"; 
 import { AuthProvider } from "./AuthContext"; 
 
@@ -55,6 +56,7 @@ const App = () => {
           <Route path="/view-report" element={ <ProtectedRoute> <ReportGrid /> </ProtectedRoute> } />
           <Route path="/edit-report/:id" element={ <ProtectedRoute> <GenerateReportPage /> </ProtectedRoute> } />
           <Route path="/underconstruction" element={ <ProtectedRoute> <Underconstruction /> </ProtectedRoute> } />
+          <Route path="/assignedto" element={<ProtectedRoute> <AssignedTo /> </ProtectedRoute>} />
         </Routes>
       </Layout>
       </AuthProvider>
