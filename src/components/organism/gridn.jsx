@@ -917,7 +917,7 @@ const handleViewReport = async () => {
             {menuData.add.title}
           </Button>
         )}
-        {pageName === 'users' && (
+        {/* {pageName === 'users' && (
           <Button 
             onClick={() => handleAsignedTo()} 
             className='Action-btn' 
@@ -925,7 +925,7 @@ const handleViewReport = async () => {
           >
             Asigned To
           </Button>
-        )}
+        )} */}
 
         {pageName === 'reports' && (
             <Button 
