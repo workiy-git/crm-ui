@@ -242,77 +242,82 @@ useEffect(() => {
     setIsDialogOpen(false);
   };
 
-  const handleSave = async () => {
-    fetchNotifications();
-
-    if (!formData) return;
-    console.log("formdata",formData)
-
-    // Perform validation
-    if (editComponentRef.current && !editComponentRef.current.validateForm()) {
-      handleSaveError("Please fix the validation errors before saving.");
-      return;
-    }
-    // Check if formData has changed from initialFormData
-    if (JSON.stringify(formData) === JSON.stringify(initialFormData)) {
-      handleSaveError("No changes detected. Nothing to save.");
-      return;
-    }
-// Check if all fields are empty in Add mode
-if (isAdding && Object.values(formData).every(value => value === "")) {
-  handleSaveError("No data provided. Please fill in the form before submitting.");
-  return;
-}
-
-  try {
-    const dataToSend = { pageName, pageId, ...formData };
-    pageSchema.forEach((field) => {
-      if (!dataToSend.hasOwnProperty(field.fieldName)) {
-        dataToSend[field.fieldName] = "";  // Set default empty value
+  const getChangedValues = (initialData, currentData) => {
+    const changedValues = {};
+    Object.keys(currentData).forEach((key) => {
+      if (currentData[key] !== initialData[key]) {
+        changedValues[key] = currentData[key];
       }
     });
-    console.log("dataToSend",dataToSend)
-    console.log("rowData",rowData)
+    return changedValues;
+  };
+  
+
+const handleSave = async () => {
+  fetchNotifications();
+
+  if (!formData) return;
+  console.log("formdata", formData);
+
+  // Perform validation
+  if (editComponentRef.current && !editComponentRef.current.validateForm()) {
+    handleSaveError("Please fix the validation errors before saving.");
+    return;
+  }
+
+  // Check if formData has changed from initialFormData
+  if (JSON.stringify(formData) === JSON.stringify(initialFormData)) {
+    handleSaveError("No changes detected. Nothing to save.");
+    return;
+  }
+
+  // Check if all fields are empty in Add mode
+  if (isAdding && Object.values(formData).every((value) => value === "")) {
+    handleSaveError("No data provided. Please fill in the form before submitting.");
+    return;
+  }
+
+  try {
+    // Get only changed values
+    const changedValues = getChangedValues(initialFormData, formData);
+    const dataToSend = { pageName, pageId, ...changedValues };
+
+    console.log("Changed Values", changedValues);
+    console.log("Data to Send", dataToSend);
+
     if (isAdding) {
       await axios.post(
-        `${config.apiUrl}/appdata/create`, 
+        `${config.apiUrl}/appdata/create`,
         dataToSend, // The request body
         {
-          headers: headers // The configuration object where headers are passed
+          headers: headers, // The configuration object where headers are passed
         }
       );
-      
-      handleSaveSuccess("Data Added successfully!");
-    
+
+      handleSaveSuccess("Data added successfully!");
+
       // Use setTimeout with a callback function to navigate after 2000ms
       setTimeout(() => {
         navigate(`/container/${pageName}`);
       }, 2000); // 2000ms delay
     } else {
       await axios.put(
-        `${config.apiUrl}/appdata/${id}`, 
+        `${config.apiUrl}/appdata/${id}`,
         dataToSend, // Request body
         {
           headers: headers, // Configuration object, including headers
         }
       );
-      // const updatedData = await axios.get(`${config.apiUrl}/appdata/${id}`);
-      // console.log("updatedData",updatedData.data.data)
-      // console.log("rowData",rowData)
-      handleSaveSuccess("Data saved successfully!");
-      // navigate(`/${pageName}/view/${updatedData._id}`, {
-      //   state: { rowData: updatedData.data.data, pageName, mode: 'view' },
-      // });
 
+      handleSaveSuccess("Data saved successfully!");
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
-
-    
   } catch (error) {
     handleSaveError("Error saving data.");
     console.error("Error saving data:", error);
   }
-  };
+};
+
   // Handle Cancel with Unsaved Changes Confirmation
   const handleCancel = () => {
     if (hasUnsavedChanges) {
