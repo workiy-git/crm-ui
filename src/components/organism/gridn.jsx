@@ -917,15 +917,15 @@ const handleViewReport = async () => {
             {menuData.add.title}
           </Button>
         )}
-        {/* {pageName === 'users' && (
+        {pageName === 'users' && (
           <Button 
             onClick={() => handleAsignedTo()} 
             className='Action-btn' 
             sx={{ color: 'white', background: '#212529' }}
           >
-            Asigned To
+            Assign To
           </Button>
-        )} */}
+        )}
 
         {pageName === 'reports' && (
             <Button 
