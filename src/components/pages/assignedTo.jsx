@@ -1,106 +1,270 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { headers } from '../atoms/Authorization'; // Ensure headers are correctly imported from your auth module
-import config from "../../config/config"; // Assuming config contains the base API URL
-
+import { DataGrid } from '@mui/x-data-grid';
+import { headers } from '../atoms/Authorization';
+import config from "../../config/config";
 import '../../assets/styles/assignedToPage.css';
 
 const AssignedTo = () => {
-    const [users, setUsers] = useState([]); // State to hold users data
-    const [loading, setLoading] = useState(true); // Loading state
-    const [error, setError] = useState(null); // Error state
-    const [selectedFrom, setSelectedFrom] = useState(""); // State to hold selected 'From' user
+    const [roles, setRoles] = useState([]);
+    const [users, setUsers] = useState([]);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
+    const [selectedRole, setSelectedRole] = useState("");
+    const [selectedUser, setSelectedUser] = useState("");
+    const [assignedData, setAssignedData] = useState([]);
+    const [otherUsers, setOtherUsers] = useState([]);
+    const [selectedOtherUser, setSelectedOtherUser] = useState("");
 
-    // Fetch users data for dropdowns
     useEffect(() => {
+        const fetchRoles = async () => {
+            try {
+                setLoading(true);
+                const endpoint = "appdata/retrieve";
+
+                const requestBody = [
+                    { "$match": { "pageName": "users" } },
+                    { "$group": { "_id": "$role" } }
+                ];
+
+                const response = await axios.post(
+                    `${config.apiUrl.replace(/\/$/, "")}/${endpoint}`,
+                    requestBody,
+                    { headers: headers }
+                );
+
+                const roleData = response.data.data.map(item => item._id);
+                setRoles(roleData);
+            } catch (err) {
+                console.error("Error fetching roles:", err);
+                setError("Failed to load roles.");
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchRoles();
+    }, []);
+
+    useEffect(() => {
+        if (!selectedRole) return;
+
         const fetchUsers = async () => {
             try {
-                const endpoint = "appdata/retrieve"; // Define the endpoint
-    
-                // Prepare the data for the POST request body (MongoDB Aggregation Query)
+                setLoading(true);
+                const endpoint = "appdata/retrieve";
+
                 const requestBody = [
-                    { "$match": { "pageName": "users" } }
+                    { "$match": { "pageName": "users", "role": selectedRole } },
+                    { "$project": { "username": 1, "first_name": 1, "last_name": 1, "_id": 0 } }
                 ];
-    
+
                 const response = await axios.post(
-                    `${config.apiUrl.replace(/\/$/, "")}/${endpoint}?page=1&pageSize=25`, // URL with query params for pagination
-                    requestBody, // Aggregation query body
-                    {
-                        headers: headers
-                    }
+                    `${config.apiUrl.replace(/\/$/, "")}/${endpoint}`,
+                    requestBody,
+                    { headers: headers }
                 );
-    
-                console.log("Response Data", response.data.data);
-    
-                // Check if the response contains `data` and if it's an array
-                if (response.data.data && Array.isArray(response.data.data)) {
-                    // Filter users by "Presales Team" role and extract only the `username`
-                    const presalesUsers = response.data.data
-                        .filter(user => user.role === "Presales Team") // Filter by role
-                        .map(user => user); // Extract full user objects
-    
-                    setUsers(presalesUsers); // Store the filtered users in the state
-                    console.log("Filtered Presales Team Users", presalesUsers);
-                } else {
-                    setError("Unexpected response structure.");
-                }
-            } catch (error) {
-                console.error("Error fetching users:", error);
+
+                setUsers(response.data.data || []);
+            } catch (err) {
+                console.error("Error fetching users:", err);
                 setError("Failed to load users.");
             } finally {
                 setLoading(false);
             }
         };
-    
-        fetchUsers(); // Call the fetch function on component mount
-    }, []);
-    
-    // Handle selection in the 'From' dropdown
-    const handleFromChange = (event) => {
-        setSelectedFrom(event.target.value); // Update selected 'From' value
+
+        fetchUsers();
+    }, [selectedRole]);
+
+    useEffect(() => {
+        if (!selectedUser) return;
+
+        const fetchAssignedData = async () => {
+            try {
+                setLoading(true);
+                const endpoint = "appdata/retrieve";
+
+                const requestBody = [
+                    {
+                        "$match": {
+                            "pageName": "leads",
+                            "assigned_to": { "$regex":  `^\\s*${selectedUser}\\s*$`, "$options": "i" }
+                        }
+                    },
+                    {
+                        "$project": {
+                            "mobile_phone": 1,
+                            "name": 1,
+                            "lead_source": 1,
+                            "lead_medium": 1,
+                            "assigned_to": { "$trim": { "input": "$assigned_to" } },
+                            "_id": 0
+                        }
+                    }
+                ];
+
+                const response = await axios.post(
+                    `${config.apiUrl.replace(/\/$/, "")}/${endpoint}`,
+                    requestBody,
+                    { headers: headers }
+                );
+
+                const cleanData = (data) =>
+                    data.map(item => ({
+                        ...item,
+                        assigned_to: item.assigned_to.trim()
+                    }));
+
+                setAssignedData(cleanData(response.data.data || []));
+
+                // Fetch other users for reassignment
+                setOtherUsers(users.filter(user => user.username !== selectedUser));
+            } catch (err) {
+                console.error("Error fetching assigned data:", err);
+                setError("Failed to load assigned data.");
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchAssignedData();
+    }, [selectedUser]);
+
+    const handleRoleChange = (event) => {
+        setSelectedRole(event.target.value);
+        setUsers([]);
+        setSelectedUser("");
+        setAssignedData([]);
+        setOtherUsers([]);
+        setSelectedOtherUser("");
     };
+
+    const handleUserChange = (event) => {
+        setSelectedUser(event.target.value.trim());
+    };
+
+    const handleOtherUserChange = async (event) => {
+        const confirmReassign = window.confirm("Are you sure you want to reassign the data to this user?");
+        if (confirmReassign) {
+            const newAssignedUser = event.target.value.trim().toLowerCase();
+            setSelectedOtherUser(newAssignedUser);
+    
+            try {
+                setLoading(true);
+    
+                const endpoint = "appdata/update";
+    
+                const requestBody = {
+                    filter: {
+                        "pageName": "leads",
+                        "assigned_to": { "$regex": `^\\s*${selectedUser}\\s*$`, "$options": "i" }
+                    },
+                    update: {
+                        "$set": { "assigned_to": newAssignedUser }
+                    }
+                };
+    
+                console.log("Request Body:", requestBody); // Debugging log
+    
+                const response = await axios.put(
+                    `${config.apiUrl.replace(/\/$/, "")}/${endpoint}`,
+                    requestBody,
+                    { headers: headers }
+                );
+    
+                console.log("API Response:", response.data); // Debugging log
+    
+                if (response.status === 200) {
+                    alert("Data reassigned successfully.");
+    
+                    // Update the UI
+                    setAssignedData((prev) =>
+                        prev.map((item) =>
+                            item.assigned_to === selectedUser
+                                ? { ...item, assigned_to: newAssignedUser }
+                                : item
+                        )
+                    );
+    
+                    setSelectedUser("");
+                    setAssignedData([]);
+                } else {
+                    throw new Error("Failed to update data on server.");
+                }
+            } catch (err) {
+                console.error("Error reassigning data:", err);
+                setError("Failed to reassign data.");
+            } finally {
+                setLoading(false);
+            }
+        }
+    };
+    
+
+    const columns = [
+        { field: 'mobile_phone', headerName: 'Mobile Phone', width: 150 },
+        { field: 'name', headerName: 'Name', width: 200 },
+        { field: 'lead_source', headerName: 'Lead Source', width: 150 },
+        { field: 'lead_medium', headerName: 'Lead Medium', width: 150 },
+        { field: 'assigned_to', headerName: 'Assigned To', width: 150 },
+    ];
 
     return (
         <div className="split-page">
-            {/* Left Side */}
             <div className="left-side">
                 <div className="form-group">
-                    <label htmlFor="from">From:</label>
-                    <select id="from" name="from" onChange={handleFromChange} value={selectedFrom}>
+                    <label htmlFor="role">Select Role:</label>
+                    <select id="role" name="role" onChange={handleRoleChange} value={selectedRole}>
                         <option value="">Select</option>
-                        {loading && <option>Loading...</option>}
-                        {error && <option>{error}</option>}
-                        {!loading && !error && users.length > 0 && users.map((user, index) => (
-                            <option key={index} value={user.username}>
-                                {user.username}
+                        {roles.map((role, index) => (
+                            <option key={index} value={role}>
+                                {role}
                             </option>
                         ))}
-                        {!loading && !error && users.length === 0 && <option>No users available</option>}
                     </select>
                 </div>
 
-                <div className="form-group">
-                    <label htmlFor="assignTo">Assign To:</label>
-                    <select id="assignTo" name="assignTo">
-                        <option value="">Select</option>
-                        {loading && <option>Loading...</option>}
-                        {error && <option>{error}</option>}
-                        {!loading && !error && users.length > 0 && users
-                            .filter(user => user.username !== selectedFrom) // Exclude selected user from 'From' dropdown
-                            .map((user, index) => (
+                {selectedRole && (
+                    <div className="form-group">
+                        <label htmlFor="user">Select User:</label>
+                        <select id="user" name="user" onChange={handleUserChange} value={selectedUser}>
+                            <option value="">Select</option>
+                            {users.map((user, index) => (
                                 <option key={index} value={user.username}>
-                                    {/* {user.first_name} {user.last_name} */}
                                     {user.username}
                                 </option>
                             ))}
-                        {!loading && !error && users.length === 0 && <option>No users available</option>}
-                    </select>
-                </div>
+                        </select>
+                    </div>
+                )}
+
+                {selectedUser && otherUsers.length > 0 && (
+                    <div className="form-group">
+                        <label htmlFor="other-user">Reassign To:</label>
+                        <select id="other-user" name="other-user" onChange={handleOtherUserChange} value={selectedOtherUser}>
+                            <option value="">Select</option>
+                            {otherUsers.map((user, index) => (
+                                <option key={index} value={user.username}>
+                                    {user.username}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+                )}
             </div>
 
-            {/* Right Side */}
             <div className="right-side">
-                <p>Right side content goes here.</p>
+                <h3>Assigned Data</h3>
+                <div style={{ height: 400, width: '100%' }}>
+                    <DataGrid
+                        rows={assignedData.map((item, index) => ({ id: index, ...item }))}
+                        columns={columns}
+                        pageSize={5}
+                        rowsPerPageOptions={[5]}
+                        loading={loading}
+                    />
+                </div>
             </div>
         </div>
     );
