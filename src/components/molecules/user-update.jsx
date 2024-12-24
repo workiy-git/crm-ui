@@ -310,6 +310,7 @@ const Updates = ({ mode }) => {
             <List>
               {history.slice(0, itemsToShow).map((item, index) => {
                 const { dateTime, details, date, time, name } = parseHistoryItem(item);
+                console.log("date time", dateTime)
                 const { user_name } = parseHistoryItemname(item);
                 const parts = details.split('made the following changes: ');
                 const action = parts[0].trim();
@@ -317,6 +318,31 @@ const Updates = ({ mode }) => {
                 const changeList = changesString ? changesString.split(', ').map(change => change.trim()) : [];        
                 
                 const currentDate = new Date();
+                console.log("current Time", currentDate )
+                // Original time in UTC
+                const utcDate = new Date(dateTime + " UTC"); // Convert to Date object assuming UTC
+
+                // Get the local date and time
+                const localDate = new Date(utcDate);
+
+                // Format the local date and time in AM/PM without timezone name
+                const formatter = new Intl.DateTimeFormat('en-US', {
+                    hour12: true, // Display time in AM/PM
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit'
+                });
+
+                const formattedDate = formatter.format(localDate);
+
+                console.log("Original UTC Time:", dateTime);
+                console.log("Local Time:", formattedDate);
+
+
+                
                 const day = String(currentDate.getDate()).padStart(2, '0');
                 const month = String(currentDate.getMonth() + 1).padStart(2, '0'); // January is 0
                 const year = currentDate.getFullYear();
@@ -345,12 +371,18 @@ const Updates = ({ mode }) => {
                       <Box sx={{ display: 'flex', alignItems: 'center', width: '100%' }}>
                         <div style={{display:'block', textAlign:'center'}}>
                           <div>
-                            <Typography sx={{ marginRight: 1, fontSize:'10px' }} variant="body2" color="text.primary">
+                            <Typography sx={{ marginRight: 1, fontSize:'12px' }} variant="body2" color="text.primary">
+                              {formattedDate}
+                            </Typography>
+                          <Typography sx={{ marginRight: 1, fontSize:'10px' }} variant="body2" color="text.primary">
+                              {totalDays > 1 ? `(${totalDays} days ago)` : totalDays === 1 ? '(1 day ago)' : '(today)'}
+                            </Typography>
+                            {/* <Typography sx={{ marginRight: 1, fontSize:'10px' }} variant="body2" color="text.primary">
                               {date} {totalDays > 1 ? `(${totalDays} days ago)` : totalDays === 1 ? '(1 day ago)' : '(today)'}
                             </Typography>
                             <Typography sx={{ marginRight: 1, fontSize:'12px' }} variant="body2" color="text.primary">
                               {time}
-                            </Typography>
+                            </Typography> */}
                           </div>
                           <Avatar
                             alt="Profile"

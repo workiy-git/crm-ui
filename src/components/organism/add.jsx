@@ -170,7 +170,7 @@ const AddComponent = forwardRef(({ formData, setFormData, pageSchema, onSaveSucc
             {...commonProps}
             value={formattedLocalValue}
             type="datetime-local"
-            disabled={field.fieldName === 'created_time'}
+            disabled={field.display === 'disable'}
           />
         </FormControl>
       );
@@ -185,7 +185,7 @@ const AddComponent = forwardRef(({ formData, setFormData, pageSchema, onSaveSucc
         return (
           <FormControl className='details_page_inputs' key={field.fieldName} style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', width: '50%' }} error={!!isError}>
             <label style={{ width: '40%', textAlign: 'left' }}>{label}</label>
-            <TextField className='valuefield edit-field-input' {...commonProps} type={field.type || 'text'} disabled={field.dataType === 'Date'} />
+            <TextField className='valuefield edit-field-input' {...commonProps} type={field.type || 'text'} />
           </FormControl>
         );
       case 'select':
