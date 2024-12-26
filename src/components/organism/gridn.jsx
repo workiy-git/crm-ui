@@ -400,6 +400,10 @@ const GridComponent = ({ pageName }) => {
         state: { pageName, mode },
     });
 };
+  const handleAsignedTo = () => {
+    navigate("/assignedto");
+
+  };
 
 const [filteredData, setFilteredData] = useState([]);
 const [convertDialogOpen, setConvertDialogOpen] = useState(false);
@@ -911,6 +915,15 @@ const handleViewReport = async () => {
             sx={{ color: 'white', background: '#212529' }}
           >
             {menuData.add.title}
+          </Button>
+        )}
+        {pageName === 'users' && (
+          <Button 
+            onClick={() => handleAsignedTo()} 
+            className='Action-btn' 
+            sx={{ color: 'white', background: '#212529' }}
+          >
+            Assign To
           </Button>
         )}
 

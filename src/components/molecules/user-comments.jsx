@@ -1,17 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import config from '../../config/config';
+import {
+  Stack, Alert} from "@mui/material";
 import { TextField, Button, Box, Paper, List, ListItem, ListItemText, Avatar, Typography } from '@mui/material';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import { headers } from '../atoms/Authorization';
-import {useUserData} from '../molecules/userAPIData';
+import { useUserData } from '../molecules/userAPIData';
 
 const Comment = ({ mode }) => {
   const [comments, setComments] = useState([]);
   const [comment, setComment] = useState('');
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
+  
   const { id } = useParams();
   const { userData } = useUserData();
-  console.log("user", userData)
+  console.log("user", userData);
 
   const fetchComments = async () => {
     try {
@@ -43,10 +48,10 @@ const Comment = ({ mode }) => {
   }, [id, mode]);
 
   const handlePost = async () => {
-    if (comment.trim()) {
+    if (comment.trim() && comment.length <= 150) {
       try {
         const user = sessionStorage.getItem('CognitoIdentityServiceProvider.6258t5vdisgcu7rjkuc5c94ba9.LastAuthUser');
-        console.log("user", user)
+        console.log("user", user);
         const response = await fetch(`${config.apiUrl.replace(/\/$/, "")}/appdata/comments/${id}`, {
           method: 'PUT',
           headers: headers,
@@ -61,6 +66,7 @@ const Comment = ({ mode }) => {
         if (response.ok) {
           const newComment = await response.json();
           setComments([...comments, newComment]);
+          console.log("newComment", newComment);
           setComment('');
           if (mode !== 'add') {
             fetchComments();
@@ -72,6 +78,9 @@ const Comment = ({ mode }) => {
       } catch (error) {
         console.error('Error:', error);
       }
+    } else if (comment.length > 150) {
+        setError("Comment cannot exceed 150 characters.");
+        setTimeout(() => setError(''), 2000);
     } else {
       console.warn('Comment is empty');
     }
@@ -85,19 +94,41 @@ const Comment = ({ mode }) => {
         </Typography>
       ) : (
         <>
+         {(error || success) && (
+        <Stack sx={{ width:'100%',position: 'absolute', zIndex: '10'}} spacing={2}>
+          <div style={{width:'fit-content', margin:'auto'}}>
+          {success && <Alert severity="success">{success}</Alert>}
+          {error && <Alert severity="error">{error}</Alert>}
+          </div>
+        </Stack>
+      )}
           <Paper sx={{ padding: 2, marginBottom: 2 }}>
             <TextField
               label="Add Your Comments Here"
               variant="outlined"
               fullWidth
               value={comment}
-              onChange={(e) => setComment(e.target.value)}
+              onChange={(e) => {
+                const newComment = e.target.value;
+                if (newComment.length > 150) {
+                  setError('Comment cannot exceed 150 characters.')
+                  setTimeout(() => setError(''), 2000);
+                }
+                setComment(newComment);
+              }}
               multiline
               rows={3}
+              helperText={`${comment.length}/150`}
+              error={comment.length > 150}
               sx={{ marginBottom: 2 }}
             />
             <div style={{ display: 'flex', justifyContent: 'end' }}>
-              <Button variant="contained" style={{ background: '#12e5e5' }} onClick={handlePost}>
+              <Button
+                variant="contained"
+                style={{ background: comment.length <= 150 ? '#12e5e5' : '#cccccc' }}
+                onClick={handlePost}
+                disabled={comment.length > 150}
+              >
                 Post
               </Button>
             </div>
