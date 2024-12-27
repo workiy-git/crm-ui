@@ -34,9 +34,12 @@ import Loader from "../molecules/loader";
 import Pagination from "@mui/material/Pagination";
 import { useNotifications } from '../atoms/notification'; // Import the hook
 import { headers } from '../atoms/Authorization';
+import { jwtDecode } from "jwt-decode";
+
 
 const endpoint = "controls/retrive";
 const gridEndpoint = "appdata/retrieve";
+
 
 const GridComponent = ({ pageName }) => {
   const [columns, setColumns] = useState([]);
@@ -65,8 +68,7 @@ const GridComponent = ({ pageName }) => {
 
   // const [filteredRows, setFilteredRows] = useState(gridData);
   //not confirmed
-  const [menuData, setMenuData] = useState([]); 
-
+  const [menuData, setMenuData] = useState([]);
   useEffect(() => {
     axios.get(`${config.apiUrl}/menus`, {headers}) // Use apiUrl from the configuration file
       .then((response) => {
@@ -81,6 +83,46 @@ const GridComponent = ({ pageName }) => {
         // console.error('Error fetching data:', error);
       });
   }, []);
+
+  const [userData, setUserData] = useState({});
+  useEffect(() => {
+    const token = sessionStorage.getItem("accessToken");
+    if (token) {
+      // setJwtToken(token);
+      const decodedToken = jwtDecode(token);
+      const user = decodedToken.username;
+
+      axios
+        .post(
+          `${config.apiUrl}/appdata/retrieve`,
+          [
+            {
+              $match: {
+                pageName: "users",
+                username: user,
+              },
+            },
+          ],
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: token,
+              Access: "true",
+            },
+          }
+        )
+        .then((response) => {
+          setUserData(response.data.data[0]);
+          // setUserName(user);
+        })
+        .catch((error) => {
+          console.error("Error fetching user data:", error);
+        });
+    } else {
+      console.error("Token not found");
+    }
+  }, []);
+  console.log("userdata", userData);
 
     // Open the Import Data Modal
     const handleOpenImportModal = () => {
@@ -119,6 +161,7 @@ const GridComponent = ({ pageName }) => {
     closeColumnModal();
   };
   const handleDeleteClick = (row) => {
+    console.log("row", row);
     handleMenuClose();
     setRowToDelete(row); // Set the row to be deleted
     setDeleteDialogOpen(true); // Open the confirmation dialog
@@ -127,7 +170,7 @@ const GridComponent = ({ pageName }) => {
   const handleConfirmDelete = async () => {
     if (rowToDelete) {
       const id = rowToDelete._id; // Assuming `_id` is the unique identifier for the row
-
+      if (rowToDelete._id !== userData._id) {
       try {
         await axios.delete(
           `${config.apiUrl.replace(/\/$/, '')}/appdata/${id}`, 
@@ -149,7 +192,15 @@ const GridComponent = ({ pageName }) => {
         setTimeout(() => setError(''), 3000);
       }
     }
+    else {
+      setError('You can not delete your own data');
+      setTimeout(() => setError(''), 3000);
+      setDeleteDialogOpen(false); // Close the dialog
+      
+    }
+    }
   };
+  
   
   const handleCancelDelete = () => {
     setDeleteDialogOpen(false); // Close the dialog
