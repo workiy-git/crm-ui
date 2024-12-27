@@ -31,7 +31,6 @@ function Companylogo() {
     const dashedBorderStyle = {
         // borderRight: '3px dashed gray',
         borderRadius: '0',
-        background: 'white',
         padding:'2px 10px 1px 2px'
         ,height:'55px'
       };
