@@ -288,19 +288,24 @@ const GridComponent = ({ pageName }) => {
     }
   }, [selectedValue]);
   
-
   useEffect(() => {
     if (pageName) {
-      setIsLoading(true); // Set the loader to true when pageName changes
+      setIsLoading(true); // Show loading spinner when pageName changes
+  
+      // Clear filterText and reset pagination to initial state
+      setFilterText({}); // Reset all filter fields
+      setPage(1);        // Reset current page number
+      setInputPage(1);   // Reset input page number
     }
   }, [pageName]);
+  
+  // Existing handleFilterChangeAndSearch remains unchanged
+  
   
   //Drop Down Change
   const handleChange = (event, currentPage, currentpageSize) => {
     const filter = JSON.parse(event.target.value);
     setSelectedValue(event.target.value);
-    console.log("current PAges", currentPage);
-    console.log("current PAges Size", currentpageSize);
 
     const currentPageNumber = currentPage || 1;
     const currentNumberofRow = currentpageSize || 25;
@@ -321,7 +326,9 @@ const GridComponent = ({ pageName }) => {
   
   const fetchGridData = async (filter, currentPageNumber, currentNumberofRow) => {
     try {
-
+      console.log("filter", filter);  
+      console.log("current PAges", currentPageNumber);
+      console.log("current PAges Size", currentNumberofRow);
       const response = await axios.post(
         `${config.apiUrl.replace(/\/$/, "")}/${gridEndpoint}?page=${currentPageNumber}&pageSize=${currentNumberofRow}`, 
         filter, // This is the body (data you are sending)
@@ -385,8 +392,8 @@ const GridComponent = ({ pageName }) => {
         setColumns(dynamicColumns);
         setAvailableColumns(dynamicColumns); // Set available columns here
       } else {
-        setIsLoading(true);
-        setLoading(true);
+        // setIsLoading(true);
+        // setLoading(true);
         setTimeout(() => {
           setIsLoading(false);
           setLoading(false);
@@ -404,6 +411,70 @@ const GridComponent = ({ pageName }) => {
     setInputPage(1);
     setFilterText((prev) => ({ ...prev, [field]: value }));
   };
+
+  // This function updates the text in the field without triggering a search
+const handleFilterTextChange = (field, value) => {
+  setFilterText((prev) => ({ ...prev, [field]: value }));
+};
+
+// This function triggers the search when Enter is pressed
+const handleSearch = (field, value) => {
+  if (value.trim() === "") return; // Prevent empty search
+  const filter = [
+    {
+      $match: {
+        pageName: "leads",
+        [field]: value, // Dynamically add the field and value
+      },
+    },
+  ];
+  
+
+  const currentNumberOfRow = pageSize || 25;
+  // Reset page number and fetch the grid data
+  setPage(1);
+  setInputPage(1);
+  fetchGridData(filter, 1, currentNumberOfRow);
+};
+
+const handleFilterChangeAndSearch = (field, value, triggerSearch = false) => {
+  // Always update the `filterText` state
+  setFilterText((prev) => ({ ...prev, [field]: value }));
+
+  // Only fetch data when `triggerSearch` is true
+  if (triggerSearch) {
+    // Build the dynamic `$match` object
+    const updatedFilters = { ...filterText, [field]: value };
+    const activeFilters = Object.entries(updatedFilters)
+      .filter(([_, v]) => v.trim() !== "") // Exclude empty filters
+      .reduce((acc, [key, val]) => {
+        acc[key] = {
+          $regex: val.trim(), // Partial matching
+          $options: "i",      // Case-insensitive
+        };
+        return acc;
+      }, {});
+
+    const filter = [
+      {
+        $match: {
+          pageName: pageName,
+          ...activeFilters, // Include all active filters dynamically
+        },
+      },
+    ];
+
+    const currentNumberOfRow = pageSize || 25;
+    // Reset page number and fetch the grid data
+    setPage(1);
+    setInputPage(1);
+    fetchGridData(filter, 1, currentNumberOfRow);
+  }
+};
+
+
+
+
 
 
   const filteredRows = gridData.filter((row) =>
@@ -661,7 +732,7 @@ const handleViewReport = async () => {
           >
             {params.colDef.headerName}
           </div>
-          <TextField
+          {/* <TextField
             variant="outlined"
             size="small"
             value={filterText[params.field] || ""}
@@ -669,7 +740,35 @@ const handleViewReport = async () => {
             onChange={(e) => handleFilterChange(params.field, e.target.value)}
             style={{ width: "80%", background: "#ffffff", borderRadius:'10px' }}
             className="grid_search"
-          />
+          /> */}
+          {/* <TextField
+  variant="outlined"
+  size="small"
+  value={filterText[params.field] || ""}
+  onClick={(e) => e.stopPropagation()} // Stop propagation to prevent sorting
+  onKeyDown={(e) => {
+    if (e.key === "Enter") {
+      handleFilterChangeAndSearch(params.field, e.target.value, true); // Trigger search on Enter
+    }
+  }}
+  onChange={(e) => handleFilterChangeAndSearch(params.field, e.target.value)}
+  style={{ width: "80%", background: "#ffffff", borderRadius: "10px" }}
+  className="grid_search"
+/> */}
+<TextField
+ variant="outlined"
+ size="small"
+ onClick={(e) => e.stopPropagation()} // Stop propagation to prevent sorting
+  onKeyDown={(e) => {
+    if (e.key === "Enter") {
+      handleFilterChangeAndSearch(params.field, e.target.value, true); // Trigger search on Enter
+    }
+  }}
+  style={{ width: "80%", background: "#ffffff", borderRadius: "10px" }}
+  className="grid_search">
+
+</TextField>
+
         </div>
       ),
     })),
