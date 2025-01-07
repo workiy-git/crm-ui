@@ -190,6 +190,30 @@ const validateForm = () => {
             />
           </FormControl>
         );
+
+        case 'audio':
+          return (
+            <FormControl
+              className="details_page_inputs"
+              key={field.fieldName}
+              style={formControlStyles}
+              error={!!isError}
+            >
+              <label style={labelStyles}>{label}</label>
+              <audio
+                className="edit-field-input edit-field-input-audio"
+                controls
+              >
+                {/* Dynamically set the src to the audio URL in formData */}
+                <source
+                  src={formData[field.fieldName] || ''}
+                  type={ 'audio/mpeg'}
+                />
+                Your browser does not support the audio element.
+              </audio>
+            </FormControl>
+          );
+        
       
       case 'textarea':
         // Check if the textarea has nested fields (like address)

@@ -56,7 +56,7 @@ const App = () => {
           <Route path="/view-report" element={ <ProtectedRoute> <ReportGrid /> </ProtectedRoute> } />
           <Route path="/edit-report/:id" element={ <ProtectedRoute> <GenerateReportPage /> </ProtectedRoute> } />
           <Route path="/underconstruction" element={ <ProtectedRoute> <Underconstruction /> </ProtectedRoute> } />
-          <Route path="/assignedto" element={<ProtectedRoute> <AssignedTo /> </ProtectedRoute>} />
+          <Route path="/users/assignedto" element={<ProtectedRoute> <AssignedTo /> </ProtectedRoute>} />
         </Routes>
       </Layout>
       </AuthProvider>

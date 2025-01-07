@@ -135,6 +135,17 @@
   .edit-field-input [type="date"], .edit-field-input [type="datetime-local"]{
     cursor: pointer;
 }
+.edit-field-input-audio {
+  width: 50%;
+  text-align: left;
+  color: #666;
+  font-size: 12px;
+  height: 100% !important;
+}
+.edit-field-input-audio:hover{
+  width: 100%;
+}
+
 .valuefield [type="date"], .valuefield [type="datetime-local"]{
   cursor: pointer;
 }
