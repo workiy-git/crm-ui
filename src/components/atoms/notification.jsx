@@ -126,15 +126,24 @@ export const useNotifications = () => {
   const [notificationCount, setNotificationCount] = useState(0);
   const [newLeads, setNewLeads] = useState([]);
   const [todayFollowups, setTodayFollowups] = useState([]);
+  const [missedFollowups, setMissedFollowups] = useState([]);
 
   // Function to fetch notifications and follow-ups
-  const fetchNotifications = async () => {
+  const fetchNotifications = async (filter) => {
     try {
-      const response = await axios.get(`${config.apiUrl}/appdata`, { headers });
-      
+      // const response = await axios.post(`${config.apiUrl}/appdata/retrieve`,filter, { headers });
+      const response = await axios.post(
+        `${config.apiUrl.replace(/\/$/, "")}/appdata/retrieve?page=1&pageSize=100`, 
+        filter, // This is the body (data you are sending)
+        
+        {
+          headers: headers, // This is the config object where headers go
+        }
+      );
       // Check if the response contains multiple arrays and concatenate them
       let allDataArray = response.data.data;
-
+      console.log("allDataArray",allDataArray)
+      
       // If data is an array of arrays, flatten them into a single array
       if (Array.isArray(allDataArray) && Array.isArray(allDataArray[0])) {
         allDataArray = [].concat(...allDataArray); // Merge the arrays
@@ -142,23 +151,37 @@ export const useNotifications = () => {
 
       // Filter new leads for `pageName == "leads"` and `lead_status == "JUNK"`
       const filteredNewLeads = allDataArray.filter(item => item.pageName === 'leads' && item.lead_status === 'New lead');
-      
-      // Filter today's follow-up leads
-      const filteredFollowups = allDataArray.filter(item => item.pageName === 'leads' && item.created_time === getTodayDate());
-      console.log("filteredFollowups",filteredFollowups)
       setNewLeads(filteredNewLeads); // Set filtered new leads
-      setTodayFollowups(filteredFollowups);    // Set follow-up data
       setNotificationCount(filteredNewLeads.length); // Update the badge count
+      console.log("filteredNewLeads",filteredNewLeads)
+
+
+      const getTodayDate = () => {
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed
+        const day = String(now.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    };
+    
+      // Filter today's follow-up leads
+      const filteredFollowups = allDataArray.filter(item => {
+        const itemDate = item.follow_up_on.split('T')[0]; // Extract date part
+        return item.pageName === 'leads' && itemDate === getTodayDate();
+    });
+    setTodayFollowups(filteredFollowups);    // Set follow-up data
+
+    const filteredMissedFollowups = allDataArray.filter(item => {
+      const itemDate = item.follow_up_on.split('T')[0]; // Extract date part
+      return item.pageName === 'leads' && itemDate < getTodayDate();
+  });
+    setMissedFollowups(filteredMissedFollowups);    // Set follow-up data
+      
     } catch (error) {
       console.error('Error fetching notification data:', error);
     }
   };
 
-  // Utility function to get today's date in 'YYYY-MM-DD' format
-  const getTodayDate = () => {
-    const today = new Date();
-    return today.toISOString().split('T')[0]; // Get the date part only
-  };
 
   // Function to fetch menu data
   const fetchMenuData = () => {
@@ -196,6 +219,7 @@ const markLeadAsRead = (index) => {
     notificationCount,
     newLeads,
     todayFollowups,
+    missedFollowups,
     fetchNotifications,
     markLeadAsRead,
   };
@@ -222,17 +246,84 @@ function TabPanel(props) {
 
 // Notification Component
 const Notification = () => {
-  const { menuData, notificationCount, newLeads, todayFollowups, fetchNotifications, markLeadAsRead } = useNotifications();
+  const { menuData, notificationCount, newLeads, todayFollowups, missedFollowups, fetchNotifications, markLeadAsRead } = useNotifications();
   const [open, setOpen] = useState(false);
   const [tabValue, setTabValue] = useState(0);
 
+
+
+
   // Fetch notifications when the component mounts
   // useEffect(() => {
-  //   fetchNotifications(); // Fetch notifications when the component mounts
+  //   fetchNotifications(filter); // Fetch notifications when the component mounts
   // }, [fetchNotifications]);
+
+  const getNotification = (event) => { 
+    const filter = [
+      {
+        $match: {
+          pageName: 'leads',
+          lead_status: 'New lead',
+        },
+      },
+    ];
+    fetchNotifications(filter);
+  };
+
+  const getTodayFollowup = (event) => { 
+    const getTodayDate = () => {
+      const now = new Date();
+      const year = now.getFullYear();
+      const month = String(now.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed
+      const day = String(now.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    };
+    
+    console.log("Today:", getTodayDate());
+    
+    const filter = [
+      {
+        $match: {
+          pageName: 'leads',
+          follow_up_on: { $regex: `^${getTodayDate()}` }, // Match any date starting with today's date
+        },
+      },
+    ];
+    
+    fetchNotifications(filter);
+  };
+  
+
+const getMissedFollowup = (event) => {
+    const getTodayDate = () => {
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed
+        const day = String(now.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    };
+    
+    console.log("Today:", getTodayDate());
+    
+    const filter = [
+        {
+            $match: {
+                pageName: 'leads',
+                $and: [
+                    { follow_up_on: { $regex: `^\\d{4}-\\d{2}-\\d{2}` } }, // Matches a valid date pattern
+                    { follow_up_on: { $lt: getTodayDate() } } // Matches dates less than today
+                ]
+            },
+        },
+    ];
+    
+    fetchNotifications(filter);
+};
+
 
   const handleNotificationClick = () => {
     setOpen(true); // Open the popup dialog
+    getNotification(); // Fetch notifications
   };
 
   const handleClose = () => {
@@ -270,8 +361,9 @@ const Notification = () => {
       <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
         <DialogTitle>Notifications</DialogTitle>
         <Tabs value={tabValue} onChange={handleTabChange}>
-          <Tab style={{padding:'10px'}} label="Newly Come Leads" />
-          <Tab style={{padding:'10px'}} label="Today Follow-Up" />
+          <Tab onClick={getNotification} style={{padding:'10px'}} label="Newly Come Leads" />
+          <Tab onClick={getTodayFollowup} style={{padding:'10px'}} label="Today Follow-Up" />
+          <Tab onClick={getMissedFollowup} style={{padding:'10px'}} label="Missed Follow-Up" />
         </Tabs>
 
         {/* Tab Panel for New Leads */}
@@ -322,7 +414,32 @@ const Notification = () => {
                 <Box>
                   <Typography variant="body1"><strong>Name:</strong> {followup.name}</Typography>
                   <Typography variant="body2"><strong>Mobile:</strong> {followup.mobile_phone}</Typography>
-                  <Typography variant="body2"><strong>Follow-Up Date:</strong> {followup.created_time}</Typography>
+                  <Typography variant="body2"><strong>Follow-Up Date:</strong> {followup.follow_up_on}</Typography>
+                  <Typography variant="body2"><strong>Assigned To:</strong> {followup.assigned_to}</Typography>
+                  <Typography variant="body2"><strong>Status:</strong> {followup.lead_status}</Typography>
+                  <Typography variant="body2"><strong>Lead Number:</strong> {followup.lead_number}</Typography>
+                </Box>
+              </Box>
+            ))
+          )}
+        </TabPanel>
+        <TabPanel value={tabValue} index={2}>
+          {missedFollowups.length === 0 ? (
+            <p>No Missed follow-ups.</p>
+          ) : (
+            missedFollowups.map((followup, index) => (
+              <Box
+                key={index}
+                display="flex"
+                justifyContent="space-between"
+                alignItems="center"
+                borderBottom="1px solid #ccc"
+                padding="8px 0"
+              >
+                <Box>
+                  <Typography variant="body1"><strong>Name:</strong> {followup.name}</Typography>
+                  <Typography variant="body2"><strong>Mobile:</strong> {followup.mobile_phone}</Typography>
+                  <Typography variant="body2"><strong>Follow-Up Date:</strong> {followup.follow_up_on}</Typography>
                   <Typography variant="body2"><strong>Assigned To:</strong> {followup.assigned_to}</Typography>
                   <Typography variant="body2"><strong>Status:</strong> {followup.lead_status}</Typography>
                   <Typography variant="body2"><strong>Lead Number:</strong> {followup.lead_number}</Typography>

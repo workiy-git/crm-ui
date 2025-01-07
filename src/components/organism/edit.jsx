@@ -201,13 +201,7 @@ const validateForm = () => {
             >
               <label style={labelStyles}>{label}</label>
               <audio
-                sx={{
-                  width: '50%',
-                  textAlign: 'left',
-                  color: '#666',
-                  fontSize: '12px',
-                }}
-                className="edit-field-input"
+                className="edit-field-input edit-field-input-audio"
                 controls
               >
                 {/* Dynamically set the src to the audio URL in formData */}
