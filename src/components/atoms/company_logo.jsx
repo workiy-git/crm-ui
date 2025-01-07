@@ -32,7 +32,7 @@ function Companylogo() {
         // borderRight: '3px dashed gray',
         borderRadius: '0',
         padding:'2px 10px 1px 2px'
-        ,height:'55px'
+        ,height:'70px'
       };
     const logoHeightStyle = {
         height: '100%'

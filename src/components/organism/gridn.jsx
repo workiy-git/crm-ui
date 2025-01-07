@@ -523,7 +523,7 @@ const handleFilterChangeAndSearch = (field, value, triggerSearch = false) => {
     });
 };
   const handleAsignedTo = () => {
-    navigate("/assignedto");
+    navigate("/users/assignedto");
 
   };
 
@@ -1206,7 +1206,7 @@ const handleViewReport = async () => {
         <Box>
       <Pagination
         count={Math.ceil(totalRecord / pageSize)}
-        siblingCount={0}
+        // siblingCount={0}
         page={page}
         onChange={handlePageChange}
         className="pagination_main"
