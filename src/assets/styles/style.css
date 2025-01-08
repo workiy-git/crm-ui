@@ -155,3 +155,8 @@
   padding: 0 !important;
   min-width: 70px !important;
 }
+
+.notification_badge .MuiTabs-scroller{
+  overflow: visible !important;
+
+}
