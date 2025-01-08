@@ -115,18 +115,24 @@
 
 // export default Notification;
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from "react-router-dom";
 import axios from 'axios';
 import config from '../../config/config'; // Import the configuration file
 import { Grid, Badge, Dialog, DialogTitle, Tabs, Tab, Box, IconButton, Typography } from '@mui/material';
 import { headers } from './Authorization';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
+import '../../assets/styles/style.css';
 
 export const useNotifications = () => {
   const [menuData, setMenuData] = useState(null);
-  const [notificationCount, setNotificationCount] = useState(0);
+  const [newLeadCount, setNewLeadCount] = useState(0);
+  const [todayFollowupCount, setTodayFollowupCount] = useState(0);
+  const [missedFollowupCount, setMissedFollowupCount] = useState(0);
   const [newLeads, setNewLeads] = useState([]);
   const [todayFollowups, setTodayFollowups] = useState([]);
   const [missedFollowups, setMissedFollowups] = useState([]);
+  const navigate = useNavigate();
+  const [open, setOpen] = useState(false);
 
   // Function to fetch notifications and follow-ups
   const fetchNotifications = async (filter) => {
@@ -152,8 +158,7 @@ export const useNotifications = () => {
       // Filter new leads for `pageName == "leads"` and `lead_status == "JUNK"`
       const filteredNewLeads = allDataArray.filter(item => item.pageName === 'leads' && item.lead_status === 'New lead');
       setNewLeads(filteredNewLeads); // Set filtered new leads
-      setNotificationCount(filteredNewLeads.length); // Update the badge count
-      console.log("filteredNewLeads",filteredNewLeads)
+      // setNewLeadCount(filteredNewLeads.length); // Update the badge count
 
 
       const getTodayDate = () => {
@@ -182,6 +187,110 @@ export const useNotifications = () => {
     }
   };
 
+  const fetchNewLeadCount = async (filter) => {
+    try {
+      // const response = await axios.post(`${config.apiUrl}/appdata/retrieve`,filter, { headers });
+      const response = await axios.post(
+        `${config.apiUrl.replace(/\/$/, "")}/appdata/retrieve?page=1&pageSize=100`, 
+        filter, // This is the body (data you are sending)
+        
+        {
+          headers: headers, // This is the config object where headers go
+        }
+      );
+      // Check if the response contains multiple arrays and concatenate them
+      let allDataArray = response.data.data;
+      
+      // If data is an array of arrays, flatten them into a single array
+      if (Array.isArray(allDataArray) && Array.isArray(allDataArray[0])) {
+        allDataArray = [].concat(...allDataArray); // Merge the arrays
+      }
+
+      // Filter new leads for `pageName == "leads"` and `lead_status == "JUNK"`
+      const filteredNewLeads = allDataArray.filter(item => item.pageName === 'leads' && item.lead_status === 'New lead');
+      setNewLeadCount(filteredNewLeads.length); // Update the badge count
+
+    } catch (error) {
+      console.error('Error fetching notification data:', error);
+    }
+  };
+
+  const fetchTodayFollowUpCount = async (filter) => {
+    try {
+      // const response = await axios.post(`${config.apiUrl}/appdata/retrieve`,filter, { headers });
+      const response = await axios.post(
+        `${config.apiUrl.replace(/\/$/, "")}/appdata/retrieve?page=1&pageSize=100`, 
+        filter, // This is the body (data you are sending)
+        
+        {
+          headers: headers, // This is the config object where headers go
+        }
+      );
+      // Check if the response contains multiple arrays and concatenate them
+      let allDataArray = response.data.data;
+      
+      // If data is an array of arrays, flatten them into a single array
+      if (Array.isArray(allDataArray) && Array.isArray(allDataArray[0])) {
+        allDataArray = [].concat(...allDataArray); // Merge the arrays
+      }
+
+      const getTodayDate = () => {
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed
+        const day = String(now.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    };
+    
+      // Filter today's follow-up leads
+      const filteredFollowups = allDataArray.filter(item => {
+        const itemDate = item.follow_up_on.split('T')[0]; // Extract date part
+        return item.pageName === 'leads' && itemDate === getTodayDate();
+    });
+    setTodayFollowupCount(filteredFollowups.length); // Update the badge count
+
+    } catch (error) {
+      console.error('Error fetching notification data:', error);
+    }
+  };
+  const fetchMissedFollowUpCount = async (filter) => {
+    try {
+      // const response = await axios.post(`${config.apiUrl}/appdata/retrieve`,filter, { headers });
+      const response = await axios.post(
+        `${config.apiUrl.replace(/\/$/, "")}/appdata/retrieve?page=1&pageSize=100`, 
+        filter, // This is the body (data you are sending)
+        
+        {
+          headers: headers, // This is the config object where headers go
+        }
+      );
+      // Check if the response contains multiple arrays and concatenate them
+      let allDataArray = response.data.data;
+      console.log("allDataArray",allDataArray)
+      
+      // If data is an array of arrays, flatten them into a single array
+      if (Array.isArray(allDataArray) && Array.isArray(allDataArray[0])) {
+        allDataArray = [].concat(...allDataArray); // Merge the arrays
+      }
+
+      const getTodayDate = () => {
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed
+        const day = String(now.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    };
+    
+    const filteredMissedFollowups = allDataArray.filter(item => {
+      const itemDate = item.follow_up_on.split('T')[0]; // Extract date part
+      return item.pageName === 'leads' && itemDate < getTodayDate();
+  });
+    setMissedFollowupCount(filteredMissedFollowups.length); // Update the badge count
+
+    } catch (error) {
+      console.error('Error fetching notification data:', error);
+    }
+  };
 
   // Function to fetch menu data
   const fetchMenuData = () => {
@@ -194,6 +303,17 @@ export const useNotifications = () => {
       });
   };
 
+  const handleNavigate = (data) => {
+    // navigate(`/app/leads/${data._id}`);
+    setOpen(false);
+    const pageName = 'leads';
+    const mode = 'view';
+    if (data) {
+      navigate(`/${pageName}/${mode}/${data._id}`, {
+          state: { rowData: data, pageName, mode },
+      });
+  }
+  };
 // Function to mark a new lead as read
 const markLeadAsRead = (index) => {
   const updatedNewLeads = [...newLeads];
@@ -205,7 +325,7 @@ const markLeadAsRead = (index) => {
   setNewLeads(updatedNewLeads);
   
   // Reduce the notification count immediately
-  setNotificationCount(prevCount => Math.max(0, prevCount - 1)); // Ensure the count doesn't go below 0
+  setNewLeadCount(prevCount => Math.max(0, prevCount - 1)); // Ensure the count doesn't go below 0
 };
 
 
@@ -216,12 +336,21 @@ const markLeadAsRead = (index) => {
 
   return {
     menuData,
-    notificationCount,
+    newLeadCount,
+    todayFollowupCount,
+    missedFollowupCount,
     newLeads,
     todayFollowups,
     missedFollowups,
     fetchNotifications,
+    fetchNewLeadCount,
+    fetchTodayFollowUpCount,
+    fetchMissedFollowUpCount,
     markLeadAsRead,
+    handleNavigate,
+    open,
+    setOpen
+
   };
 };
 
@@ -246,8 +375,7 @@ function TabPanel(props) {
 
 // Notification Component
 const Notification = () => {
-  const { menuData, notificationCount, newLeads, todayFollowups, missedFollowups, fetchNotifications, markLeadAsRead } = useNotifications();
-  const [open, setOpen] = useState(false);
+  const { menuData, newLeadCount, todayFollowupCount, missedFollowupCount, newLeads, todayFollowups, missedFollowups, fetchNotifications, fetchNewLeadCount, fetchTodayFollowUpCount, fetchMissedFollowUpCount, markLeadAsRead, handleNavigate, open, setOpen } = useNotifications();
   const [tabValue, setTabValue] = useState(0);
 
 
@@ -268,6 +396,7 @@ const Notification = () => {
       },
     ];
     fetchNotifications(filter);
+    fetchNewLeadCount(filter);
   };
 
   const getTodayFollowup = (event) => { 
@@ -291,6 +420,7 @@ const Notification = () => {
     ];
     
     fetchNotifications(filter);
+    fetchTodayFollowUpCount(filter);
   };
   
 
@@ -318,12 +448,15 @@ const getMissedFollowup = (event) => {
     ];
     
     fetchNotifications(filter);
+    fetchMissedFollowUpCount(filter);
 };
 
 
   const handleNotificationClick = () => {
     setOpen(true); // Open the popup dialog
     getNotification(); // Fetch notifications
+    getTodayFollowup(); // Fetch today's follow-ups
+    getMissedFollowup(); // Fetch missed follow-ups
   };
 
   const handleClose = () => {
@@ -340,7 +473,7 @@ const getMissedFollowup = (event) => {
       <Grid container spacing={2}>
         <Grid item>
           {menuData && menuData.notifications_icon && (
-            <Badge badgeContent={notificationCount} color="error" max={99999}>
+            // <Badge badgeContent={notificationCount} color="error" max={99999}>
               <img
                 src={menuData.notifications_icon.icon}
                 alt='icon'
@@ -352,7 +485,7 @@ const getMissedFollowup = (event) => {
                 }}
                 onClick={handleNotificationClick} //Open popup on click
               />
-            </Badge>
+            // </Badge>
           )}
         </Grid>
       </Grid>
@@ -360,10 +493,63 @@ const getMissedFollowup = (event) => {
       {/* Popup Dialog */}
       <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
         <DialogTitle>Notifications</DialogTitle>
-        <Tabs value={tabValue} onChange={handleTabChange}>
-          <Tab onClick={getNotification} style={{padding:'10px'}} label="Newly Come Leads" />
-          <Tab onClick={getTodayFollowup} style={{padding:'10px'}} label="Today Follow-Up" />
-          <Tab onClick={getMissedFollowup} style={{padding:'10px'}} label="Missed Follow-Up" />
+        <Tabs class="notification_badge" value={tabValue} onChange={handleTabChange}>
+          <Tab onClick={getNotification} style={{padding:'10px'}} 
+          label={
+          <span>
+            New Leads{" "}
+            <span
+              style={{
+                backgroundColor: "red",
+                color: "white",
+                borderRadius: "12px",
+                padding: "4px 7px",
+                fontSize: "10px",
+                marginLeft: "5px",
+              }}
+            >
+              {newLeadCount}
+            </span>
+          </span>
+        } />
+          <Tab onClick={getTodayFollowup} style={{padding:'10px'}}
+          label={
+            <span>
+              Today Follow-Up{" "}
+              <span
+                style={{
+                  backgroundColor: "red",
+                  color: "white",
+                  borderRadius: "12px",
+                  padding: "4px 7px",
+                  fontSize: "10px",
+                  marginLeft: "5px",
+                }}
+              >
+                {todayFollowupCount}
+              </span>
+            </span>
+          } />
+          <Tab onClick={getMissedFollowup} style={{padding:'10px'}} 
+           label={
+            <span>
+              Missed Follow-Up{" "}
+              <span
+                style={{
+                  backgroundColor: "red",
+                  color: "white",
+                  borderRadius: "12px",
+                  padding: "4px 7px",
+                  fontSize: "10px",
+                  marginLeft: "5px",
+                }}
+              >
+                {missedFollowupCount}
+              </span>
+            </span>
+          }
+           />
+           
         </Tabs>
 
         {/* Tab Panel for New Leads */}
@@ -371,7 +557,8 @@ const getMissedFollowup = (event) => {
           {newLeads.length === 0 ? (
             <p>No new leads.</p>
           ) : (
-            newLeads.map((lead, index) => (
+            newLeads.map((data, index) => (
+              
               <Box
                 key={index}
                 display="flex"
@@ -379,15 +566,16 @@ const getMissedFollowup = (event) => {
                 alignItems="center"
                 borderBottom="1px solid #ccc"
                 padding="8px 0"
+                onDoubleClick={() => handleNavigate(data)}
               >
                 <Box>
-                  <Typography variant="body1"><strong>Name:</strong> {lead.name}</Typography>
-                  <Typography variant="bogy2"><strong>Mobile:</strong> {lead.mobile_phone}</Typography>
-                  <Typography variant="body2"><strong>Assigned To:</strong> {lead.assigned_to}</Typography>
-                  <Typography variant="body2"><strong>Status:</strong> {lead.lead_status}</Typography>
-                  <Typography variant="body2"><strong>Lead Number:</strong> {lead.lead_number}</Typography>
-                  {/* <Typography variant="body2"><strong>Created By:</strong> {lead.created_by} on {new Date(lead.created_time).toLocaleString()}</Typography>
-                  <Typography variant="body2"><strong>Lead Source:</strong> {lead.lead_source}</Typography> */}
+                  <Typography variant="body1"><strong>Name:</strong> {data.name}</Typography>
+                  <Typography variant="bogy2"><strong>Mobile:</strong> {data.mobile_phone}</Typography>
+                  <Typography variant="body2"><strong>Assigned To:</strong> {data.assigned_to}</Typography>
+                  <Typography variant="body2"><strong>Status:</strong> {data.lead_status}</Typography>
+                  <Typography variant="body2"><strong>Lead Number:</strong> {data.lead_number}</Typography>
+                  {/* <Typography variant="body2"><strong>Created By:</strong> {data.created_by} on {new Date(data.created_time).toLocaleString()}</Typography>
+                  <Typography variant="body2"><strong>Lead Source:</strong> {data.lead_source}</Typography> */}
                 </Box>
                 {/* <IconButton onClick={() => markLeadAsRead(index)}>
                   <CheckCircleOutlineIcon />
@@ -402,9 +590,10 @@ const getMissedFollowup = (event) => {
           {todayFollowups.length === 0 ? (
             <p>No follow-ups for today.</p>
           ) : (
-            todayFollowups.map((followup, index) => (
+            todayFollowups.map((data, index) => (
               <Box
                 key={index}
+                onDoubleClick={() => handleNavigate(data)}
                 display="flex"
                 justifyContent="space-between"
                 alignItems="center"
@@ -412,12 +601,12 @@ const getMissedFollowup = (event) => {
                 padding="8px 0"
               >
                 <Box>
-                  <Typography variant="body1"><strong>Name:</strong> {followup.name}</Typography>
-                  <Typography variant="body2"><strong>Mobile:</strong> {followup.mobile_phone}</Typography>
-                  <Typography variant="body2"><strong>Follow-Up Date:</strong> {followup.follow_up_on}</Typography>
-                  <Typography variant="body2"><strong>Assigned To:</strong> {followup.assigned_to}</Typography>
-                  <Typography variant="body2"><strong>Status:</strong> {followup.lead_status}</Typography>
-                  <Typography variant="body2"><strong>Lead Number:</strong> {followup.lead_number}</Typography>
+                  <Typography variant="body1"><strong>Name:</strong> {data.name}</Typography>
+                  <Typography variant="body2"><strong>Mobile:</strong> {data.mobile_phone}</Typography>
+                  <Typography variant="body2"><strong>Follow-Up Date:</strong> {data.follow_up_on}</Typography>
+                  <Typography variant="body2"><strong>Assigned To:</strong> {data.assigned_to}</Typography>
+                  <Typography variant="body2"><strong>Status:</strong> {data.lead_status}</Typography>
+                  <Typography variant="body2"><strong>Lead Number:</strong> {data.lead_number}</Typography>
                 </Box>
               </Box>
             ))
@@ -427,9 +616,10 @@ const getMissedFollowup = (event) => {
           {missedFollowups.length === 0 ? (
             <p>No Missed follow-ups.</p>
           ) : (
-            missedFollowups.map((followup, index) => (
+            missedFollowups.map((data, index) => (
               <Box
                 key={index}
+                onDoubleClick={() => handleNavigate(data)}
                 display="flex"
                 justifyContent="space-between"
                 alignItems="center"
@@ -437,12 +627,12 @@ const getMissedFollowup = (event) => {
                 padding="8px 0"
               >
                 <Box>
-                  <Typography variant="body1"><strong>Name:</strong> {followup.name}</Typography>
-                  <Typography variant="body2"><strong>Mobile:</strong> {followup.mobile_phone}</Typography>
-                  <Typography variant="body2"><strong>Follow-Up Date:</strong> {followup.follow_up_on}</Typography>
-                  <Typography variant="body2"><strong>Assigned To:</strong> {followup.assigned_to}</Typography>
-                  <Typography variant="body2"><strong>Status:</strong> {followup.lead_status}</Typography>
-                  <Typography variant="body2"><strong>Lead Number:</strong> {followup.lead_number}</Typography>
+                  <Typography variant="body1"><strong>Name:</strong> {data.name}</Typography>
+                  <Typography variant="body2"><strong>Mobile:</strong> {data.mobile_phone}</Typography>
+                  <Typography variant="body2"><strong>Follow-Up Date:</strong> {data.follow_up_on}</Typography>
+                  <Typography variant="body2"><strong>Assigned To:</strong> {data.assigned_to}</Typography>
+                  <Typography variant="body2"><strong>Status:</strong> {data.lead_status}</Typography>
+                  <Typography variant="body2"><strong>Lead Number:</strong> {data.lead_number}</Typography>
                 </Box>
               </Box>
             ))
