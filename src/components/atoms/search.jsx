@@ -78,6 +78,7 @@ const Search = () => {
             { mobile_phone: searchValue },
             { alternative_phone: searchValue },
             { whatsapp: searchValue },
+            { lead_number: searchValue },
           ],
         },
       },
@@ -163,6 +164,7 @@ const Search = () => {
         <TableRow>
           <TableCell>Name</TableCell>
           <TableCell>Mobile Phone</TableCell>
+          <TableCell>Lead ID</TableCell>
           <TableCell>Alternative Phone</TableCell>
           <TableCell>WhatsApp</TableCell>
           <TableCell>Assigned To</TableCell>
@@ -173,6 +175,7 @@ const Search = () => {
           <TableRow onDoubleClick={() => handleNavigate(row)} key={index}>
             <TableCell>{row.name || 'N/A'}</TableCell>
             <TableCell>{row.mobile_phone || 'N/A'}</TableCell>
+            <TableCell>{row.lead_number || 'N/A'}</TableCell>
             <TableCell>{row.alternative_phone || 'N/A'}</TableCell>
             <TableCell>{row.whatsapp || 'N/A'}</TableCell>
             <TableCell>{row.assigned_to || 'N/A'}</TableCell>

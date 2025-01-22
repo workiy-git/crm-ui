@@ -187,7 +187,7 @@ const AssignedTo = () => {
                         "$set": { "assigned_to": newAssignedUser }
                     }
                 };
-    
+                console.log("selectedUser:", selectedUser); // Debugging log
                 console.log("Request Body:", requestBody); // Debugging log
     
                 const response = await axios.put(
@@ -223,7 +223,7 @@ const AssignedTo = () => {
             }
         }
     };
-    
+        console.log("Assigned Data:", assignedData); // Debugging log
 
     const columns = [
         { field: 'mobile_phone', headerName: 'Mobile Phone', width: 150 },
