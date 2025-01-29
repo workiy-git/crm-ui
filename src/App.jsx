@@ -10,8 +10,10 @@ import Header from "./components/organism/header";
 import SideMenu from "./components/organism/sidemenu";
 import GenerateReportPage from "./components/pages/generate-reports";
 import ReportGrid from "./components/organism/reportGrid";
-import AssignedTo from "./components/pages/assignedTo"
+import AssignedTo from "./components/pages/assignedTo";
+import SelectedEditComponent from "./components/molecules/selectedEdit";
 import ProtectedRoute from "./protectedRoute"; 
+import CustomDropdown from "./components/molecules/customDropdown";
 import { AuthProvider } from "./AuthContext"; 
 
 const Layout = ({ children }) => {
@@ -57,6 +59,8 @@ const App = () => {
           <Route path="/edit-report/:id" element={ <ProtectedRoute> <GenerateReportPage /> </ProtectedRoute> } />
           <Route path="/underconstruction" element={ <ProtectedRoute> <Underconstruction /> </ProtectedRoute> } />
           <Route path="/users/assignedto" element={<ProtectedRoute> <AssignedTo /> </ProtectedRoute>} />
+          <Route path="/selected/edit" element={<ProtectedRoute> <SelectedEditComponent /> </ProtectedRoute>} />
+          <Route path="/customdropdown" element={<ProtectedRoute> <CustomDropdown /> </ProtectedRoute>} />
         </Routes>
       </Layout>
       </AuthProvider>
