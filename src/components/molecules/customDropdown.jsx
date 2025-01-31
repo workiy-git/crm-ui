@@ -1,20 +1,43 @@
 import React, { useState, useEffect, useCallback } from "react";
 import axios from "axios";
-import config from '../../config/config';
-import { headers } from '../atoms/Authorization'
-import { useLocation } from "react-router-dom";
+import config from "../../config/config";
+import { headers } from "../atoms/Authorization";
+import { useLocation, useNavigate } from "react-router-dom";
+import { Alert, Stack } from "@mui/material";
 
 const CustomDynamicForm = () => {
   const [dynamicFields, setDynamicFields] = useState([]);
-  const [formData, setFormData] = useState({});
-  const [savedData, setSavedData] = useState([]);
+  const [conditions, setConditions] = useState([]);
+  const [formData, setFormData] = useState({ dynamicName: "" });
+  const [error, setError] = useState(null);
+  const [success, setSuccess] = useState(null);
   const location = useLocation();
-  const pageName = location.state?.pageName; // Get the page name from state
+  const pageName = location.state?.pageName;
+  const navigate = useNavigate();
+  const [filterConditions, setFilterConditions] = useState({});
 
-  console.log("Received Page Name:", pageName);
+useEffect(() => {
+  const fetchFilterConditions = async () => {
+    try {
+      const response = await axios.get(`${config.apiUrl}/webforms`, { headers });
+     // Extract only the object where pageName is "customfilters"
+     const customFiltersData = response.data.data.find(
+      (item) => item.pageName === "CustomFilter"
+    );
 
-  const [webformsData, setWebformsData] = useState([]);
+    setFilterConditions(customFiltersData.filterConditions || {}); 
+    console.log("Custom Filters Datas:", customFiltersData.filterConditions);
+    console.log("Custom Filters Datas (htmlControl):", customFiltersData.filterConditions.map(fc => fc.htmlControl));
+    } catch (error) {
+      console.error("Error fetching filter conditions:", error);
+    }
+  };
 
+  fetchFilterConditions();
+}, []);
+
+
+  // Function to fetch data with retry logic
   const fetchDataWithRetry = useCallback(
     async (url, retryCount = 3) => {
       try {
@@ -29,228 +52,401 @@ const CustomDynamicForm = () => {
         }
       }
     },
-    [] // No dependencies, so it's memoized only once
+    []
   );
-  
+
   useEffect(() => {
     const fetchWebformsData = async () => {
       try {
         const apiUrl = `${config.apiUrl.replace(/\/$/, "")}/webforms`;
         const response = await fetchDataWithRetry(apiUrl);
         const fetchedWebformsData = response.data || [];
-        const currentPage = fetchedWebformsData.find((page) => page.pageName === pageName);
-        // setWebformsData(currentPage.fields);
+        const currentPage = fetchedWebformsData.find(
+          (page) => page.pageName === pageName
+        );
         setDynamicFields(currentPage.fields);
-        console.log("Webform Data:", currentPage.fields);
-        } catch (error) {
+      } catch (error) {
         console.error("Error fetching Webform data:", error);
-        }
+      }
     };
     fetchWebformsData();
-    }, [fetchDataWithRetry]);
+  }, [fetchDataWithRetry]);
 
-//   const fetchDataWithRetry = useCallback(
-//     async (url, retryCount = 3) => {
-//       try {
-//         const response = await axios.get(url);
-//         return response.data;
-//       } catch (error) {
-//         if (retryCount > 0) {
-//           console.warn("Retrying request, attempts left:", retryCount);
-//           return fetchDataWithRetry(url, retryCount - 1);
-//         } else {
-//           throw error;
-//         }
-//       }
-//     },
-//     [] // No dependencies, so it's memoized only once
-//   );
-
-//   useEffect(() => {
-//     const fetchDynamicFields = async () => {
-//       try {
-//         // Replace with your API URL
-//         const apiUrl = "https://api.example.com/webforms"; // Example URL
-//         const response = await fetchDataWithRetry(apiUrl);
-
-//         // Assume `response.data` contains the fields array
-//         const currentPage = response.data.find((page) => page.pageName === "leads"); // Replace with the dynamic pageName logic
-//         setDynamicFields(currentPage.fields);
-//       } catch (error) {
-//         console.error("Error fetching dynamic fields:", error);
-//       }
-//     };
-
-//     fetchDynamicFields();
-//   }, [fetchDataWithRetry]);
-
-  // Handle input changes
-  const handleInputChange = (fieldName, value) => {
-    setFormData({
-      ...formData,
-      [fieldName]: value,
-    });
+  // Add a new condition
+  const handleAddCondition = () => {
+    setConditions([...conditions, { fieldName: "", operator: "", value: "" }]);
   };
 
-  // Save the form data
-  const handleSave = async ()  => {
-    // Get the dynamic name from the text field (you can specify a name field here)
-    const dynamicName = formData["dynamicName"]; // Default to "New Leads" if empty
+  // Handle changes in condition fields
+  const handleConditionChange = (index, key, value) => {
+    const updatedConditions = [...conditions];
+    updatedConditions[index][key] = value;
+    setConditions(updatedConditions);
+    console.log("Updated Conditions:", updatedConditions);
+  };
 
-    // Transform the data into the desired structure
-    const transformedData = {
-      name: dynamicName, // Use the dynamic name entered by the user
-      filter: [
-        {
-          $match: {
-            pageName: pageName, // Replace with appropriate page name
-            ...formData, // Add the form data to $match
-          },
-        },
-      ],
-    };
+  // Handle changes in the custom filter name
+  const handleInputChange = (key, value) => {
+    setFormData({ ...formData, [key]: value });
+  };
 
-    // Update the saved data
-    setSavedData([...savedData, transformedData]);
-    setFormData({}); // Reset form data
+  // Save the filter
+  // const handleSave = async () => {
+  //   if (!formData["dynamicName"]) {
+  //     setError("Custom Filter Name is required.");
+  //     setTimeout(() => setError(null), 3000);
+  //     return;
+  //   }
 
-    try {
-        // First, fetch the leads data from /controls
-        const response = await axios.get(`${config.apiUrl}/controls`, { headers });
-    
-        console.log('Custom Data received:', response.data.data);
-    
-        // Filter the response to get the item where pageName matches
-        const leadsData = response.data.data.filter(item => item.pageName === pageName);
-        if (leadsData.length > 0) {
-          console.log('Leads Data:', leadsData[0].value); // Assuming you want the first match
-          console.log('Saved Data:', JSON.stringify(savedData, null, 2)); // Log saved data after leadsData[0].value
-    
-          // Determine if you're adding or updating the control
-          const controlId = leadsData[0]._id; // Get the ID of the existing control if it exists
-    
-          let dbResponse;
-          if (controlId) {
-            // If controlId exists, update the control
-            dbResponse = await axios.put(`${config.apiUrl}/controls/${controlId}`, transformedData, { headers });
-            console.log('Control updated successfully:', dbResponse.data);
-          } else {
-            // If no controlId, create a new control
-            dbResponse = await axios.post(`${config.apiUrl}/controls`, transformedData, { headers });
-            console.log('New control added successfully:', dbResponse.data);
+  //   const dynamicName = formData["dynamicName"];
+  //   const transformedData = {
+  //     name: dynamicName,
+  //     filter: [
+  //       {
+  //         $match: {
+  //           pageName: pageName,
+  //           $expr: conditions, // Save conditions
+  //         },
+  //       },
+  //     ],
+  //   };
+
+  //   try {
+  //     const response = await axios.get(`${config.apiUrl}/controls`, { headers });
+  //     const controls = response.data.data;
+  //     const existingControl = controls.find((control) => control.pageName === pageName);
+
+  //     if (existingControl) {
+  //       // Update existing control
+  //       const updatedValue = [...existingControl.value, transformedData];
+  //       const updatedControl = { ...existingControl, value: updatedValue };
+  //       delete updatedControl._id;
+
+  //       try {
+  //         await axios.put(`${config.apiUrl}/controls/${existingControl._id}`, updatedControl, { headers });
+  //         setSuccess("Filter updated successfully.");
+  //       } catch (error) {
+  //         console.error("Error updating the control:", error);
+  //         setError("Failed to update the filter.");
+  //       }
+  //     } else {
+  //       // Create a new control
+  //       try {
+  //         await axios.post(`${config.apiUrl}/controls`, transformedData, { headers });
+  //         setSuccess("Filter created successfully.");
+  //       } catch (error) {
+  //         console.error("Error creating a new control:", error);
+  //         setError("Failed to create the filter.");
+  //       }
+  //     }
+
+  //     setTimeout(() => {
+  //       setSuccess(null);
+  //       navigate(-1); // Navigate back
+  //     }, 3000);
+  //   } catch (error) {
+  //     console.error("Error saving filter:", error);
+  //     setError("An error occurred while saving the filter.");
+  //     setTimeout(() => setError(null), 3000);
+  //   }
+  // };
+
+  const handleSave = async () => {
+    if (!formData["dynamicName"]) {
+      setError("Custom Filter Name is required.");
+      setTimeout(() => setError(null), 3000);
+      return;
+    }
+  
+    const dynamicName = formData["dynamicName"];
+    let matchConditions = { pageName: pageName };
+  
+    if (!filterConditions || !dynamicFields.length) {
+      console.error("Filter conditions or dynamic fields are not loaded yet.");
+      return;
+    }
+  
+    conditions.forEach((condition) => {
+      if (condition.operator && condition.value !== "") {
+        const selectedField = dynamicFields.find(
+          (field) => field.fieldName === condition.fieldName
+        );
+  
+        if (!selectedField) return;
+  
+        const fieldConditionMappings =
+          filterConditions
+            .find((fc) => fc.htmlControl === selectedField?.htmlControl)
+            ?.typeMappings?.find((typeMapping) => typeMapping.type === selectedField?.type)
+            ?.conditions || [];
+  
+        const directConditions =
+          filterConditions.find((fc) => fc.htmlControl === selectedField?.htmlControl)
+            ?.conditions || [];
+  
+        const allConditions = [...fieldConditionMappings, ...directConditions];
+  
+        const fieldCondition = allConditions.find((cond) => cond.operator === condition.operator);
+  
+        if (fieldCondition) {
+          switch (condition.operator) {
+            case "$eq":
+            case "$ne":
+            case "$gt":
+            case "$lt":
+              matchConditions[condition.fieldName] = { [condition.operator]: condition.value };
+              break;
+            case "$regex":
+              matchConditions[condition.fieldName] = { [condition.operator]: condition.value, $options: "i" };
+              break;
+            case "doesNotContain":
+              matchConditions[condition.fieldName] = { $not: { $regex: condition.value, $options: "i" } };
+              break;
+            case "is checked":
+              matchConditions[condition.fieldName] = true;
+              break;
+            case "is not checked":
+              matchConditions[condition.fieldName] = false;
+              break;
+            default:
+              console.warn("Operator not handled:", condition.operator);
           }
         }
-      } catch (error) {
-        console.error('Error fetching control data or saving data:', error);
       }
+    });
+  
+    const transformedData = {
+      name: dynamicName,
+      filter: [{ $match: matchConditions }],
+    };
+  
+    try {
+      const response = await axios.get(`${config.apiUrl}/controls`, { headers });
+      const controls = response.data.data;
+      const existingControl = controls.find((control) => control.pageName === pageName);
+  
+      if (existingControl) {
+        const updatedValue = existingControl.value ? [...existingControl.value, transformedData] : [transformedData];
+        const updatedControl = { ...existingControl, value: updatedValue };
+  
+        delete updatedControl._id; // Ensure _id is not included in the update request
+  
+        try {
+          await axios.put(`${config.apiUrl}/controls/${existingControl._id}`, updatedControl, { headers });
+          setSuccess("Filter updated successfully.");
+        } catch (error) {
+          console.error("Error updating the control:", error);
+          setError("Failed to update the filter.");
+        }
+      } else {
+        try {
+          await axios.post(`${config.apiUrl}/controls`, transformedData, { headers });
+          setSuccess("Filter created successfully.");
+        } catch (error) {
+          console.error("Error creating a new control:", error);
+          setError("Failed to create the filter.");
+        }
+      }
+  
+      setTimeout(() => {
+        setSuccess(null);
+        navigate(-1); // Navigate back
+      }, 3000);
+    } catch (error) {
+      console.error("Error saving filter:", error);
+      setError("An error occurred while saving the filter.");
+      setTimeout(() => setError(null), 3000);
+    }
   };
-
-  console.log("filter data",` ${JSON.stringify(savedData, null, 2)}`)
-
-
+  
+  
+  
   
 
   return (
-    <div style={{ padding: "20px", height: "400px", overflow:'scroll' }}>
-      <h3>Dynamic Form</h3>
-
-      {/* Add a dynamic name input */}
-      <div style={{ marginBottom: "20px" }}>
-        <label htmlFor="dynamicName" style={{ marginRight: "10px" }}>
-          Name
-        </label>
-        <input
-          id="dynamicName"
-          type="text"
-          value={formData["dynamicName"] || ""}
-          onChange={(e) => handleInputChange("dynamicName", e.target.value)}
-          placeholder="Enter the name (e.g., New Leads)"
-          style={{ padding: "5px", fontSize: "16px" }}
-        />
+    <div>
+      {(error || success) && (
+        <Stack sx={{ width: "100%", position: "absolute", zIndex: "10" }} spacing={2}>
+          <div style={{ width: "fit-content", margin: "auto" }}>
+            {success && <Alert severity="success">{success}</Alert>}
+            {error && <Alert severity="error">{error}</Alert>}
+          </div>
+        </Stack>
+      )}
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          background: "#F5BD71",
+          color: "black",
+          height: "65px",
+        }}
+      >
+        <h2 style={{ margin: "auto 40px", textTransform: "capitalize" }}>
+          Custom Filter
+        </h2>
       </div>
+      <div style={{ padding: "20px" }}>
+        {/* Input for custom filter name */}
+        <div style={{ margin: "10px" }}>
+          <label htmlFor="dynamicName" style={{ marginRight: "10px" }}>
+            Custom Filter Name *
+          </label>
+          <input
+            id="dynamicName"
+            type="text"
+            value={formData["dynamicName"]}
+            onChange={(e) => handleInputChange("dynamicName", e.target.value)}
+            placeholder="Enter the name (e.g., New Leads)"
+            style={{ padding: "5px", fontSize: "16px" }}
+          />
+        </div>
 
-      {/* Dynamic Fields Rendering */}
-
-      {dynamicFields.map((field) => {
-        if (field.htmlControl === "input") {
-          return (
-            <div key={field.fieldName} style={{ marginBottom: "20px" }}>
-              <label htmlFor={field.fieldName} style={{ marginRight: "10px" }}>
-                {field.label}
-                {/* {field.required ? "*" : ""} */}
-              </label>
-              <input
-                id={field.fieldName}
-                type={field.type || "text"}
-                value={formData[field.fieldName] || ""}
-                onChange={(e) => handleInputChange(field.fieldName, e.target.value)}
-                placeholder={`Enter ${field.label}`}
-                style={{ padding: "5px", fontSize: "16px" }}
-                pattern={field.pattern || undefined}
-                title={field.patternMessage || undefined}
-                // required={field.required}
-              />
-            </div>
+        {/* Dynamic conditions */}
+        {conditions.map((condition, index) => {
+          const selectedField = dynamicFields.find(
+            (field) => field.fieldName === condition.fieldName
           );
-        } else if (field.htmlControl === "select") {
+
           return (
-            <div key={field.fieldName} style={{ marginBottom: "20px" }}>
-              <label htmlFor={field.fieldName} style={{ marginRight: "10px" }}>
-                {field.label} 
-                {/* {field.required ? "*" : ""} */}
-              </label>
+            <div
+              key={index}
+              style={{
+                margin: "20px 10px",
+                display: "flex",
+                gap: "10px",
+                alignItems: "center",
+              }}
+            >
               <select
-                id={field.fieldName}
-                value={formData[field.fieldName] || ""}
-                onChange={(e) => handleInputChange(field.fieldName, e.target.value)}
-                style={{ padding: "5px", fontSize: "16px" }}
-                // required={field.required}
+                value={condition.fieldName}
+                onChange={(e) =>
+                  handleConditionChange(index, "fieldName", e.target.value)
+                }
+                style={{ padding: "5px", fontSize: "16px", width: '25%' }}
               >
                 <option value="" disabled>
-                  -- Select {field.label} --
+                  -- Select Field --
                 </option>
-                {field.options &&
-                  field.options.map((option, index) => (
-                    <option key={index} value={option}>
+                {dynamicFields.map((field) => (
+                  <option key={field.fieldName} value={field.fieldName}>
+                    {field.label}
+                  </option>
+                ))}
+              </select>
+
+
+              {/* <select
+                value={condition.operator}
+                onChange={(e) => handleConditionChange(index, "operator", e.target.value)}
+                style={{ padding: "5px", fontSize: "16px" }}
+              >
+                <option value="" disabled>
+                  -- Select Operator --
+                </option>
+                {selectedField && filterConditions[selectedField.type] &&
+                  Object.entries(filterConditions[selectedField.type]).map(([key, value]) => (
+                    <option key={key} value={key}>
+                      {value.description}
+                    </option>
+                  ))}
+              </select> */}
+       {/* {filterConditions
+        .find(fc => fc.htmlControl === selectedField?.htmlControl)?.typeMappings
+        ?.find(typeMapping => typeMapping.type === selectedField?.type)?.conditions && ( */}
+        {/* )} */}
+          
+          
+        <select 
+        value={condition.operator}
+        onChange={(e) => handleConditionChange(index, "operator", e.target.value)}
+        style={{ padding: "5px", fontSize: "16px", width: '25%' }}>
+
+          <option value="">-- Select Condition --</option>
+          {filterConditions
+            .find(fc => fc.htmlControl === selectedField?.htmlControl)
+            ?.typeMappings?.find(typeMapping => typeMapping.type === selectedField?.type)
+            ?.conditions.map((condition, index) => (
+              <option key={index} value={condition.operator}>
+                {condition.label}
+              </option>
+            )) ||
+            filterConditions
+              .find(fc => fc.htmlControl === selectedField?.htmlControl)
+              ?.conditions?.map((condition, index) => (
+                <option key={index} value={condition.operator}>
+                  {condition.label}
+                </option>
+              ))}
+        </select>
+
+
+
+
+
+              {selectedField?.htmlControl === "select" && selectedField.options ? (
+                <select
+                  value={condition.value}
+                  onChange={(e) =>
+                    handleConditionChange(index, "value", e.target.value)
+                  }
+                  style={{ padding: "5px", fontSize: "16px", width: '25%' }}
+                >
+                  <option value="" disabled>
+                    -- Select {selectedField.label} --
+                  </option>
+                  {selectedField.options.map((option, optIndex) => (
+                    <option key={optIndex} value={option}>
                       {option}
                     </option>
                   ))}
-              </select>
+                </select>
+              ) : (
+                <input
+                  type="text"
+                  value={condition.value}
+                  onChange={(e) =>
+                    handleConditionChange(index, "value", e.target.value)
+                  }
+                  placeholder="Enter Value"
+                  style={{ padding: "5px", fontSize: "16px", width: '25%' }}
+                />
+              )}
             </div>
           );
-        }
-        return null;
-      })}
+        })}
 
-      {/* Save Button */}
-      <button
-        onClick={handleSave}
-        style={{
-          padding: "10px 20px",
-          fontSize: "16px",
-          backgroundColor: "#007BFF",
-          color: "white",
-          border: "none",
-          borderRadius: "5px",
-          cursor: "pointer",
-        }}
-      >
-        Save
-      </button>
-
-      {/* Display Saved Data */}
-      <div style={{ marginTop: "40px" }}>
-        <h4>Saved Data:</h4>
-        <pre
+        <button
+          onClick={handleAddCondition}
           style={{
-            background: "#f4f4f4",
-            padding: "15px",
+            margin: "10px",
+            padding: "10px 20px",
+            fontSize: "16px",
+            backgroundColor: "#007BFF",
+            color: "white",
+            border: "none",
             borderRadius: "5px",
-            overflow: "auto",
+            cursor: "pointer",
           }}
         >
-          {JSON.stringify(savedData, null, 2)}
-        </pre>
+          Add Condition
+        </button>
+
+        <button
+          onClick={handleSave}
+          style={{
+            padding: "10px 20px",
+            fontSize: "16px",
+            backgroundColor: "#007BFF",
+            color: "white",
+            border: "none",
+            borderRadius: "5px",
+            cursor: "pointer",
+            margin: "10px", 
+          }}
+        >
+          Save
+        </button>
       </div>
     </div>
   );
