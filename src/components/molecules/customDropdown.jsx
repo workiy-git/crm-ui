@@ -26,6 +26,7 @@ useEffect(() => {
     );
 
     setFilterConditions(customFiltersData.filterConditions || {}); 
+    setConditions([...conditions, { fieldName: "", operator: "", value: "" }]);
     console.log("Custom Filters Datas:", customFiltersData.filterConditions);
     console.log("Custom Filters Datas (htmlControl):", customFiltersData.filterConditions.map(fc => fc.htmlControl));
     } catch (error) {
@@ -89,67 +90,6 @@ useEffect(() => {
   const handleInputChange = (key, value) => {
     setFormData({ ...formData, [key]: value });
   };
-
-  // Save the filter
-  // const handleSave = async () => {
-  //   if (!formData["dynamicName"]) {
-  //     setError("Custom Filter Name is required.");
-  //     setTimeout(() => setError(null), 3000);
-  //     return;
-  //   }
-
-  //   const dynamicName = formData["dynamicName"];
-  //   const transformedData = {
-  //     name: dynamicName,
-  //     filter: [
-  //       {
-  //         $match: {
-  //           pageName: pageName,
-  //           $expr: conditions, // Save conditions
-  //         },
-  //       },
-  //     ],
-  //   };
-
-  //   try {
-  //     const response = await axios.get(`${config.apiUrl}/controls`, { headers });
-  //     const controls = response.data.data;
-  //     const existingControl = controls.find((control) => control.pageName === pageName);
-
-  //     if (existingControl) {
-  //       // Update existing control
-  //       const updatedValue = [...existingControl.value, transformedData];
-  //       const updatedControl = { ...existingControl, value: updatedValue };
-  //       delete updatedControl._id;
-
-  //       try {
-  //         await axios.put(`${config.apiUrl}/controls/${existingControl._id}`, updatedControl, { headers });
-  //         setSuccess("Filter updated successfully.");
-  //       } catch (error) {
-  //         console.error("Error updating the control:", error);
-  //         setError("Failed to update the filter.");
-  //       }
-  //     } else {
-  //       // Create a new control
-  //       try {
-  //         await axios.post(`${config.apiUrl}/controls`, transformedData, { headers });
-  //         setSuccess("Filter created successfully.");
-  //       } catch (error) {
-  //         console.error("Error creating a new control:", error);
-  //         setError("Failed to create the filter.");
-  //       }
-  //     }
-
-  //     setTimeout(() => {
-  //       setSuccess(null);
-  //       navigate(-1); // Navigate back
-  //     }, 3000);
-  //   } catch (error) {
-  //     console.error("Error saving filter:", error);
-  //     setError("An error occurred while saving the filter.");
-  //     setTimeout(() => setError(null), 3000);
-  //   }
-  // };
 
   const handleSave = async () => {
     if (!formData["dynamicName"]) {
@@ -260,6 +200,15 @@ useEffect(() => {
   };
   
   
+  const handleDeleteCondition = (index) => {
+    if (index === 0) {
+      alert("The first condition cannot be deleted.");
+      return;
+    }
+    const updatedConditions = conditions.filter((_, i) => i !== index);
+    setConditions(updatedConditions);
+  };
+  
   
   
 
@@ -290,7 +239,7 @@ useEffect(() => {
         {/* Input for custom filter name */}
         <div style={{ margin: "10px" }}>
           <label htmlFor="dynamicName" style={{ marginRight: "10px" }}>
-            Custom Filter Name *
+            Filter Name *
           </label>
           <input
             id="dynamicName"
@@ -304,117 +253,111 @@ useEffect(() => {
 
         {/* Dynamic conditions */}
         {conditions.map((condition, index) => {
-          const selectedField = dynamicFields.find(
-            (field) => field.fieldName === condition.fieldName
-          );
+  const selectedField = dynamicFields.find(
+    (field) => field.fieldName === condition.fieldName
+  );
 
-          return (
-            <div
-              key={index}
-              style={{
-                margin: "20px 10px",
-                display: "flex",
-                gap: "10px",
-                alignItems: "center",
-              }}
-            >
-              <select
-                value={condition.fieldName}
-                onChange={(e) =>
-                  handleConditionChange(index, "fieldName", e.target.value)
-                }
-                style={{ padding: "5px", fontSize: "16px", width: '25%' }}
-              >
-                <option value="" disabled>
-                  -- Select Field --
-                </option>
-                {dynamicFields.map((field) => (
-                  <option key={field.fieldName} value={field.fieldName}>
-                    {field.label}
-                  </option>
-                ))}
-              </select>
+  return (
+    <div
+      key={index}
+      style={{
+        margin: "20px 10px",
+        display: "flex",
+        gap: "10px",
+        alignItems: "center",
+      }}
+    >
+      <select
+        value={condition.fieldName}
+        onChange={(e) =>
+          handleConditionChange(index, "fieldName", e.target.value)
+        }
+        style={{ padding: "5px", fontSize: "16px", width: "20%" }}
+      >
+        <option value="" disabled>
+          -- Select Field --
+        </option>
+        {dynamicFields.map((field) => (
+          <option key={field.fieldName} value={field.fieldName}>
+            {field.label}
+          </option>
+        ))}
+      </select>
 
-
-              {/* <select
-                value={condition.operator}
-                onChange={(e) => handleConditionChange(index, "operator", e.target.value)}
-                style={{ padding: "5px", fontSize: "16px" }}
-              >
-                <option value="" disabled>
-                  -- Select Operator --
-                </option>
-                {selectedField && filterConditions[selectedField.type] &&
-                  Object.entries(filterConditions[selectedField.type]).map(([key, value]) => (
-                    <option key={key} value={key}>
-                      {value.description}
-                    </option>
-                  ))}
-              </select> */}
-       {/* {filterConditions
-        .find(fc => fc.htmlControl === selectedField?.htmlControl)?.typeMappings
-        ?.find(typeMapping => typeMapping.type === selectedField?.type)?.conditions && ( */}
-        {/* )} */}
-          
-          
-        <select 
+      <select
         value={condition.operator}
         onChange={(e) => handleConditionChange(index, "operator", e.target.value)}
-        style={{ padding: "5px", fontSize: "16px", width: '25%' }}>
-
-          <option value="">-- Select Condition --</option>
-          {filterConditions
+        style={{ padding: "5px", fontSize: "16px", width: "20%" }}
+      >
+        <option value="">-- Select Condition --</option>
+        {filterConditions
+          .find(fc => fc.htmlControl === selectedField?.htmlControl)
+          ?.typeMappings?.find(typeMapping => typeMapping.type === selectedField?.type)
+          ?.conditions.map((condition, index) => (
+            <option key={index} value={condition.operator}>
+              {condition.label}
+            </option>
+          )) ||
+          filterConditions
             .find(fc => fc.htmlControl === selectedField?.htmlControl)
-            ?.typeMappings?.find(typeMapping => typeMapping.type === selectedField?.type)
-            ?.conditions.map((condition, index) => (
+            ?.conditions?.map((condition, index) => (
               <option key={index} value={condition.operator}>
                 {condition.label}
               </option>
-            )) ||
-            filterConditions
-              .find(fc => fc.htmlControl === selectedField?.htmlControl)
-              ?.conditions?.map((condition, index) => (
-                <option key={index} value={condition.operator}>
-                  {condition.label}
-                </option>
-              ))}
+            ))}
+      </select>
+
+      {selectedField?.htmlControl === "select" && selectedField.options ? (
+        <select
+          value={condition.value}
+          onChange={(e) =>
+            handleConditionChange(index, "value", e.target.value)
+          }
+          style={{ padding: "5px", fontSize: "16px", width: "20%" }}
+        >
+          <option value="" disabled>
+            -- Select {selectedField.label} --
+          </option>
+          {selectedField.options.map((option, optIndex) => (
+            <option key={optIndex} value={option}>
+              {option}
+            </option>
+          ))}
         </select>
+      ) : (
+        <input
+          type="text"
+          value={condition.value}
+          onChange={(e) =>
+            handleConditionChange(index, "value", e.target.value)
+          }
+          placeholder="Enter Value"
+          style={{ padding: "5px", fontSize: "16px", width: "20%" }}
+        />
+      )}
 
+      {/* Delete Button */}
+      <button
+  onClick={() => handleDeleteCondition(index)}
+  disabled={index === 0} // Disable delete for first condition
+  style={{
+    padding: "5px 10px",
+    fontSize: "14px",
+    backgroundColor: index === 0 ? "#ccc" : "#FF4D4D",
+    color: "white",
+    border: "none",
+    borderRadius: "5px",
+    cursor: index === 0 ? "not-allowed" : "pointer",
+    display: index === 0 ? "none" : "block",
+  }}
+>
+  Delete
+</button>
 
+    </div>
+  );
+})}
 
-
-
-              {selectedField?.htmlControl === "select" && selectedField.options ? (
-                <select
-                  value={condition.value}
-                  onChange={(e) =>
-                    handleConditionChange(index, "value", e.target.value)
-                  }
-                  style={{ padding: "5px", fontSize: "16px", width: '25%' }}
-                >
-                  <option value="" disabled>
-                    -- Select {selectedField.label} --
-                  </option>
-                  {selectedField.options.map((option, optIndex) => (
-                    <option key={optIndex} value={option}>
-                      {option}
-                    </option>
-                  ))}
-                </select>
-              ) : (
-                <input
-                  type="text"
-                  value={condition.value}
-                  onChange={(e) =>
-                    handleConditionChange(index, "value", e.target.value)
-                  }
-                  placeholder="Enter Value"
-                  style={{ padding: "5px", fontSize: "16px", width: '25%' }}
-                />
-              )}
-            </div>
-          );
-        })}
 
         <button
           onClick={handleAddCondition}
