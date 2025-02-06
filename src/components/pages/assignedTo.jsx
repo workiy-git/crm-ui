@@ -4,6 +4,9 @@ import { DataGrid } from '@mui/x-data-grid';
 import { headers } from '../atoms/Authorization';
 import config from "../../config/config";
 import '../../assets/styles/assignedToPage.css';
+import Typography from '@mui/material/Typography';
+import Pagination from '@mui/material/Pagination';
+import Stack from '@mui/material/Stack';
 
 const AssignedTo = () => {
     const [roles, setRoles] = useState([]);
@@ -15,6 +18,20 @@ const AssignedTo = () => {
     const [assignedData, setAssignedData] = useState([]);
     const [otherUsers, setOtherUsers] = useState([]);
     const [selectedOtherUser, setSelectedOtherUser] = useState("");
+    const [page, setPage] = React.useState(1);
+    const [rowsPerPage, setRowsPerPage] = useState(25);
+    const [totalPages, setTotalPages] = useState(0);
+    const [totalRecords, setTotalRecords] = useState(0);
+    const [currentPage, setCurrentPage] = useState(1);
+
+
+    const handleChange = (event, value) => {
+      setPage(value);
+      const currentPage = value;
+      fetchAssignedData(currentPage, rowsPerPage);
+
+    };
+
 
     useEffect(() => {
         const fetchRoles = async () => {
@@ -77,10 +94,9 @@ const AssignedTo = () => {
         fetchUsers();
     }, [selectedRole]);
 
-    useEffect(() => {
-        if (!selectedUser) return;
+    
 
-        const fetchAssignedData = async () => {
+        const fetchAssignedData = async (currentPage, rowsPerPage) => {
             try {
                 setLoading(true);
                 const endpoint = "appdata/retrieve";
@@ -105,17 +121,22 @@ const AssignedTo = () => {
                 ];
 
                 const response = await axios.post(
-                    `${config.apiUrl.replace(/\/$/, "")}/${endpoint}`,
+                    `${config.apiUrl.replace(/\/$/, "")}/${endpoint}?page=${currentPage}&pageSize=${rowsPerPage}`,
                     requestBody,
                     { headers: headers }
                 );
+                
+                setRowsPerPage(response.data.pagination.pageSize);
+                setTotalPages(response.data.pagination.totalPages);
+                setTotalRecords(response.data.pagination.totalCount);
+                setCurrentPage(response.data.pagination.currentPage);
 
                 const cleanData = (data) =>
                     data.map(item => ({
                         ...item,
                         assigned_to: item.assigned_to.trim()
                     }));
-
+                    console.log("Assigned Data:", response.data.pagination); // Debugging log
                 setAssignedData(cleanData(response.data.data || []));
 
                 // Fetch other users for reassignment
@@ -127,8 +148,10 @@ const AssignedTo = () => {
                 setLoading(false);
             }
         };
+    useEffect(() => {
+        if (!selectedUser) return;
 
-        fetchAssignedData();
+        fetchAssignedData(currentPage, rowsPerPage);
     }, [selectedUser]);
 
     const handleRoleChange = (event) => {
@@ -164,7 +187,7 @@ const AssignedTo = () => {
                         "$set": { "assigned_to": newAssignedUser }
                     }
                 };
-    
+                console.log("selectedUser:", selectedUser); // Debugging log
                 console.log("Request Body:", requestBody); // Debugging log
     
                 const response = await axios.put(
@@ -200,7 +223,7 @@ const AssignedTo = () => {
             }
         }
     };
-    
+        console.log("Assigned Data:", assignedData); // Debugging log
 
     const columns = [
         { field: 'mobile_phone', headerName: 'Mobile Phone', width: 150 },
@@ -211,7 +234,27 @@ const AssignedTo = () => {
     ];
 
     return (
-        <div className="split-page">
+        <div>
+            <div style={{ width: "100%", }}>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              background: "#F5BD71",
+              color: "black",
+              height: "65px",
+            }}
+          >
+            <div style={{alignContent:'center'}}>
+              <div>
+            <h2 className='details_page_heading' style={{ margin: "auto 40px", textTransform:'capitalize'}}>AssignedTo Page</h2>
+            <div style={{margin:'10px 20px 10px 40px', borderBottom:'2px solid black' }}></div>
+            </div>
+            </div>
+            </div>
+            </div>
+            <div  className="split-page" >
+           
             <div className="left-side">
                 <div className="form-group">
                     <label htmlFor="role">Select Role:</label>
@@ -253,18 +296,25 @@ const AssignedTo = () => {
                     </div>
                 )}
             </div>
-
             <div className="right-side">
                 <h3>Assigned Data</h3>
                 <div style={{ height: 400, width: '100%' }}>
                     <DataGrid
                         rows={assignedData.map((item, index) => ({ id: index, ...item }))}
                         columns={columns}
-                        pageSize={5}
-                        rowsPerPageOptions={[5]}
+                        // pageSize={5}
+                        // rowsPerPageOptions={[5]}
                         loading={loading}
                     />
+                     <Stack style={{display:'flex', flexDirection:'row', alignItems:'center', margin:'10px', justifyContent:'space-between'}} spacing={2}>
+                     <Typography>Total Records: {totalRecords}</Typography>
+                     <div style={{display:'flex', flexDirection:'row', alignItems:'center', margin:'0px'}} >
+                        <Typography>Page: {page}</Typography>
+                        <Pagination style={{margin:'0'}} count={totalPages} page={page} onChange={handleChange} />
+                    </div>
+                    </Stack>
                 </div>
+            </div>
             </div>
         </div>
     );

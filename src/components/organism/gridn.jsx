@@ -272,6 +272,10 @@ const GridComponent = ({ pageName }) => {
       handleChange({ target: { value: selectedValue } });
     }
   }, [selectedValue]);
+
+  const handleCustomDropDown =() => {
+    navigate("/customdropdown", { state: { pageName: pageName } });
+  }
   
   useEffect(() => {
     if (pageName) {
@@ -285,14 +289,22 @@ const GridComponent = ({ pageName }) => {
   }, [pageName]);
   
   const handleChange = (event, currentPage, currentpageSize) => {
-    const filter = JSON.parse(event.target.value);
-    setSelectedValue(event.target.value);
-
+    const selectedValue = event.target.value;
+    setSelectedValue(selectedValue);
+  
+    if (selectedValue === "custom") {
+      handleCustomDropDown(); // Call your custom dropdown function
+      return; // Exit early to avoid fetching grid data
+    }
+  
+    const filter = JSON.parse(selectedValue);
+  
     const currentPageNumber = currentPage || 1;
     const currentNumberofRow = currentpageSize || 25;
     setLoading(true);
     fetchGridData(filter, currentPageNumber, currentNumberofRow); // Fetch grid data for the selected option
   };
+  
   
   const flattenObject = (obj, parent = '', res = {}) => {
     for (let key in obj) {
@@ -484,7 +496,7 @@ const handleFilterChangeAndSearch = (field, value, triggerSearch = false) => {
     });
 };
   const handleAsignedTo = () => {
-    navigate("/assignedto");
+    navigate("/users/assignedto");
 
   };
 
@@ -713,6 +725,22 @@ const handleViewReport = async () => {
     setMenuAnchor(null);
   };
 
+  const editSelectedRows = () => {
+    const selectedData = gridData.filter((row) =>
+      selectedRows.includes(row.id)
+    );
+    console.log("Selected Data:", selectedData);
+
+    if (selectedData.length === 0) {
+      setError('No rows selected');
+      setTimeout(() => setError(''), 3000);
+      return;
+    };
+     // Navigate to another component with selected data
+     navigate('/selected/edit', { state: { selectedData } });
+    
+  };
+  
   const emailSelectedRows = () => {
     // Filter the gridData to get the selected rows
     const selectedData = gridData.filter((row) =>
@@ -794,7 +822,12 @@ const handleViewReport = async () => {
     exportSelectedRows();
   };
   const handleEmailClick = () => {
+    closeMenu();
     emailSelectedRows();
+  };
+  const handleEditClick = () => {
+    closeMenu();
+    editSelectedRows();
   };
   const handleSelectAllRows = (isChecked) => {
     if (isChecked) {
@@ -944,6 +977,9 @@ const handleViewReport = async () => {
         onClose={closeMenu}>
             <MenuItem onClick={handleOpenImportModal}>Import Data</MenuItem>
             <MenuItem onClick={handleExportClick}>Export Data</MenuItem>
+            {pageName === 'leads' && (
+              <MenuItem onClick={handleEditClick}>Edit</MenuItem>
+            )}
         </Menu>
         
         <div className="dropdown" style={{ margin: "8px", width: "250px" }}>
@@ -966,6 +1002,7 @@ const handleViewReport = async () => {
                 {option.name}
               </option>
             ))}
+            <option value="custom">Custom</option>
           </select>
         </div>
         </Box>
@@ -1050,7 +1087,7 @@ const handleViewReport = async () => {
         <Box>
       <Pagination
         count={Math.ceil(totalRecord / pageSize)}
-        siblingCount={0}
+        // siblingCount={0}
         page={page}
         onChange={handlePageChange}
         className="pagination_main"
