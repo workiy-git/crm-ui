@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 import { useLocation, useNavigate } from "react-router-dom";
 import config from "../../config/config";
@@ -64,7 +64,45 @@ const GridComponent = ({ pageName }) => {
   const { fetchNotifications } = useNotifications();
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const [inputPage, setInputPage] = useState("");
+  const [dynamicFields, setDynamicFields] = useState([]);
 
+
+
+    // Function to fetch data with retry logic
+    const fetchDataWithRetry = useCallback(
+      async (url, retryCount = 3) => {
+        try {
+          const response = await axios.get(url, { headers });
+          return response.data;
+        } catch (error) {
+          if (retryCount > 0) {
+            console.warn("Retrying request, attempts left:", retryCount);
+            return fetchDataWithRetry(url, retryCount - 1);
+          } else {
+            throw error;
+          }
+        }
+      },
+      []
+    );
+  
+    useEffect(() => {
+      const fetchWebformsData = async () => {
+        try {
+          const apiUrl = `${config.apiUrl.replace(/\/$/, "")}/webforms`;
+          const response = await fetchDataWithRetry(apiUrl);
+          const fetchedWebformsData = response.data || [];
+          const currentPage = fetchedWebformsData.find(
+            (page) => page.pageName === pageName
+          );
+          setDynamicFields(currentPage.fields);
+          console.log("Dynamic Fields:", currentPage.fields); 
+        } catch (error) {
+          console.error("Error fetching Webform data:", error);
+        }
+      };
+      fetchWebformsData();
+    }, [fetchDataWithRetry]);
 
   // const [filteredRows, setFilteredRows] = useState(gridData);
   //not confirmed
@@ -450,6 +488,7 @@ const handleSearch = (field, value) => {
 };
 
 const handleFilterChangeAndSearch = (field, value, triggerSearch = false) => {
+  console.log("field", field);
   // Always update the `filterText` state
   setFilterText((prev) => ({ ...prev, [field]: value }));
 
@@ -718,71 +757,101 @@ const handleViewReport = async () => {
     ...columns.map((column) => ({
       ...column,
       cellClassName: 'center-align',
-      renderHeader: (params) => (
-        
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            padding: "0",
-            // height: "40px",
-            width: "100%",
-            boxSizing: "border-box",
-            // color: "white",
-            // background: "#212529",
-          }}
-        >
+      renderHeader: (params) => {
+        // Get the field type from dynamicFields
+        const fieldType = dynamicFields.find((field) => field.fieldName === params.field)?.type || "text";
+        console.log("fieldType", fieldType);
+        return (
           <div
             style={{
-              marginBottom: "5px",
-              fontWeight: "bold",
-              textAlign: "center",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              padding: "0", 
               width: "100%",
-              fontSize: "10px",
+              boxSizing: "border-box",
             }}
           >
-            {params.colDef.headerName}
+            <div
+              style={{
+                marginBottom: "5px",
+                fontWeight: "bold",
+                textAlign: "center",
+                width: "100%",
+                fontSize: "10px",
+              }}
+            >
+              {params.colDef.headerName}
+            </div>
+  
+            {/* Render search input based on field type */}
+            {fieldType === "dropdown" ? (
+              <Select
+                value={filterText[params.field] || ""}
+                onChange={(e) => handleFilterChangeAndSearch(params.field, e.target.value, true)}
+                displayEmpty
+                variant="outlined"
+                size="small"
+                style={{ width: "100%", background: "#ffffff", borderRadius: "10px", height: '20px' }}
+              >
+                <MenuItem disabled value="">Select</MenuItem>
+                {(dynamicFields.find((field) => field.fieldName === params.field)?.options || []).map((option) => (
+                  <MenuItem key={option} value={option}>
+                    {option}
+                  </MenuItem>
+                ))}
+              </Select>
+            ) : fieldType === "date" ? (
+              <TextField
+                type="date"
+                variant="outlined"
+                size="small"
+                value={filterText[params.field] || ""}
+                onChange={(e) => handleFilterChangeAndSearch(params.field, e.target.value, true)}
+                style={{ width: "80%", background: "#ffffff", borderRadius: "10px" }}
+                className="grid_search"
+              />
+            ) : fieldType === "datetime-local" ? (
+              <TextField
+                type="date"
+                variant="outlined"
+                size="small"
+                value={filterText[params.field] || ""}
+                onChange={(e) => handleFilterChangeAndSearch(params.field, e.target.value, true)}
+                style={{ width: "80%", background: "#ffffff", borderRadius: "10px" }}
+                className="grid_search"
+              />
+            ) : fieldType === "boolean" ? (
+              <Select
+                value={filterText[params.field] || ""}
+                onChange={(e) => handleFilterChangeAndSearch(params.field, e.target.value, true)}
+                displayEmpty
+                variant="outlined"
+                size="small"
+                style={{ width: "100%", background: "#ffffff", borderRadius: "10px", height: '20px' }}
+              >
+                <MenuItem disabled value="">Select</MenuItem>
+                <MenuItem value="Yes">Yes</MenuItem>
+                <MenuItem value="No">No</MenuItem>
+              </Select>
+            ) : (
+              <TextField
+                variant="outlined"
+                size="small"
+                value={filterText[params.field] || ""}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    handleFilterChangeAndSearch(params.field, e.target.value, true);
+                  }
+                }}
+                onChange={(e) => handleFilterChangeAndSearch(params.field, e.target.value)}
+                style={{ width: "80%", background: "#ffffff", borderRadius: "10px" }}
+                className="grid_search"
+              />
+            )}
           </div>
-          {/* <TextField
-            variant="outlined"
-            size="small"
-            value={filterText[params.field] || ""}
-            onClick={(e) => e.stopPropagation()} // Stop propagation to prevent sorting
-            onChange={(e) => handleFilterChange(params.field, e.target.value)}
-            style={{ width: "80%", background: "#ffffff", borderRadius:'10px' }}
-            className="grid_search"
-          /> */}
-          {/* <TextField
-  variant="outlined"
-  size="small"
-  value={filterText[params.field] || ""}
-  onClick={(e) => e.stopPropagation()} // Stop propagation to prevent sorting
-  onKeyDown={(e) => {
-    if (e.key === "Enter") {
-      handleFilterChangeAndSearch(params.field, e.target.value, true); // Trigger search on Enter
-    }
-  }}
-  onChange={(e) => handleFilterChangeAndSearch(params.field, e.target.value)}
-  style={{ width: "80%", background: "#ffffff", borderRadius: "10px" }}
-  className="grid_search"
-/> */}
-<TextField
- variant="outlined"
- size="small"
- onClick={(e) => e.stopPropagation()} // Stop propagation to prevent sorting
-  onKeyDown={(e) => {
-    if (e.key === "Enter") {
-      handleFilterChangeAndSearch(params.field, e.target.value, true); // Trigger search on Enter
-    }
-  }}
-  style={{ width: "80%", background: "#ffffff", borderRadius: "10px" }}
-  className="grid_search">
-
-</TextField>
-
-        </div>
-      ),
+        );
+      },
     })),
   ];
 
