@@ -555,3 +555,6 @@
 .MuiDataGrid-columnHeaderDraggableContainer .MuiDataGrid-menuIcon button{
   color: #dedede;
 }
+.MuiDataGrid-columnHeaderDraggableContainer .MuiSelect-select{
+  padding: 0 35px !important;
+}
