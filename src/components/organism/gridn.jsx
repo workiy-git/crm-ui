@@ -341,9 +341,6 @@ const GridComponent = ({ pageName }) => {
     }
   }, [pageName]);
   
-  // Existing handleFilterChangeAndSearch remains unchanged
-  
-  
   //Drop Down Change
   const handleChange = (event, currentPage, currentpageSize) => {
     const selectedValue = event.target.value;
@@ -387,7 +384,6 @@ const GridComponent = ({ pageName }) => {
           headers: headers, // This is the config object where headers go
         }
       );
-      
       
       const dataWithIds = response.data.data.map((item, index) => {
         const flattenedItem = flattenObject(item); // Flatten the object
@@ -442,8 +438,6 @@ const GridComponent = ({ pageName }) => {
         setColumns(dynamicColumns);
         setAvailableColumns(dynamicColumns); // Set available columns here
       } else {
-        // setIsLoading(true);
-        // setLoading(true);
         setTimeout(() => {
           setIsLoading(false);
           setLoading(false);
@@ -479,7 +473,6 @@ const handleSearch = (field, value) => {
     },
   ];
   
-
   const currentNumberOfRow = pageSize || 25;
   // Reset page number and fetch the grid data
   setPage(1);
@@ -522,11 +515,6 @@ const handleFilterChangeAndSearch = (field, value, triggerSearch = false) => {
     fetchGridData(filter, 1, currentNumberOfRow);
   }
 };
-
-
-
-
-
 
   const filteredRows = gridData.filter((row) =>
     columns.every((column) => {
@@ -580,9 +568,6 @@ const handleFilterChangeAndSearch = (field, value, triggerSearch = false) => {
 
 const [filteredData, setFilteredData] = useState([]);
 const [convertDialogOpen, setConvertDialogOpen] = useState(false);
-
-
-
 const openConfirmationDialog = () => {
   setConvertDialogOpen(true);
 };
@@ -593,11 +578,6 @@ const handleConfirmconcertToLead = async () => {
   if (selectedRow) {
     const id = selectedRow._id; // Get the unique ID for the row
     const updatedRow = { pageName: "leads" }; // Only updating the pageName field
-
-    // Log for debugging purposes
-    console.log('ID:', id);
-    console.log('Updated Data being sent:', updatedRow);
-
     try {
       // Send the PUT request with only the pageName field
       await axios.put(`${config.apiUrl}/appdata/${id}`, updatedRow);
@@ -688,7 +668,6 @@ const handleViewReport = async () => {
       cellClassName: 'center-align',
       headerName: (
         <div style={{display:'flex', flexDirection:'column', margin:'auto', padding:'0 10px'}}>
-        {/* <lable>Select All</lable> */}
         <Checkbox
           style={{color:'white', padding:'0'}}
           className= "select-all-check-box"
@@ -747,8 +726,6 @@ const handleViewReport = async () => {
         onViewReport={handleViewReport}
         onEditReport={handleEditReport}
         convertToLead={openConfirmationDialog}
-        // convertToLead={handleConfirmconcertToLead}
-
       />
         </div>
       ),
@@ -854,8 +831,6 @@ const handleViewReport = async () => {
       },
     })),
   ];
-
-
   const [menuAnchor, setMenuAnchor] = useState(null);
   const openMenu = (event) => {
     setMenuAnchor(event.currentTarget);
@@ -882,30 +857,16 @@ const handleViewReport = async () => {
   };
   
   const emailSelectedRows = () => {
-    // Filter the gridData to get the selected rows
     const selectedData = gridData.filter((row) =>
       selectedRows.includes(row.id)
     );
-    // if (selectedData.length === 0) {
-    //   setError('No rows selected');
-    //   setTimeout(() => setError(''), 3000);
-    //   return;
-    // }
-    // console.log("Selected Data:", selectedData);
-  
-    // Extract the caller_email from the selected rows and filter out invalid emails
     const emailAddresses = selectedData
       .map((row) => row.caller_email || row.email)  // Extract email addresses
       .filter((email) => typeof email === 'string' && email.trim() !== ""); // Remove undefined and empty emails
-  
-    // Log or store the email addresses as needed
     console.log("Filtered Emails:", emailAddresses);
-  
-    // Return the filtered email addresses
     return emailAddresses;
   };
   
-
   const exportSelectedRows = () => {
     const selectedData = gridData.filter((row) =>
       selectedRows.includes(row.id)
@@ -954,7 +915,6 @@ const handleViewReport = async () => {
       document.body.removeChild(link);
     }
     
-    
   };
   const openColumnModal = () => {
     setTempVisibleColumns(columns);
@@ -985,58 +945,6 @@ const handleViewReport = async () => {
     editSelectedRows();
   };
 
-
-  // const handleCSVImport = (file) => {
-  //   Papa.parse(file, {
-  //     header: true,
-  //     complete: async (results) => {
-  //       const importedData = results.data;
-  //       console.log(importedData);
-  
-  //       try {
-  //         const response = await axios.post(`${config.apiUrl}/appdata/create`, { data: importedData }, {
-  //           headers: {
-  //             'Content-Type': 'application/json',
-  //           },
-  //         });
-  //         console.log('Success:', response.data);
-  //       } catch (error) {
-  //         if (error.response) {
-  //           // The request was made and the server responded with a status code
-  //           // that falls out of the range of 2xx
-  //           console.error('Error response:', error.response.data);
-  //           console.error('Error status:', error.response.status);
-  //           console.error('Error headers:', error.response.headers);
-  //         } else if (error.request) {
-  //           // The request was made but no response was received
-  //           console.error('Error request:', error.request);
-  //         } else {
-  //           // Something happened in setting up the request that triggered an Error
-  //           console.error('Error message:', error.message);
-  //         }
-  //         console.error('Error config:', error.config);
-  //       }
-  //     },
-  //     error: (error) => {
-  //       console.error("Error parsing CSV:", error);
-  //     }
-  //   });
-  // };
-
-
-  // const handleImportClick = () => {
-  //   const fileInput = document.createElement('input');
-  //   fileInput.type = 'file';
-  //   fileInput.accept = '.csv';
-  //   fileInput.onchange = (event) => {
-  //     const file = event.target.files[0];
-  //     if (file) {
-  //       handleCSVImport(file);
-  //     }
-  //   };
-  //   fileInput.click();
-  // };
-
   const handleSelectAllRows = (isChecked) => {
     if (isChecked) {
       const allRowIds = filteredRows.map((row) => row.id);
@@ -1045,7 +953,6 @@ const handleViewReport = async () => {
       setSelectedRows([]);
     }
   };
-  
   
   const handleRowSelection = (rowId, isChecked) => {
     setSelectedRows((prevSelectedRows) => {
@@ -1064,10 +971,7 @@ const handleViewReport = async () => {
     const currentPage = 1;
     const currentpageSize = event.target.value;
     handleChange({ target: { value: selectedValue } }, currentPage, currentpageSize);
-    // handleChange({ target: { value: selectedValue } });
-    // fetchGridData(); // Fetch grid data when the page size changes
     console.log("page size", event.target.value);
-    // setPage(1); // Reset to the first page when the page size changes
   };
   
   const handlePageInputChange = (e) => {
@@ -1197,9 +1101,6 @@ const handleViewReport = async () => {
             {pageName === 'leads' && (
               <MenuItem onClick={handleEditClick}>Edit</MenuItem>
             )}
-            
-            {/* <MenuItem onClick={handleEmailClick}>Send Email</MenuItem> */}
-
         </Menu>
         
         <div className="dropdown" style={{ margin: "8px", width: "250px" }}>
@@ -1240,9 +1141,6 @@ const handleViewReport = async () => {
           },}}
       >
         <div style={{fontSize:'12px', display: 'flex', alignItems:'center'}}>
-        {/* <span style={{ marginLeft: "16px" }}>
-          Page {page} of {Math.ceil(totalRecord / pageSize)}
-        </span> */}
         <div style={{ display: 'flex', alignItems: 'center' }}>
           <div>Page</div>
           <div style={{ width: '40px', margin: '0 15px' }}> {/* Increased width to give more space */}
@@ -1285,7 +1183,6 @@ const handleViewReport = async () => {
               boxSizing: 'border-box', // Ensures padding doesn't affect width
             }}
           />
-
         </div>
         <div>of</div>
         <div  style={{ margin: '0 7px', width: '50px' }}>{Math.ceil(totalRecord / pageSize)}</div>
@@ -1294,8 +1191,6 @@ const handleViewReport = async () => {
           Total Rows:
         </span> 
         <span style={{width: '50px'}}>{totalRecord}</span>
-        
-        
         <Select
           value={pageSize}
           onChange={handlePageSizeChange}
