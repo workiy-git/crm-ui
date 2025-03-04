@@ -66,9 +66,6 @@ const GridComponent = ({ pageName }) => {
   const [inputPage, setInputPage] = useState("");
   const [dynamicFields, setDynamicFields] = useState([]);
 
-
-
-    // Function to fetch data with retry logic
     const fetchDataWithRetry = useCallback(
       async (url, retryCount = 3) => {
         try {
