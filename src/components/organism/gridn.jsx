@@ -477,50 +477,75 @@ const handleSearch = (field, value) => {
   fetchGridData(filter, 1, currentNumberOfRow);
 };
 
-const handleFilterChangeAndSearch = (field, value, triggerSearch = false) => {
-  console.log("field", field);
-  // Always update the `filterText` state
-  setFilterText((prev) => ({ ...prev, [field]: value }));
+const handleFilterChangeAndSearch = (field, value, isDropdown) => {
+  let filterValue = value;
 
-  // Only fetch data when `triggerSearch` is true
-  if (triggerSearch) {
-    // Build the dynamic `$match` object
-    const updatedFilters = { ...filterText, [field]: value };
-    const activeFilters = Object.entries(updatedFilters)
-      .filter(([_, v]) => v.trim() !== "") // Exclude empty filters
-      .reduce((acc, [key, val]) => {
+  if (isDropdown) {
+    // Ensure it's always an array
+    filterValue = Array.isArray(value) ? value : [value];
+
+    // If no option is selected, reset all filters
+    if (filterValue.length === 0) {
+      setFilterText({});
+      return;
+    }
+  } else {
+    // Ensure it's a string for other field types
+    filterValue = typeof value === "string" ? value.trim() : "";
+  }
+
+  setFilterText((prev) => ({
+    ...prev,
+    [field]: filterValue,
+  }));
+};
+
+// 🆕 useEffect to trigger search when filterText changes
+useEffect(() => {
+  performSearch();
+}, [filterText]); // Run performSearch when filterText updates
+
+const performSearch = () => {
+  // Build the dynamic `$match` object
+  const activeFilters = Object.entries(filterText)
+    .filter(([_, v]) => (Array.isArray(v) ? v.length > 0 : v.trim() !== "")) // Exclude empty filters
+    .reduce((acc, [key, val]) => {
+      if (Array.isArray(val)) {
+        acc[key] = { $in: val }; // Handle array values for multi-select
+      } else {
         acc[key] = {
           $regex: val.trim(), // Partial matching
           $options: "i",      // Case-insensitive
         };
-        return acc;
-      }, {});
+      }
+      return acc;
+    }, {});
 
-    const filter = [
-      {
-        $match: {
-          pageName: pageName,
-          ...activeFilters, // Include all active filters dynamically
-        },
+  const filter = [
+    {
+      $match: {
+        pageName: pageName,
+        ...activeFilters, // Include all active filters dynamically
       },
-    ];
+    },
+  ];
 
-    const currentNumberOfRow = pageSize || 25;
-    // Reset page number and fetch the grid data
-    setPage(1);
-    setInputPage(1);
-    fetchGridData(filter, 1, currentNumberOfRow);
-  }
+  const currentNumberOfRow = pageSize || 25;
+  // Reset page number and fetch the grid data
+  setPage(1);
+  setInputPage(1);
+  fetchGridData(filter, 1, currentNumberOfRow);
 };
 
-  const filteredRows = gridData.filter((row) =>
-    columns.every((column) => {
-      const value = row[column.field];
-      const filterValue = filterText[column.field] || "";
-      return String(value).toLowerCase().includes(filterValue.toLowerCase());
-    })
-  );
-
+const filteredRows = gridData.filter((row) =>
+  columns.every((column) => {
+    const value = row[column.field];
+    const filterValue = filterText[column.field] || "";
+    return Array.isArray(filterValue)
+      ? filterValue.some((v) => v.toLowerCase() === String(value).toLowerCase())
+      : String(value).toLowerCase().includes(filterValue.toLowerCase());
+  })
+);
 
   const handleMenuOpen = (event, row) => {
     event.preventDefault();
@@ -730,6 +755,8 @@ const handleViewReport = async () => {
     },
     ...columns.map((column) => ({
       ...column,
+      sortable: false,
+      disableColumnMenu: true,
       cellClassName: 'center-align',
       renderHeader: (params) => {
         // Get the field type from dynamicFields
@@ -761,16 +788,21 @@ const handleViewReport = async () => {
             {/* Render search input based on field type */}
             {fieldType === "dropdown" ? (
               <Select
-                value={filterText[params.field] || ""}
+                multiple
+                value={filterText[params.field] || []} // Always expects an array
                 onChange={(e) => handleFilterChangeAndSearch(params.field, e.target.value, true)}
                 displayEmpty
                 variant="outlined"
                 size="small"
                 style={{ width: "100%", background: "#ffffff", borderRadius: "10px", height: '20px' }}
+                renderValue={(selected) => (selected && selected.length > 0 ? selected.join(", ") : "Select")}
               >
-                <MenuItem disabled value="">Select</MenuItem>
+                <MenuItem disabled value="">
+                  Select
+                </MenuItem>
                 {(dynamicFields.find((field) => field.fieldName === params.field)?.options || []).map((option) => (
                   <MenuItem key={option} value={option}>
+                    <Checkbox checked={filterText[params.field]?.includes(option) || false} />
                     {option}
                   </MenuItem>
                 ))}
@@ -781,7 +813,7 @@ const handleViewReport = async () => {
                 variant="outlined"
                 size="small"
                 value={filterText[params.field] || ""}
-                onChange={(e) => handleFilterChangeAndSearch(params.field, e.target.value, true)}
+                onChange={(e) => handleFilterChangeAndSearch(params.field, e.target.value, false)}
                 style={{ width: "80%", background: "#ffffff", borderRadius: "10px" }}
                 className="grid_search"
               />
@@ -791,14 +823,14 @@ const handleViewReport = async () => {
                 variant="outlined"
                 size="small"
                 value={filterText[params.field] || ""}
-                onChange={(e) => handleFilterChangeAndSearch(params.field, e.target.value, true)}
+                onChange={(e) => handleFilterChangeAndSearch(params.field, e.target.value, false)}
                 style={{ width: "80%", background: "#ffffff", borderRadius: "10px" }}
                 className="grid_search"
               />
             ) : fieldType === "boolean" ? (
               <Select
                 value={filterText[params.field] || ""}
-                onChange={(e) => handleFilterChangeAndSearch(params.field, e.target.value, true)}
+                onChange={(e) => handleFilterChangeAndSearch(params.field, e.target.value, false)}
                 displayEmpty
                 variant="outlined"
                 size="small"
@@ -815,10 +847,10 @@ const handleViewReport = async () => {
                 value={filterText[params.field] || ""}
                 onKeyDown={(e) => {
                   if (e.key === "Enter") {
-                    handleFilterChangeAndSearch(params.field, e.target.value, true);
+                    handleFilterChangeAndSearch(params.field, e.target.value, false);
                   }
                 }}
-                onChange={(e) => handleFilterChangeAndSearch(params.field, e.target.value)}
+                onChange={(e) => handleFilterChangeAndSearch(params.field, e.target.value, false)}
                 style={{ width: "80%", background: "#ffffff", borderRadius: "10px" }}
                 className="grid_search"
               />
