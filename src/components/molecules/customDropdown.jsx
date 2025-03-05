@@ -130,12 +130,24 @@ useEffect(() => {
   
         if (fieldCondition) {
           switch (condition.operator) {
+            case "$eqto":
+
+            const startOfDay = `${condition.value}T00:00:00.000Z`; 
+            const endOfDay = `${condition.value}T23:59:59.999Z`;
+
+            matchConditions[condition.fieldName] = {
+              $gte: startOfDay,
+              $lt: endOfDay,
+            };
+              // matchConditions[condition.fieldName] = { $regex: condition.value, $options: "i" };
+              break;
             case "$eq":
             case "$ne":
             case "$gt":
             case "$lt":
               matchConditions[condition.fieldName] = { [condition.operator]: condition.value };
               break;
+            
             case "$regex":
               matchConditions[condition.fieldName] = { [condition.operator]: condition.value, $options: "i" };
               break;
@@ -148,10 +160,20 @@ useEffect(() => {
             case "is not checked":
               matchConditions[condition.fieldName] = false;
               break;
+            case "$gte_lte":
+              if (condition.value?.start && condition.value?.end) {
+                matchConditions[condition.fieldName] = {
+                  $gte: condition.value.start,
+                  $lte: condition.value.end,
+                };
+              }
+              break;
+              
             default:
               console.warn("Operator not handled:", condition.operator);
           }
         }
+        
       }
     });
   
@@ -324,7 +346,35 @@ useEffect(() => {
             </option>
           ))}
         </select>
-      ) : (
+      ) : selectedField?.htmlControl === "date" ? (
+        condition.operator === "$gte_lte" ? (
+          <div style={{ display: "flex", gap: "10px" }}>
+            <input
+              type="date"
+              value={condition.value.start}
+              onChange={(e) =>
+                handleConditionChange(index, "value", { ...condition.value, start: e.target.value })
+              }
+              style={{ padding: "5px", fontSize: "16px", width: "45%" }}
+            />
+            <input
+              type="date"
+              value={condition.value.end}
+              onChange={(e) =>
+                handleConditionChange(index, "value", { ...condition.value, end: e.target.value })
+              }
+              style={{ padding: "5px", fontSize: "16px", width: "45%" }}
+            />
+          </div>
+        ) : (
+          <input
+            type="date"
+            value={condition.value}
+            onChange={(e) => handleConditionChange(index, "value", e.target.value)}
+            style={{ padding: "5px", fontSize: "16px", width: "20%" }}
+          />
+        )
+      ): (
         <input
           type="text"
           value={condition.value}
