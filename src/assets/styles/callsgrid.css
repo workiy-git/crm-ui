@@ -558,3 +558,22 @@
 .MuiDataGrid-columnHeaderDraggableContainer .MuiSelect-select{
   padding: 0 35px !important;
 }
+
+
+.DropDown-select-option .MuiSelect-select{
+  padding: 0 !important;
+  text-align: left;
+}
+.DropDown-select-option .MuiSelect-select div:nth-child(2){
+  display: none;
+}
+#menu- .MuiMenu-paper {
+  top: 140px !important;
+  height: 240px !important;
+}
+.grid_menu_delete_btn{
+  visibility: hidden;
+}
+.grid_menu_option_list:hover .grid_menu_delete_btn{
+  visibility: visible !important;
+}
