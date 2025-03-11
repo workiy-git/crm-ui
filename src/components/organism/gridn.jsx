@@ -8,6 +8,9 @@ import "../../assets/styles/callsgrid.css";
 import GridMenu from "../molecules/gridmenu";
 import Papa from 'papaparse';
 import CsvImporter from "../molecules/csvImpoter";
+import OutlinedInput from '@mui/material/OutlinedInput';
+import Chip from '@mui/material/Chip';
+import DeleteIcon from '@mui/icons-material/Delete';
 
 
 
@@ -100,7 +103,7 @@ const GridComponent = ({ pageName }) => {
       };
       fetchWebformsData();
     }, [fetchDataWithRetry]);
-
+ 
   // const [filteredRows, setFilteredRows] = useState(gridData);
   //not confirmed
   const [menuData, setMenuData] = useState([]);
@@ -251,7 +254,7 @@ const GridComponent = ({ pageName }) => {
   }, [pageName]);
   
   
-
+const [existingControl, setExistingControl] = useState([]);
   // Fetch select options
   useEffect(() => {
     const fetchSelectOptions = async () => {
@@ -269,6 +272,8 @@ const GridComponent = ({ pageName }) => {
             headers: headers, // Pass the headers here
           }
         );
+        setExistingControl(response.data.data.find((control) => control.pageName === pageName))
+        console.log("response Data", response);
         const options = response.data.data[0].value.map((option) => ({
           name: option.name,
           filter: option.filter,
@@ -301,6 +306,50 @@ const GridComponent = ({ pageName }) => {
     fetchSelectOptions();
   }, [pageName]);
 
+  const handleDeleteOption = async (index, option) => {
+    
+    // Show confirmation dialog before deleting
+    const isConfirmed = window.confirm(`Are you sure you want to delete "${option.name}"?`);
+    
+    if (!isConfirmed) {
+        return; // Exit if user cancels
+    }
+
+    console.log("existingControl", existingControl);
+    console.log("Deleting option:", option);
+
+    try {
+        // Remove the selected option from existingControl.value
+        const updatedOptions = existingControl.value.filter((_, i) => i !== index);
+        console.log("Updated Options", updatedOptions);
+
+        // Create an object excluding `_id`
+        const { _id, ...updatedControl } = existingControl; // Exclude `_id`
+        updatedControl.value = updatedOptions; // Update value array
+
+        // Send a PUT request to update the backend
+        await axios.put(`${config.apiUrl}/controls/${_id}`, updatedControl, { headers });
+
+        // Update state with new options
+        setSelectOptions(updatedOptions);
+
+        // Update selected value if needed
+        if (updatedOptions.length > 0) {
+            setSelectedValue(JSON.stringify(updatedOptions[0].filter));
+        } else {
+            setSelectedValue(""); // Clear selection if empty
+        }
+
+    } catch (error) {
+        console.error("Error deleting option:", error);
+    }
+};
+
+
+
+  
+  
+  
   // Handle page change
   const [key, setKey] = useState(0);
   const handlePageChange = (event, value) => {
@@ -481,16 +530,16 @@ const handleFilterChangeAndSearch = (field, value, isDropdown) => {
   let filterValue = value;
 
   if (isDropdown) {
-    // Ensure it's always an array
     filterValue = Array.isArray(value) ? value : [value];
 
-    // If no option is selected, reset all filters
     if (filterValue.length === 0) {
       setFilterText({});
       return;
     }
+  } else if (typeof value === "object") {
+    // If value is an object (startDate & endDate), store it as is
+    filterValue = value;
   } else {
-    // Ensure it's a string for other field types
     filterValue = typeof value === "string" ? value.trim() : "";
   }
 
@@ -500,21 +549,30 @@ const handleFilterChangeAndSearch = (field, value, isDropdown) => {
   }));
 };
 
+
 // 🆕 useEffect to trigger search when filterText changes
 useEffect(() => {
   performSearch();
 }, [filterText]); // Run performSearch when filterText updates
 
 const performSearch = () => {
-  // Build the dynamic `$match` object
   const activeFilters = Object.entries(filterText)
-    .filter(([_, v]) => (Array.isArray(v) ? v.length > 0 : v.trim() !== "")) // Exclude empty filters
+    .filter(([key, val]) => (Array.isArray(val) ? val.length > 0 : val.trim() !== "")) // Exclude empty filters
     .reduce((acc, [key, val]) => {
-      if (Array.isArray(val)) {
-        acc[key] = { $in: val }; // Handle array values for multi-select
+      if (key === "created_time") { 
+        // If the field type is datetime-local, format it as a date range
+        const startOfDay = `${val}T00:00:00.000Z`;
+        const endOfDay = `${val}T23:59:59.999Z`;
+
+        acc[key] = {
+          $gte: startOfDay,
+          $lt: endOfDay,
+        };
+      } else if (Array.isArray(val)) {
+        acc[key] = { $in: val }; // Handle multi-select filters
       } else {
         acc[key] = {
-          $regex: val.trim(), // Partial matching
+          $regex: val.trim(), // Partial text search
           $options: "i",      // Case-insensitive
         };
       }
@@ -531,11 +589,12 @@ const performSearch = () => {
   ];
 
   const currentNumberOfRow = pageSize || 25;
-  // Reset page number and fetch the grid data
   setPage(1);
   setInputPage(1);
   fetchGridData(filter, 1, currentNumberOfRow);
 };
+
+
 
 const filteredRows = gridData.filter((row) =>
   columns.every((column) => {
@@ -761,7 +820,7 @@ const handleViewReport = async () => {
       renderHeader: (params) => {
         // Get the field type from dynamicFields
         const fieldType = dynamicFields.find((field) => field.fieldName === params.field)?.type || "text";
-        console.log("fieldType", fieldType);
+        // console.log("fieldType", fieldType);
         return (
           <div
             style={{
@@ -818,6 +877,7 @@ const handleViewReport = async () => {
                 className="grid_search"
               />
             ) : fieldType === "datetime-local" ? (
+              <>
               <TextField
                 type="date"
                 variant="outlined"
@@ -827,6 +887,16 @@ const handleViewReport = async () => {
                 style={{ width: "80%", background: "#ffffff", borderRadius: "10px" }}
                 className="grid_search"
               />
+              <TextField
+                type="date"
+                variant="outlined"
+                size="small"
+                value={filterText[params.field] || ""}
+                onChange={(e) => handleFilterChangeAndSearch(params.field, e.target.value, false)}
+                style={{ width: "80%", background: "#ffffff", borderRadius: "10px" }}
+                className="grid_search"
+              />
+              </>
             ) : fieldType === "boolean" ? (
               <Select
                 value={filterText[params.field] || ""}
@@ -1133,7 +1203,7 @@ const handleViewReport = async () => {
         </Menu>
         
         <div className="dropdown" style={{ margin: "8px", width: "250px" }}>
-          <select
+          {/* <select
             value={selectedValue}
             onChange={handleChange}
             style={{
@@ -1153,7 +1223,72 @@ const handleViewReport = async () => {
               </option>
             ))}
             <option value="custom">Custom</option>
-          </select>
+          </select> */}
+          {/* <FormControl style={{ width: "250px" }}>
+            <Select className="DropDown-select-option"
+              style={{
+                color: "white",
+                background: "rgb(70, 70, 70)",
+                width: "100%",
+                padding: "5px 10px",
+                borderRadius: "4px",
+                border: "1px solid rgb(206, 212, 218)",
+                cursor: "pointer"
+              }}
+            
+              value={selectedValue}
+              onChange={handleChange}
+            >
+              {selectOptions.map((option, index) => (
+                <MenuItem
+                  key={index} value={JSON.stringify(option.filter)}
+                  style={{display: "flex", justifyContent:"space-between"}}
+                >
+                  <div>{option.name}</div> <div onClick={() => console.log("Deleted")}>Delete</div>
+                </MenuItem>
+              ))}
+              <MenuItem value="custom">Custom</MenuItem>
+            </Select>
+          </FormControl> */}
+          <FormControl style={{ width: "250px" }}>
+  <Select
+    className="DropDown-select-option"
+    style={{
+      color: "white",
+      background: "rgb(70, 70, 70)",
+      width: "100%",
+      padding: "5px 10px",
+      borderRadius: "4px",
+      border: "1px solid rgb(206, 212, 218)",
+      cursor: "pointer",
+    }}
+    value={selectedValue}
+    onChange={handleChange}
+  >
+    {selectOptions.map((option, index) => (
+      <MenuItem
+      className="grid_menu_option_list"
+        key={index}
+        value={JSON.stringify(option.filter)}
+        style={{ display: "flex", justifyContent: "space-between" }}
+      >
+        <div>{option.name}</div>
+        <div className="grid_menu_delete_btn"
+          style={{ cursor: "pointer", color: "black", marginLeft: "10px"}}
+          onClick={(e) => {
+            e.stopPropagation(); // Prevent dropdown from closing
+            handleDeleteOption(index, option);
+          }}
+        >
+          <DeleteIcon style={{height:'30px', width:'18px'}} />
+        </div>
+      </MenuItem>
+    ))}
+    <MenuItem value="custom">Custom</MenuItem>
+  </Select>
+</FormControl>
+
+
         </div>
         </Box>
         <Box
