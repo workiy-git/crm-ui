@@ -13,6 +13,7 @@ import TextField from '@mui/material/TextField';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
 import { headers } from '../atoms/Authorization';
 import { useNavigate } from "react-router-dom";
+import LaunchIcon from '@mui/icons-material/Launch';
 
 const Search = () => {
   const [menuData, setMenuData] = useState([]);
@@ -45,17 +46,22 @@ const Search = () => {
     setSearchValue(event.target.value);
   };
 
+  const [loading, setLoading] = useState(false); // Add loading state
+
   const handleGetData = async (filter) => {
     try {
+      setLoading(true); // Set loading to true before fetching data
       const response = await axios.post(
         `${config.apiUrl.replace(/\/$/, '')}/appdata/retrieve?page=1&pageSize=100`,
         filter,
         { headers }
       );
-      setSearchResult(response.data.data); // Set the search results
-      console.log('Search Result:', response.data.data);
+      setSearchResult(response.data.data || []); // Set search results
     } catch (error) {
       console.error('Error fetching data:', error);
+      setSearchResult([]); // Clear results on error
+    } finally {
+      setLoading(false); // Set loading to false after request completes
     }
   };
 
@@ -79,6 +85,8 @@ const Search = () => {
             { alternative_phone: searchValue },
             { whatsapp: searchValue },
             { lead_number: searchValue },
+            { name : searchValue },
+            {email : searchValue},
           ],
         },
       },
@@ -111,91 +119,100 @@ const Search = () => {
     justifyContent: 'center',
   }));
 
-  const StyledInputBase = styled(InputBase)(({ theme }) => ({
+  const StyledInputBase = styled('div')(({ theme }) => ({
     color: 'white',
     width: '100%',
-    '& .MuiInputBase-input': {
+    height: '15px',
+    cursor: 'text',
       padding: theme.spacing(1, 1, 1, 0),
       paddingLeft: `calc(1em + ${theme.spacing(4)})`,
       transition: theme.transitions.create('width'),
       [theme.breakpoints.up('sm')]: {
-        width: '40ch',
+        width: '15ch',
         '&:focus': {
-          width: '20ch',
+          width: '15ch',
         },
       },
-    },
   }));
 
   return (
     <div>
-      <SearchContainer style={{ background: 'black', borderRadius: '100px' }}>
+      <SearchContainer onClick={handleSearchClick} style={{ background: 'black', borderRadius: '100px' }}>
         <SearchIconWrapper>
-          <SearchIcon />
+          <SearchIcon style={{marginRight:'20px'}} /> Search
         </SearchIconWrapper>
         <StyledInputBase
           placeholder="Search"
-          inputProps={{ 'aria-label': 'search' }}
           onClick={handleSearchClick}
+          
         />
       </SearchContainer>
 
       <Dialog open={isSearchOpen} onClose={handleSearchClose} maxWidth="md" fullWidth>
-        <DialogTitle>Search</DialogTitle>
-        <DialogContent>
-          <TextField
-            autoFocus
-            margin="dense"
-            label="Enter search value"
-            fullWidth
-            variant="standard"
-            value={searchValue}
-            onChange={handleSearchInputChange}
-            onKeyPress={(event) => {
-              if (event.key === 'Enter') {
-                handleSearchSubmit();
-              }
-            }}
-          />
-          {searchResult.length > 0 ? (
-  <TableContainer component={Paper} style={{ marginTop: '20px' }}>
-    <Table>
-      <TableHead>
-        <TableRow>
-          <TableCell>Name</TableCell>
-          <TableCell>Mobile Phone</TableCell>
-          <TableCell>Lead ID</TableCell>
-          <TableCell>Alternative Phone</TableCell>
-          <TableCell>WhatsApp</TableCell>
-          <TableCell>Assigned To</TableCell>
-        </TableRow>
-      </TableHead>
-      <TableBody>
-        {searchResult.map((row, index) => (
-          <TableRow onDoubleClick={() => handleNavigate(row)} key={index}>
-            <TableCell>{row.name || 'N/A'}</TableCell>
-            <TableCell>{row.mobile_phone || 'N/A'}</TableCell>
-            <TableCell>{row.lead_number || 'N/A'}</TableCell>
-            <TableCell>{row.alternative_phone || 'N/A'}</TableCell>
-            <TableCell>{row.whatsapp || 'N/A'}</TableCell>
-            <TableCell>{row.assigned_to || 'N/A'}</TableCell>
-          </TableRow>
-        ))}
-      </TableBody>
-    </Table>
-  </TableContainer>
-) : (
-  <div style={{ marginTop: '20px', textAlign: 'center', fontSize: '16px', color: 'gray' }}>
-    No Data Available
-  </div>
-)}
-
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleSearchClose}>Close</Button>
-          <Button onClick={handleSearchSubmit}>Search</Button>
-        </DialogActions>
-      </Dialog>
+    <DialogTitle>Search</DialogTitle>
+    <DialogContent>
+      <TextField
+        autoFocus
+        margin="dense"
+        label="Enter search value"
+        fullWidth
+        variant="standard"
+        value={searchValue}
+        onChange={handleSearchInputChange}
+        onKeyPress={(event) => {
+          if (event.key === 'Enter') {
+            handleSearchSubmit();
+          }
+        }}
+      />
+      
+      {/* Show "Loading..." while fetching data */}
+      {loading ? (
+        <div style={{ marginTop: '20px', textAlign: 'center', fontSize: '16px', color: 'gray' }}>
+          Loading...
+        </div>
+      ) : searchResult.length > 0 ? (
+        <TableContainer component={Paper} style={{ marginTop: '20px' }}>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell>Edit</TableCell>
+                <TableCell>Name</TableCell>
+                <TableCell>Mobile Phone</TableCell>
+                <TableCell>Lead ID</TableCell>
+                <TableCell>Alternative Phone</TableCell>
+                <TableCell>WhatsApp</TableCell>
+                <TableCell>Assigned To</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {searchResult.map((row, index) => (
+                <TableRow onDoubleClick={() => handleNavigate(row)} key={index}>
+                  <TableCell>
+                    <LaunchIcon onClick={() => handleNavigate(row)} style={{ cursor: 'pointer' }} />
+                  </TableCell>  
+                  <TableCell>{row.name || 'N/A'}</TableCell>
+                  <TableCell>{row.mobile_phone || 'N/A'}</TableCell>
+                  <TableCell>{row.lead_number || 'N/A'}</TableCell>
+                  <TableCell>{row.alternative_phone || 'N/A'}</TableCell>
+                  <TableCell>{row.whatsapp || 'N/A'}</TableCell>
+                  <TableCell>{row.assigned_to || 'N/A'}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      ) : (
+        <div style={{ marginTop: '20px', textAlign: 'center', fontSize: '16px', color: 'gray' }}>
+          No Data Available
+        </div>
+      )}
+    </DialogContent>
+    <DialogActions>
+      <Button onClick={handleSearchClose}>Close</Button>
+      <Button onClick={handleSearchSubmit}>Search</Button>
+    </DialogActions>
+  </Dialog>
     </div>
   );
 };
