@@ -11,6 +11,7 @@ import CsvImporter from "../molecules/csvImpoter";
 import OutlinedInput from '@mui/material/OutlinedInput';
 import Chip from '@mui/material/Chip';
 import DeleteIcon from '@mui/icons-material/Delete';
+import dayjs from "dayjs";
 
 
 
@@ -45,6 +46,7 @@ const gridEndpoint = "appdata/retrieve";
 
 
 const GridComponent = ({ pageName }) => {
+  const [open, setOpen] = useState(false);
   const [columns, setColumns] = useState([]);
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
@@ -68,6 +70,7 @@ const GridComponent = ({ pageName }) => {
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const [inputPage, setInputPage] = useState("");
   const [dynamicFields, setDynamicFields] = useState([]);
+  const [dateRange, setDateRange] = useState({ startDate: null, endDate: null });
 
     const fetchDataWithRetry = useCallback(
       async (url, retryCount = 3) => {
@@ -353,16 +356,17 @@ const [existingControl, setExistingControl] = useState([]);
   // Handle page change
   const [key, setKey] = useState(0);
   const handlePageChange = (event, value) => {
-    // setKey(prevKey => prevKey + 1);
     const currentPage = value;
     const currentpageSize = pageSize;
     setLoading(true);
     
-    handleChange({ target: { value: selectedValue } }, currentPage, currentpageSize);
+    // Use the existing filterText state to fetch data for the selected filter
+    const filter = JSON.parse(selectedValue);
+    fetchGridData(filter, currentPage, currentpageSize);
+    
     setPage(value);
     setInputPage(value);
     console.log("current page", value);
-    // fetchGridData();
   };
 
   // Fetch grid data based on the selected filter
@@ -431,6 +435,8 @@ const [existingControl, setExistingControl] = useState([]);
         }
       );
       
+      console.log("Response data:", response.data);
+
       const dataWithIds = response.data.data.map((item, index) => {
         const flattenedItem = flattenObject(item); // Flatten the object
         return {
@@ -438,9 +444,10 @@ const [existingControl, setExistingControl] = useState([]);
           id: item._id || index,
         };
       });
+      console.log("Data with IDs:", dataWithIds);
+
       setTotalRecord(response.data.pagination.totalCount);
-  
-      setGridData(dataWithIds);
+      setGridData(dataWithIds); // Ensure gridData is set with the fetched data
       setTotalRows(dataWithIds.length);
   
       if (response.data.data.length > 0) {
@@ -549,6 +556,22 @@ const handleFilterChangeAndSearch = (field, value, isDropdown) => {
   }));
 };
 
+const handleDateChange = (field, type) => (e) => {
+  const value = e.target.value;
+  setDateRange((prev) => ({
+    ...prev,
+    [type]: value ? dayjs(value).format("YYYY-MM-DD") : null,
+  }));
+};
+
+const handleDateSearch = (field) => {
+  if (dateRange.startDate || dateRange.endDate) {
+    handleFilterChangeAndSearch(field, {
+      startDate: dateRange.startDate,
+      endDate: dateRange.endDate,
+    }, false);
+  }
+};
 
 // 🆕 useEffect to trigger search when filterText changes
 useEffect(() => {
@@ -557,22 +580,42 @@ useEffect(() => {
 
 const performSearch = () => {
   const activeFilters = Object.entries(filterText)
-    .filter(([key, val]) => (Array.isArray(val) ? val.length > 0 : val.trim() !== "")) // Exclude empty filters
+    .filter(([key, val]) => (Array.isArray(val) ? val.length > 0 : String(val).trim() !== "")) // Exclude empty filters
     .reduce((acc, [key, val]) => {
-      if (key === "created_time") { 
-        // If the field type is datetime-local, format it as a date range
-        const startOfDay = `${val}T00:00:00.000Z`;
-        const endOfDay = `${val}T23:59:59.999Z`;
+      if (key === "created_time") {
+        if (val.startDate && val.endDate) {
+          // If both startDate and endDate are provided, use them as a range
+          const startOfDay = `${dayjs(val.startDate).format("YYYY-MM-DD")}T00:00:00.000Z`;
+          const endOfDay = `${dayjs(val.endDate).format("YYYY-MM-DD")}T23:59:59.999Z`;
 
-        acc[key] = {
-          $gte: startOfDay,
-          $lt: endOfDay,
-        };
+          acc[key] = {
+            $gte: startOfDay,
+            $lt: endOfDay,
+          };
+        } else if (val.startDate) {
+          // If only startDate is provided, use it for the entire day
+          const startOfDay = `${dayjs(val.startDate).format("YYYY-MM-DD")}T00:00:00.000Z`;
+          const endOfDay = `${dayjs(val.startDate).format("YYYY-MM-DD")}T23:59:59.999Z`;
+
+          acc[key] = {
+            $gte: startOfDay,
+            $lt: endOfDay,
+          };
+        } else if (val.endDate) {
+          // If only endDate is provided, use it for the entire day
+          const startOfDay = `${dayjs(val.endDate).format("YYYY-MM-DD")}T00:00:00.000Z`;
+          const endOfDay = `${dayjs(val.endDate).format("YYYY-MM-DD")}T23:59:59.999Z`;
+
+          acc[key] = {
+            $gte: startOfDay,
+            $lt: endOfDay,
+          };
+        }
       } else if (Array.isArray(val)) {
         acc[key] = { $in: val }; // Handle multi-select filters
       } else {
         acc[key] = {
-          $regex: val.trim(), // Partial text search
+          $regex: String(val).trim(), // Partial text search
           $options: "i",      // Case-insensitive
         };
       }
@@ -587,24 +630,20 @@ const performSearch = () => {
       },
     },
   ];
-
+  setSelectedValue(JSON.stringify(filter)); // Update the selected value for the dropdown
   const currentNumberOfRow = pageSize || 25;
   setPage(1);
   setInputPage(1);
   fetchGridData(filter, 1, currentNumberOfRow);
 };
 
-
-
-const filteredRows = gridData.filter((row) =>
-  columns.every((column) => {
-    const value = row[column.field];
-    const filterValue = filterText[column.field] || "";
-    return Array.isArray(filterValue)
-      ? filterValue.some((v) => v.toLowerCase() === String(value).toLowerCase())
-      : String(value).toLowerCase().includes(filterValue.toLowerCase());
-  })
-);
+const filteredRows = gridData.map((row) => {
+  const flattenedRow = flattenObject(row);
+  return {
+    ...flattenedRow,
+    id: row._id,
+  };
+});
 
   const handleMenuOpen = (event, row) => {
     event.preventDefault();
@@ -814,13 +853,14 @@ const handleViewReport = async () => {
     },
     ...columns.map((column) => ({
       ...column,
-      sortable: false,
+      // sortable: false,
       disableColumnMenu: true,
       cellClassName: 'center-align',
       renderHeader: (params) => {
         // Get the field type from dynamicFields
         const fieldType = dynamicFields.find((field) => field.fieldName === params.field)?.type || "text";
         // console.log("fieldType", fieldType);
+        
         return (
           <div
             style={{
@@ -878,24 +918,44 @@ const handleViewReport = async () => {
               />
             ) : fieldType === "datetime-local" ? (
               <>
-              <TextField
-                type="date"
-                variant="outlined"
-                size="small"
-                value={filterText[params.field] || ""}
-                onChange={(e) => handleFilterChangeAndSearch(params.field, e.target.value, false)}
-                style={{ width: "80%", background: "#ffffff", borderRadius: "10px" }}
-                className="grid_search"
-              />
-              <TextField
-                type="date"
-                variant="outlined"
-                size="small"
-                value={filterText[params.field] || ""}
-                onChange={(e) => handleFilterChangeAndSearch(params.field, e.target.value, false)}
-                style={{ width: "80%", background: "#ffffff", borderRadius: "10px" }}
-                className="grid_search"
-              />
+              <div>
+      {/* Button to open modal */}
+      <Button style={{ width: "90%", background: "#ffffff", borderRadius: "10px", padding: "0px 30px", color: 'black' }}  variant="contained" size="small" onClick={() => setOpen(true)}>
+        Select Date
+      </Button>
+
+      {/* Date Picker Popup */}
+      <Dialog open={open} onClose={() => setOpen(false)}>
+        <DialogTitle>Select Date Range</DialogTitle>
+        <DialogContent>
+          <TextField
+            type="date"
+            variant="outlined"
+            size="small"
+            value={dateRange.startDate || ""}
+            onChange={handleDateChange(params.field, "startDate")}
+            style={{ width: "100%", marginBottom: "10px" }}
+            placeholder="Start Date"
+          />
+          <TextField
+            type="date"
+            variant="outlined"
+            size="small"
+            value={dateRange.endDate || ""}
+            onChange={handleDateChange(params.field, "endDate")}
+            style={{ width: "100%" }}
+            placeholder="End Date"
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpen(false)} color="secondary">Cancel</Button>
+          <Button onClick={() => { 
+            handleDateSearch(params.field); 
+            setOpen(false);
+          }} color="primary">OK</Button>
+        </DialogActions>
+      </Dialog>
+    </div>
               </>
             ) : fieldType === "boolean" ? (
               <Select
@@ -1106,6 +1166,16 @@ const handleViewReport = async () => {
   //Loader
   const [isLoading, setIsLoading] = useState(true); 
 
+  useEffect(() => {
+    if (pageName) {
+      setIsLoading(true); // Set the loader to true when pageName changes
+      setPage(1); // Reset to the first page when the pageName changes
+      setInputPage(1); // Reset the input page number when the pageName changes
+      setFilterText({}); // Reset all filter fields
+      setDateRange({ startDate: null, endDate: null }); // Reset date range
+    }
+  }, [pageName]);
+
   if (isLoading) {
     return <Loader />; // Use the Loader component here
   }
@@ -1203,53 +1273,6 @@ const handleViewReport = async () => {
         </Menu>
         
         <div className="dropdown" style={{ margin: "8px", width: "250px" }}>
-          {/* <select
-            value={selectedValue}
-            onChange={handleChange}
-            style={{
-              color: "white",
-              background: "#464646",
-              width: "100%",
-              padding: "5px 10px",
-              borderRadius: "4px",
-              border: "1px solid #ced4da",
-              cursor: "pointer", // Add this line to change the cursor to a pointer
-            }}
-            aria-label="Without label"
-          >
-            {selectOptions.map((option, index) => (
-              <option key={index} value={JSON.stringify(option.filter)}>
-                {option.name}
-              </option>
-            ))}
-            <option value="custom">Custom</option>
-          </select> */}
-          {/* <FormControl style={{ width: "250px" }}>
-            <Select className="DropDown-select-option"
-              style={{
-                color: "white",
-                background: "rgb(70, 70, 70)",
-                width: "100%",
-                padding: "5px 10px",
-                borderRadius: "4px",
-                border: "1px solid rgb(206, 212, 218)",
-                cursor: "pointer"
-              }}
-            
-              value={selectedValue}
-              onChange={handleChange}
-            >
-              {selectOptions.map((option, index) => (
-                <MenuItem
-                  key={index} value={JSON.stringify(option.filter)}
-                  style={{display: "flex", justifyContent:"space-between"}}
-                >
-                  <div>{option.name}</div> <div onClick={() => console.log("Deleted")}>Delete</div>
-                </MenuItem>
-              ))}
-              <MenuItem value="custom">Custom</MenuItem>
-            </Select>
-          </FormControl> */}
           <FormControl style={{ width: "250px" }}>
   <Select
     className="DropDown-select-option"
