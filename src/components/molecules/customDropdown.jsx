@@ -38,10 +38,165 @@ useEffect(() => {
 }, []);
 
 const today = new Date().toISOString().split("T")[0];
+
+const getDateString = (offset) => {
+  let date = new Date();
+  date.setDate(date.getDate() + offset);
+  return date.toISOString().split("T")[0];
+};
+
+const yesterday = getDateString(-1);
+const tomorrow = getDateString(1);
+
+// Calculate start and end of the current week (Monday to Sunday)
+const thisWeekStart = new Date();
+thisWeekStart.setDate(thisWeekStart.getDate() - thisWeekStart.getDay() + 1);
+const thisWeekEnd = new Date();
+thisWeekEnd.setDate(thisWeekEnd.getDate() - thisWeekEnd.getDay() + 7);
+
+// Calculate start and end of next week
+const nextWeekStart = new Date();
+nextWeekStart.setDate(thisWeekEnd.getDate() + 1);
+const nextWeekEnd = new Date();
+nextWeekEnd.setDate(nextWeekStart.getDate() + 6);
+
+// Convert to YYYY-MM-DD format
+const thisWeekStartDate = thisWeekStart.toISOString().split("T")[0];
+const thisWeekEndDate = thisWeekEnd.toISOString().split("T")[0];
+const nextWeekStartDate = nextWeekStart.toISOString().split("T")[0];
+const nextWeekEndDate = nextWeekEnd.toISOString().split("T")[0];
+
 console.log("Today's date:", today);
 
+const getDateRange = (type) => {
+  const today = new Date();
+  let startDate, endDate;
 
-  // Function to fetch data with retry logic
+  if (type === "thisMonth") {
+    startDate = new Date(today.getFullYear(), today.getMonth(), 1);
+    endDate = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+  } else if (type === "nextMonth") {
+    startDate = new Date(today.getFullYear(), today.getMonth() + 1, 1);
+    endDate = new Date(today.getFullYear(), today.getMonth() + 2, 0);
+  }
+
+  switch (type) {
+    case "last7days":
+      startDate = new Date();
+      startDate.setDate(today.getDate() - 7);
+      endDate = today;
+      break;
+
+    case "last30days":
+      startDate = new Date();
+      startDate.setDate(today.getDate() - 30);
+      endDate = today;
+      break;
+
+    case "last45days":
+      startDate = new Date();
+      startDate.setDate(today.getDate() - 45);
+      endDate = today;
+      break;
+
+    case "last60days":
+      startDate = new Date();
+      startDate.setDate(today.getDate() - 60);
+      endDate = today;
+      break;
+
+    case "last90days":
+      startDate = new Date();
+      startDate.setDate(today.getDate() - 90);
+      endDate = today;
+      break;
+
+    case "last120days":
+      startDate = new Date();
+      startDate.setDate(today.getDate() - 120);
+      endDate = today;
+      break;
+
+    case "next7days":
+      startDate = today;
+      endDate = new Date();
+      endDate.setDate(today.getDate() + 7);
+      break;
+
+    case "next30days":
+      startDate = today;
+      endDate = new Date();
+      endDate.setDate(today.getDate() + 30);
+      break;
+
+    case "next45days":
+      startDate = today;
+      endDate = new Date();
+      endDate.setDate(today.getDate() + 45);
+      break;
+
+    case "next60days":
+      startDate = today;
+      endDate = new Date();
+      endDate.setDate(today.getDate() + 60);
+      break;
+
+    case "next90days":
+      startDate = today;
+      endDate = new Date();
+      endDate.setDate(today.getDate() + 90);
+      break;
+
+    case "next120days":
+      startDate = today;
+      endDate = new Date();
+      endDate.setDate(today.getDate() + 120);
+      break;
+
+    case "previousFinancialYear":
+      startDate = new Date(today.getFullYear() - 1, 3, 1);
+      endDate = new Date(today.getFullYear(), 2, 31);
+      break;
+
+    case "currentFinancialYear":
+      startDate = new Date(today.getFullYear(), 3, 1);
+      endDate = new Date(today.getFullYear() + 1, 2, 31);
+      break;
+
+    case "nextFinancialYear":
+      startDate = new Date(today.getFullYear() + 1, 3, 1);
+      endDate = new Date(today.getFullYear() + 2, 2, 31);
+      break;
+
+    case "previousWeek":
+      startDate = new Date();
+      startDate.setDate(today.getDate() - today.getDay() - 6);
+      endDate = new Date();
+      endDate.setDate(today.getDate() - today.getDay());
+      break;
+
+    case "previousWeek":
+      const currentDay = today.getDay();
+      const daysToSubtract = currentDay === 0 ? 7 : currentDay;
+      startDate = new Date(today);
+      startDate.setDate(today.getDate() - daysToSubtract - 6);
+      endDate = new Date(today);
+      endDate.setDate(today.getDate() - daysToSubtract);
+      break;
+
+    default:
+      return { error: "Invalid type selected" };
+  }
+
+  const formatDate = (date) => {
+    return date.toLocaleDateString("en-GB").split('/').join('-');
+  };
+
+  return {
+    startDate: formatDate(startDate),
+    endDate: formatDate(endDate),
+  };
+};
   const fetchDataWithRetry = useCallback(
     async (url, retryCount = 3) => {
       try {
@@ -76,12 +231,10 @@ console.log("Today's date:", today);
     fetchWebformsData();
   }, [fetchDataWithRetry]);
   
-  // Add a new condition
   const handleAddCondition = () => {
     setConditions([...conditions, { fieldName: "", operator: "", value: "" }]);
   };
 
-  // Handle changes in condition fields
   const handleConditionChange = (index, key, value) => {
     const updatedConditions = [...conditions];
     updatedConditions[index][key] = value;
@@ -89,7 +242,6 @@ console.log("Today's date:", today);
     console.log("Updated Conditions:", updatedConditions);
   };
 
-  // Handle changes in the custom filter name
   const handleInputChange = (key, value) => {
     setFormData({ ...formData, [key]: value });
   };
@@ -142,19 +294,154 @@ console.log("Today's date:", today);
               $gte: startOfDay,
               $lt: endOfDay,
             };
-              // matchConditions[condition.fieldName] = { $regex: condition.value, $options: "i" };
               break;
             case "$gte_today_lte":
-
-              const startToday = `${today}T00:00:00.000Z`; 
-              const endToday = `${today}T23:59:59.999Z`;
-  
               matchConditions[condition.fieldName] = {
-                $gte: startToday,
-                $lt: endToday,
+                $gte: `${today}T00:00:00.000Z`,
+                $lt: `${today}T23:59:59.999Z`,
               };
-                // matchConditions[condition.fieldName] = { $regex: condition.value, $options: "i" };
-                break;
+              break;
+
+            case "$gte_yesterday_lte":
+              matchConditions[condition.fieldName] = {
+                $gte: `${yesterday}T00:00:00.000Z`,
+                $lt: `${yesterday}T23:59:59.999Z`,
+              };
+              break;
+
+            case "$gte_tomorrow_lte":
+              matchConditions[condition.fieldName] = {
+                $gte: `${tomorrow}T00:00:00.000Z`,
+                $lt: `${tomorrow}T23:59:59.999Z`,
+              };
+              break;
+
+            case "$gte_thisweek_lte":
+              matchConditions[condition.fieldName] = {
+                $gte: `${thisWeekStartDate}T00:00:00.000Z`,
+                $lt: `${thisWeekEndDate}T23:59:59.999Z`,
+              };
+              break;
+
+            case "$gte_nextweek_lte":
+              matchConditions[condition.fieldName] = {
+                $gte: `${nextWeekStartDate}T00:00:00.000Z`,
+                $lt: `${nextWeekEndDate}T23:59:59.999Z`,
+              };
+              break;
+
+            case "$gte_thismonth_lte":
+              const { startDate: thisMonthStartDate, endDate: thisMonthEndDate } = getDateRange("thisMonth");
+              matchConditions[condition.fieldName] = {
+                $gte: `${thisMonthStartDate}T00:00:00.000Z`,
+                $lt: `${thisMonthEndDate}T23:59:59.999Z`,
+              };
+              break;
+
+            case "$gte_nextmonth_lte":
+              const { startDate: nextMonthStartDate, endDate: nextMonthEndDate } = getDateRange("nextMonth");
+              matchConditions[condition.fieldName] = {
+                $gte: `${nextMonthStartDate}T00:00:00.000Z`,
+                $lt: `${nextMonthEndDate}T23:59:59.999Z`,
+              };
+              break;
+
+            case "$gte_last7days_lte":
+              const { startDate: last7DaysStartDate, endDate: last7DaysEndDate } = getDateRange("last7days");
+              matchConditions[condition.fieldName] = {
+                $gte: `${last7DaysStartDate}T00:00:00.000Z`,
+                $lt: `${last7DaysEndDate}T23:59:59.999Z`,
+              };
+              break;
+
+            case "$gte_last30days_lte":
+              const { startDate: last30DaysStartDate, endDate: last30DaysEndDate } = getDateRange("last30days");
+              matchConditions[condition.fieldName] = {
+                $gte: `${last30DaysStartDate}T00:00:00.000Z`,
+                $lt: `${last30DaysEndDate}T23:59:59.999Z`,
+              };
+              break;
+
+            case "$gte_last45days_lte":
+              const { startDate: last45DaysStartDate, endDate: last45DaysEndDate } = getDateRange("last45days");
+              matchConditions[condition.fieldName] = {
+                $gte: `${last45DaysStartDate}T00:00:00.000Z`,
+                $lt: `${last45DaysEndDate}T23:59:59.999Z`,
+              };
+              break;
+
+            case "$gte_last60days_lte":
+              const { startDate: last60DaysStartDate, endDate: last60DaysEndDate } = getDateRange("last60days");
+              matchConditions[condition.fieldName] = {
+                $gte: `${last60DaysStartDate}T00:00:00.000Z`,
+                $lt: `${last60DaysEndDate}T23:59:59.999Z`,
+              };
+              break;
+
+            case "$gte_last90days_lte":
+              const { startDate: last90DaysStartDate, endDate: last90DaysEndDate } = getDateRange("last90days");
+              matchConditions[condition.fieldName] = {
+                $gte: `${last90DaysStartDate}T00:00:00.000Z`,
+                $lt: `${last90DaysEndDate}T23:59:59.999Z`,
+              };
+              break;
+
+            case "$gte_last120days_lte":
+              const { startDate: last120DaysStartDate, endDate: last120DaysEndDate } = getDateRange("last120days");
+              matchConditions[condition.fieldName] = {
+                $gte: `${last120DaysStartDate}T00:00:00.000Z`,
+                $lt: `${last120DaysEndDate}T23:59:59.999Z`,
+              };
+              break;
+
+            case "$gte_next7days_lte":
+              const { startDate: next7DaysStartDate, endDate: next7DaysEndDate } = getDateRange("next7days");
+              matchConditions[condition.fieldName] = {
+                $gte: `${next7DaysStartDate}T00:00:00.000Z`,
+                $lt: `${next7DaysEndDate}T23:59:59.999Z`,
+              };
+              break;
+
+            case "$gte_next30days_lte":
+              const { startDate: next30DaysStartDate, endDate: next30DaysEndDate } = getDateRange("next30days");
+              matchConditions[condition.fieldName] = {
+                $gte: `${next30DaysStartDate}T00:00:00.000Z`,
+                $lt: `${next30DaysEndDate}T23:59:59.999Z`,
+              };
+              break;
+
+            case "$gte_next45days_lte":
+              const { startDate: next45DaysStartDate, endDate: next45DaysEndDate } = getDateRange("next45days");
+              matchConditions[condition.fieldName] = {
+                $gte: `${next45DaysStartDate}T00:00:00.000Z`,
+                $lt: `${next45DaysEndDate}T23:59:59.999Z`,
+              };
+              break;
+
+            case "$gte_next60days_lte":
+              const { startDate: next60DaysStartDate, endDate: next60DaysEndDate } = getDateRange("next60days");
+              matchConditions[condition.fieldName] = {
+                $gte: `${next60DaysStartDate}T00:00:00.000Z`,
+                $lt: `${next60DaysEndDate}T23:59:59.999Z`,
+              };
+              break;
+
+            case "$gte_next90days_lte":
+              const { startDate: next90DaysStartDate, endDate: next90DaysEndDate } = getDateRange("next90days");
+              matchConditions[condition.fieldName] = {
+                $gte: `${next90DaysStartDate}T00:00:00.000Z`,
+                $lt: `${next90DaysEndDate}T23:59:59.999Z`,
+              };
+              break;
+
+            case "$gte_next120days_lte":
+              const { startDate: next120DaysStartDate, endDate: next120DaysEndDate } = getDateRange("next120days");
+              matchConditions[condition.fieldName] = {
+                $gte: `${next120DaysStartDate}T00:00:00.000Z`,
+                $lt: `${next120DaysEndDate}T23:59:59.999Z`,
+              };
+              break;
+
             case "$eq":
             case "$ne":
             case "$gt":
@@ -183,6 +470,38 @@ console.log("Today's date:", today);
               }
               break;
               
+            case "$gte_previousFinancialYear_lte":
+              const { startDate: previousFinancialYearStartDate, endDate: previousFinancialYearEndDate } = getDateRange("previousFinancialYear");
+              matchConditions[condition.fieldName] = {
+                $gte: `${previousFinancialYearStartDate}T00:00:00.000Z`,
+                $lt: `${previousFinancialYearEndDate}T23:59:59.999Z`,
+              };
+              break;
+
+            case "$gte_currentFinancialYear_lte":
+              const { startDate: currentFinancialYearStartDate, endDate: currentFinancialYearEndDate } = getDateRange("currentFinancialYear");
+              matchConditions[condition.fieldName] = {
+                $gte: `${currentFinancialYearStartDate}T00:00:00.000Z`,
+                $lt: `${currentFinancialYearEndDate}T23:59:59.999Z`,
+              };
+              break;
+
+            case "$gte_nextFinancialYear_lte":
+              const { startDate: nextFinancialYearStartDate, endDate: nextFinancialYearEndDate } = getDateRange("nextFinancialYear");
+              matchConditions[condition.fieldName] = {
+                $gte: `${nextFinancialYearStartDate}T00:00:00.000Z`,
+                $lt: `${nextFinancialYearEndDate}T23:59:59.999Z`,
+              };
+              break;
+
+            case "$gte_previousWeek_lte":
+              const { startDate: previousWeekStartDate, endDate: previousWeekEndDate } = getDateRange("previousWeek");
+              matchConditions[condition.fieldName] = {
+                $gte: `${previousWeekStartDate}T00:00:00.000Z`,
+                $lt: `${previousWeekEndDate}T23:59:59.999Z`,
+              };
+              break;
+
             default:
               console.warn("Operator not handled:", condition.operator);
           }
@@ -205,7 +524,7 @@ console.log("Today's date:", today);
         const updatedValue = existingControl.value ? [...existingControl.value, transformedData] : [transformedData];
         const updatedControl = { ...existingControl, value: updatedValue };
   
-        delete updatedControl._id; // Ensure _id is not included in the update request
+        delete updatedControl._id;
   
         try {
           await axios.put(`${config.apiUrl}/controls/${existingControl._id}`, updatedControl, { headers });
@@ -226,7 +545,7 @@ console.log("Today's date:", today);
   
       setTimeout(() => {
         setSuccess(null);
-        navigate(-1); // Navigate back
+        navigate(-1);
       }, 3000);
     } catch (error) {
       console.error("Error saving filter:", error);
@@ -272,7 +591,6 @@ console.log("Today's date:", today);
         </h2>
       </div>
       <div style={{ padding: "20px" }}>
-        {/* Input for custom filter name */}
         <div style={{ margin: "10px" }}>
           <label htmlFor="dynamicName" style={{ marginRight: "10px" }}>
             Filter Name *
@@ -287,7 +605,6 @@ console.log("Today's date:", today);
           />
         </div>
 
-        {/* Dynamic conditions */}
         {conditions.map((condition, index) => {
   const selectedField = dynamicFields.find(
     (field) => field.fieldName === condition.fieldName
@@ -381,15 +698,345 @@ console.log("Today's date:", today);
             />
           </div>
         ) : condition.operator === "$gte_today_lte" ? (
-                <input
-                  type="date"
-                  value={today}
-                  onChange={(e) => handleConditionChange(index, "value", e.target.value)}
-                  readOnly
-                  style={{ padding: "5px", fontSize: "16px", width: "20%" }}
-                />
-          ) : (
-          
+          <input
+            type="date"
+            value={today}
+            onChange={(e) => handleConditionChange(index, "value", e.target.value)}
+            readOnly
+            style={{ padding: "5px", fontSize: "16px", width: "20%" }}
+          />
+        ) : condition.operator === "$gte_yesterday_lte" ? (
+          <input
+            type="date"
+            value={yesterday}
+            onChange={(e) => handleConditionChange(index, "value", e.target.value)}
+            readOnly
+            style={{ padding: "5px", fontSize: "16px", width: "20%" }}
+          />
+        ) : condition.operator === "$gte_tomorrow_lte" ? (
+          <input
+            type="date"
+            value={tomorrow}
+            onChange={(e) => handleConditionChange(index, "value", e.target.value)}
+            readOnly
+            style={{ padding: "5px", fontSize: "16px", width: "20%" }}
+          />
+        ) : condition.operator === "$gte_thisweek_lte" ? (
+          <div style={{ display: "flex", gap: "10px" }}>
+            <input
+              type="date"
+              value={thisWeekStartDate}
+              readOnly
+              style={{ padding: "5px", fontSize: "16px", width: "45%" }}
+            />
+            <input
+              type="date"
+              value={thisWeekEndDate}
+              readOnly
+              style={{ padding: "5px", fontSize: "16px", width: "45%" }}
+            />
+          </div>
+        ) : condition.operator === "$gte_nextweek_lte" ? (
+          <div style={{ display: "flex", gap: "10px" }}>
+            <input
+              type="date"
+              value={nextWeekStartDate}
+              readOnly
+              style={{ padding: "5px", fontSize: "16px", width: "45%" }}
+            />
+            <input
+              type="date"
+              value={nextWeekEndDate}
+              readOnly
+              style={{ padding: "5px", fontSize: "16px", width: "45%" }}
+            />
+          </div>
+        ) : condition.operator === "$gte_previousWeek_lte" ? (
+          <div style={{ display: "flex", gap: "10px" }}>
+            <input
+              type="date"
+              value={getDateRange("previousWeek").startDate.split('-').reverse().join('-')}
+              readOnly
+              style={{ padding: "5px", fontSize: "16px", width: "45%" }}
+            />
+            <input
+              type="date"
+              value={getDateRange("previousWeek").endDate.split('-').reverse().join('-')}
+              readOnly
+              style={{ padding: "5px", fontSize: "16px", width: "45%" }}
+            />
+          </div>
+        ) : condition.operator === "$gte_prevweek_lte" ? (
+          <div style={{ display: "flex", gap: "10px" }}>
+            <input
+              type="date"
+              value={getDateRange("previousWeek").startDate}
+              readOnly
+              style={{ padding: "5px", fontSize: "16px", width: "45%" }}
+            />
+            <input
+              type="date"
+              value={getDateRange("previousWeek").endDate}
+              readOnly
+              style={{ padding: "5px", fontSize: "16px", width: "45%" }}
+            />
+          </div>
+        ) : condition.operator === "$gte_thismonth_lte" ? (
+          <div style={{ display: "flex", gap: "10px" }}>
+            <input
+              type="date"
+              value={getDateRange("thisMonth").startDate}
+              readOnly
+              style={{ padding: "5px", fontSize: "16px", width: "45%" }}
+            />
+            <input
+              type="date"
+              value={getDateRange("thisMonth").endDate}
+              readOnly
+              style={{ padding: "5px", fontSize: "16px", width: "45%" }}
+            />
+          </div>
+        ) : condition.operator === "$gte_nextmonth_lte" ? (
+          <div style={{ display: "flex", gap: "10px" }}>
+            <input
+              type="date"
+              value={getDateRange("nextMonth").startDate}
+              readOnly
+              style={{ padding: "5px", fontSize: "16px", width: "45%" }}
+            />
+            <input
+              type="date"
+              value={getDateRange("nextMonth").endDate}
+              readOnly
+              style={{ padding: "5px", fontSize: "16px", width: "45%" }}
+            />
+          </div>
+        ) : condition.operator === "$gte_last7days_lte" ? (
+          <div style={{ display: "flex", gap: "10px" }}>
+            <input
+              type="date"
+              value={getDateRange("last7days").startDate.split('-').reverse().join('-')}
+              readOnly
+              style={{ padding: "5px", fontSize: "16px", width: "45%" }}
+            />
+            <input
+              type="date"
+              value={getDateRange("last7days").endDate.split('-').reverse().join('-')}
+              readOnly
+              style={{ padding: "5px", fontSize: "16px", width: "45%" }}
+            />
+          </div>
+        ) : condition.operator === "$gte_last30days_lte" ? (
+          <div style={{ display: "flex", gap: "10px" }}>
+            <input
+              type="date"
+              value={getDateRange("last30days").startDate.split('-').reverse().join('-')}
+              readOnly
+              style={{ padding: "5px", fontSize: "16px", width: "45%" }}
+            />
+            <input
+              type="date"
+              value={getDateRange("last30days").endDate.split('-').reverse().join('-')}
+              readOnly
+              style={{ padding: "5px", fontSize: "16px", width: "45%" }}
+            />
+          </div>
+        ) : condition.operator === "$gte_last45days_lte" ? (
+          <div style={{ display: "flex", gap: "10px" }}>
+            <input
+              type="date"
+              value={getDateRange("last45days").startDate.split('-').reverse().join('-')}
+              readOnly
+              style={{ padding: "5px", fontSize: "16px", width: "45%" }}
+            />
+            <input
+              type="date"
+              value={getDateRange("last45days").endDate.split('-').reverse().join('-')}
+              readOnly
+              style={{ padding: "5px", fontSize: "16px", width: "45%" }}
+            />
+          </div>
+        ) : condition.operator === "$gte_last60days_lte" ? (
+          <div style={{ display: "flex", gap: "10px" }}>
+            <input
+              type="date"
+              value={getDateRange("last60days").startDate.split('-').reverse().join('-')}
+              readOnly
+              style={{ padding: "5px", fontSize: "16px", width: "45%" }}
+            />
+            <input
+              type="date"
+              value={getDateRange("last60days").endDate.split('-').reverse().join('-')}
+              readOnly
+              style={{ padding: "5px", fontSize: "16px", width: "45%" }}
+            />
+          </div>
+        ) : condition.operator === "$gte_last90days_lte" ? (
+          <div style={{ display: "flex", gap: "10px" }}>
+            <input
+              type="date"
+              value={getDateRange("last90days").startDate.split('-').reverse().join('-')}
+              readOnly
+              style={{ padding: "5px", fontSize: "16px", width: "45%" }}
+            />
+            <input
+              type="date"
+              value={getDateRange("last90days").endDate.split('-').reverse().join('-')}
+              readOnly
+              style={{ padding: "5px", fontSize: "16px", width: "45%" }}
+            />
+          </div>
+        ) : condition.operator === "$gte_last120days_lte" ? (
+          <div style={{ display: "flex", gap: "10px" }}>
+            <input
+              type="date"
+              value={getDateRange("last120days").startDate.split('-').reverse().join('-')}
+              readOnly
+              style={{ padding: "5px", fontSize: "16px", width: "45%" }}
+            />
+            <input
+              type="date"
+              value={getDateRange("last120days").endDate.split('-').reverse().join('-')}
+              readOnly
+              style={{ padding: "5px", fontSize: "16px", width: "45%" }}
+            />
+          </div>
+        ) : condition.operator === "$gte_next7days_lte" ? (
+          <div style={{ display: "flex", gap: "10px" }}>
+            <input
+              type="date"
+              value={getDateRange("next7days").startDate.split('-').reverse().join('-')}
+              readOnly
+              style={{ padding: "5px", fontSize: "16px", width: "45%" }}
+            />
+            <input
+              type="date"
+              value={getDateRange("next7days").endDate.split('-').reverse().join('-')}
+              readOnly
+              style={{ padding: "5px", fontSize: "16px", width: "45%" }}
+            />
+          </div>
+        ) : condition.operator === "$gte_next30days_lte" ? (
+          <div style={{ display: "flex", gap: "10px" }}>
+            <input
+              type="date"
+              value={getDateRange("next30days").startDate.split('-').reverse().join('-')}
+              readOnly
+              style={{ padding: "5px", fontSize: "16px", width: "45%" }}
+            />
+            <input
+              type="date"
+              value={getDateRange("next30days").endDate.split('-').reverse().join('-')}
+              readOnly
+              style={{ padding: "5px", fontSize: "16px", width: "45%" }}
+            />
+          </div>
+        ) : condition.operator === "$gte_next45days_lte" ? (
+          <div style={{ display: "flex", gap: "10px" }}>
+            <input
+              type="date"
+              value={getDateRange("next45days").startDate.split('-').reverse().join('-')}
+              readOnly
+              style={{ padding: "5px", fontSize: "16px", width: "45%" }}
+            />
+            <input
+              type="date"
+              value={getDateRange("next45days").endDate.split('-').reverse().join('-')}
+              readOnly
+              style={{ padding: "5px", fontSize: "16px", width: "45%" }}
+            />
+          </div>
+        ) : condition.operator === "$gte_next60days_lte" ? (
+          <div style={{ display: "flex", gap: "10px" }}>
+            <input
+              type="date"
+              value={getDateRange("next60days").startDate.split('-').reverse().join('-')}
+              readOnly
+              style={{ padding: "5px", fontSize: "16px", width: "45%" }}
+            />
+            <input
+              type="date"
+              value={getDateRange("next60days").endDate.split('-').reverse().join('-')}
+              readOnly
+              style={{ padding: "5px", fontSize: "16px", width: "45%" }}
+            />
+          </div>
+        ) : condition.operator === "$gte_next90days_lte" ? (
+          <div style={{ display: "flex", gap: "10px" }}>
+            <input
+              type="date"
+              value={getDateRange("next90days").startDate.split('-').reverse().join('-')}
+              readOnly
+              style={{ padding: "5px", fontSize: "16px", width: "45%" }}
+            />
+            <input
+              type="date"
+              value={getDateRange("next90days").endDate.split('-').reverse().join('-')}
+              readOnly
+              style={{ padding: "5px", fontSize: "16px", width: "45%" }}
+            />
+          </div>
+        ) : condition.operator === "$gte_next120days_lte" ? (
+          <div style={{ display: "flex", gap: "10px" }}>
+            <input
+              type="date"
+              value={getDateRange("next120days").startDate.split('-').reverse().join('-')}
+              readOnly
+              style={{ padding: "5px", fontSize: "16px", width: "45%" }}
+            />
+            <input
+              type="date"
+              value={getDateRange("next120days").endDate.split('-').reverse().join('-')}
+              readOnly
+              style={{ padding: "5px", fontSize: "16px", width: "45%" }}
+            />
+          </div>
+        ) : condition.operator === "$gte_previousFinancialYear_lte" ? (
+          <div style={{ display: "flex", gap: "10px" }}>
+            <input
+              type="date"
+              value={getDateRange("previousFinancialYear").startDate.split('-').reverse().join('-')}
+              readOnly
+              style={{ padding: "5px", fontSize: "16px", width: "45%" }}
+            />
+            <input
+              type="date"
+              value={getDateRange("previousFinancialYear").endDate.split('-').reverse().join('-')}
+              readOnly
+              style={{ padding: "5px", fontSize: "16px", width: "45%" }}
+            />
+          </div>
+        ) : condition.operator === "$gte_currentFinancialYear_lte" ? (
+          <div style={{ display: "flex", gap: "10px" }}>
+            <input
+              type="date"
+              value={getDateRange("currentFinancialYear").startDate.split('-').reverse().join('-')}
+              readOnly
+              style={{ padding: "5px", fontSize: "16px", width: "45%" }}
+            />
+            <input
+              type="date"
+              value={getDateRange("currentFinancialYear").endDate.split('-').reverse().join('-')}
+              readOnly
+              style={{ padding: "5px", fontSize: "16px", width: "45%" }}
+            />
+          </div>
+        ) : condition.operator === "$gte_nextFinancialYear_lte" ? (
+          <div style={{ display: "flex", gap: "10px" }}>
+            <input
+              type="date"
+              value={getDateRange("nextFinancialYear").startDate.split('-').reverse().join('-')}
+              readOnly
+              style={{ padding: "5px", fontSize: "16px", width: "45%" }}
+            />
+            <input
+              type="date"
+              value={getDateRange("nextFinancialYear").endDate.split('-').reverse().join('-')}
+              readOnly
+              style={{ padding: "5px", fontSize: "16px", width: "45%" }}
+            />
+          </div>
+        ) : (
           <input
             type="date"
             value={condition.value}
@@ -409,10 +1056,9 @@ console.log("Today's date:", today);
         />
       )}
 
-      {/* Delete Button */}
       <button
   onClick={() => handleDeleteCondition(index)}
-  disabled={index === 0} // Disable delete for first condition
+  disabled={index === 0}
   style={{
     padding: "5px 10px",
     fontSize: "14px",
@@ -430,8 +1076,6 @@ console.log("Today's date:", today);
     </div>
   );
 })}
-
-
         <button
           onClick={handleAddCondition}
           style={{
