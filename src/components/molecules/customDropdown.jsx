@@ -37,6 +37,9 @@ useEffect(() => {
   fetchFilterConditions();
 }, []);
 
+const today = new Date().toISOString().split("T")[0];
+console.log("Today's date:", today);
+
 
   // Function to fetch data with retry logic
   const fetchDataWithRetry = useCallback(
@@ -72,7 +75,7 @@ useEffect(() => {
     };
     fetchWebformsData();
   }, [fetchDataWithRetry]);
-
+  
   // Add a new condition
   const handleAddCondition = () => {
     setConditions([...conditions, { fieldName: "", operator: "", value: "" }]);
@@ -107,7 +110,7 @@ useEffect(() => {
     }
   
     conditions.forEach((condition) => {
-      if (condition.operator && condition.value !== "") {
+      if (condition.operator !== "") {
         const selectedField = dynamicFields.find(
           (field) => field.fieldName === condition.fieldName
         );
@@ -141,6 +144,17 @@ useEffect(() => {
             };
               // matchConditions[condition.fieldName] = { $regex: condition.value, $options: "i" };
               break;
+            case "$gte_today_lte":
+
+              const startToday = `${today}T00:00:00.000Z`; 
+              const endToday = `${today}T23:59:59.999Z`;
+  
+              matchConditions[condition.fieldName] = {
+                $gte: startToday,
+                $lt: endToday,
+              };
+                // matchConditions[condition.fieldName] = { $regex: condition.value, $options: "i" };
+                break;
             case "$eq":
             case "$ne":
             case "$gt":
@@ -366,7 +380,16 @@ useEffect(() => {
               style={{ padding: "5px", fontSize: "16px", width: "45%" }}
             />
           </div>
-        ) : (
+        ) : condition.operator === "$gte_today_lte" ? (
+                <input
+                  type="date"
+                  value={today}
+                  onChange={(e) => handleConditionChange(index, "value", e.target.value)}
+                  readOnly
+                  style={{ padding: "5px", fontSize: "16px", width: "20%" }}
+                />
+          ) : (
+          
           <input
             type="date"
             value={condition.value}
@@ -374,7 +397,7 @@ useEffect(() => {
             style={{ padding: "5px", fontSize: "16px", width: "20%" }}
           />
         )
-      ): (
+      ) : (
         <input
           type="text"
           value={condition.value}
