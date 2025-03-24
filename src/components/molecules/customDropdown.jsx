@@ -189,7 +189,7 @@ const getDateRange = (type) => {
   }
 
   const formatDate = (date) => {
-    return date.toLocaleDateString("en-GB").split('/').join('-');
+    return date.toISOString().split("T")[0];
   };
 
   return {
@@ -238,6 +238,11 @@ const getDateRange = (type) => {
   const handleConditionChange = (index, key, value) => {
     const updatedConditions = [...conditions];
     updatedConditions[index][key] = value;
+
+    if (key === "operator") {
+      updatedConditions[index].value = ""; // Reset value when operator changes
+    }
+
     setConditions(updatedConditions);
     console.log("Updated Conditions:", updatedConditions);
   };
@@ -285,170 +290,12 @@ const getDateRange = (type) => {
   
         if (fieldCondition) {
           switch (condition.operator) {
-            case "$eqto":
-
-            const startOfDay = `${condition.value}T00:00:00.000Z`; 
-            const endOfDay = `${condition.value}T23:59:59.999Z`;
-
-            matchConditions[condition.fieldName] = {
-              $gte: startOfDay,
-              $lt: endOfDay,
-            };
-              break;
-            case "$gte_today_lte":
-              matchConditions[condition.fieldName] = {
-                $gte: `${today}T00:00:00.000Z`,
-                $lt: `${today}T23:59:59.999Z`,
-              };
-              break;
-
-            case "$gte_yesterday_lte":
-              matchConditions[condition.fieldName] = {
-                $gte: `${yesterday}T00:00:00.000Z`,
-                $lt: `${yesterday}T23:59:59.999Z`,
-              };
-              break;
-
-            case "$gte_tomorrow_lte":
-              matchConditions[condition.fieldName] = {
-                $gte: `${tomorrow}T00:00:00.000Z`,
-                $lt: `${tomorrow}T23:59:59.999Z`,
-              };
-              break;
-
-            case "$gte_thisweek_lte":
-              matchConditions[condition.fieldName] = {
-                $gte: `${thisWeekStartDate}T00:00:00.000Z`,
-                $lt: `${thisWeekEndDate}T23:59:59.999Z`,
-              };
-              break;
-
-            case "$gte_nextweek_lte":
-              matchConditions[condition.fieldName] = {
-                $gte: `${nextWeekStartDate}T00:00:00.000Z`,
-                $lt: `${nextWeekEndDate}T23:59:59.999Z`,
-              };
-              break;
-
-            case "$gte_thismonth_lte":
-              const { startDate: thisMonthStartDate, endDate: thisMonthEndDate } = getDateRange("thisMonth");
-              matchConditions[condition.fieldName] = {
-                $gte: `${thisMonthStartDate}T00:00:00.000Z`,
-                $lt: `${thisMonthEndDate}T23:59:59.999Z`,
-              };
-              break;
-
-            case "$gte_nextmonth_lte":
-              const { startDate: nextMonthStartDate, endDate: nextMonthEndDate } = getDateRange("nextMonth");
-              matchConditions[condition.fieldName] = {
-                $gte: `${nextMonthStartDate}T00:00:00.000Z`,
-                $lt: `${nextMonthEndDate}T23:59:59.999Z`,
-              };
-              break;
-
-            case "$gte_last7days_lte":
-              const { startDate: last7DaysStartDate, endDate: last7DaysEndDate } = getDateRange("last7days");
-              matchConditions[condition.fieldName] = {
-                $gte: `${last7DaysStartDate}T00:00:00.000Z`,
-                $lt: `${last7DaysEndDate}T23:59:59.999Z`,
-              };
-              break;
-
-            case "$gte_last30days_lte":
-              const { startDate: last30DaysStartDate, endDate: last30DaysEndDate } = getDateRange("last30days");
-              matchConditions[condition.fieldName] = {
-                $gte: `${last30DaysStartDate}T00:00:00.000Z`,
-                $lt: `${last30DaysEndDate}T23:59:59.999Z`,
-              };
-              break;
-
-            case "$gte_last45days_lte":
-              const { startDate: last45DaysStartDate, endDate: last45DaysEndDate } = getDateRange("last45days");
-              matchConditions[condition.fieldName] = {
-                $gte: `${last45DaysStartDate}T00:00:00.000Z`,
-                $lt: `${last45DaysEndDate}T23:59:59.999Z`,
-              };
-              break;
-
-            case "$gte_last60days_lte":
-              const { startDate: last60DaysStartDate, endDate: last60DaysEndDate } = getDateRange("last60days");
-              matchConditions[condition.fieldName] = {
-                $gte: `${last60DaysStartDate}T00:00:00.000Z`,
-                $lt: `${last60DaysEndDate}T23:59:59.999Z`,
-              };
-              break;
-
-            case "$gte_last90days_lte":
-              const { startDate: last90DaysStartDate, endDate: last90DaysEndDate } = getDateRange("last90days");
-              matchConditions[condition.fieldName] = {
-                $gte: `${last90DaysStartDate}T00:00:00.000Z`,
-                $lt: `${last90DaysEndDate}T23:59:59.999Z`,
-              };
-              break;
-
-            case "$gte_last120days_lte":
-              const { startDate: last120DaysStartDate, endDate: last120DaysEndDate } = getDateRange("last120days");
-              matchConditions[condition.fieldName] = {
-                $gte: `${last120DaysStartDate}T00:00:00.000Z`,
-                $lt: `${last120DaysEndDate}T23:59:59.999Z`,
-              };
-              break;
-
-            case "$gte_next7days_lte":
-              const { startDate: next7DaysStartDate, endDate: next7DaysEndDate } = getDateRange("next7days");
-              matchConditions[condition.fieldName] = {
-                $gte: `${next7DaysStartDate}T00:00:00.000Z`,
-                $lt: `${next7DaysEndDate}T23:59:59.999Z`,
-              };
-              break;
-
-            case "$gte_next30days_lte":
-              const { startDate: next30DaysStartDate, endDate: next30DaysEndDate } = getDateRange("next30days");
-              matchConditions[condition.fieldName] = {
-                $gte: `${next30DaysStartDate}T00:00:00.000Z`,
-                $lt: `${next30DaysEndDate}T23:59:59.999Z`,
-              };
-              break;
-
-            case "$gte_next45days_lte":
-              const { startDate: next45DaysStartDate, endDate: next45DaysEndDate } = getDateRange("next45days");
-              matchConditions[condition.fieldName] = {
-                $gte: `${next45DaysStartDate}T00:00:00.000Z`,
-                $lt: `${next45DaysEndDate}T23:59:59.999Z`,
-              };
-              break;
-
-            case "$gte_next60days_lte":
-              const { startDate: next60DaysStartDate, endDate: next60DaysEndDate } = getDateRange("next60days");
-              matchConditions[condition.fieldName] = {
-                $gte: `${next60DaysStartDate}T00:00:00.000Z`,
-                $lt: `${next60DaysEndDate}T23:59:59.999Z`,
-              };
-              break;
-
-            case "$gte_next90days_lte":
-              const { startDate: next90DaysStartDate, endDate: next90DaysEndDate } = getDateRange("next90days");
-              matchConditions[condition.fieldName] = {
-                $gte: `${next90DaysStartDate}T00:00:00.000Z`,
-                $lt: `${next90DaysEndDate}T23:59:59.999Z`,
-              };
-              break;
-
-            case "$gte_next120days_lte":
-              const { startDate: next120DaysStartDate, endDate: next120DaysEndDate } = getDateRange("next120days");
-              matchConditions[condition.fieldName] = {
-                $gte: `${next120DaysStartDate}T00:00:00.000Z`,
-                $lt: `${next120DaysEndDate}T23:59:59.999Z`,
-              };
-              break;
-
             case "$eq":
             case "$ne":
             case "$gt":
             case "$lt":
               matchConditions[condition.fieldName] = { [condition.operator]: condition.value };
               break;
-            
             case "$regex":
               matchConditions[condition.fieldName] = { [condition.operator]: condition.value, $options: "i" };
               break;
@@ -469,39 +316,156 @@ const getDateRange = (type) => {
                 };
               }
               break;
-              
+            case "$eqto":
+              matchConditions[condition.fieldName] = condition.value;
+              break;
+            case "$gte_today_lte":
+              matchConditions[condition.fieldName] = today;
+              break;
+            case "$gte_yesterday_lte":
+              matchConditions[condition.fieldName] = yesterday;
+              break;
+            case "$gte_tomorrow_lte":
+              matchConditions[condition.fieldName] = tomorrow;
+              break;
+            case "$gte_thisweek_lte":
+              matchConditions[condition.fieldName] = {
+                $gte: thisWeekStartDate,
+                $lt: thisWeekEndDate,
+              };
+              break;
+            case "$gte_nextweek_lte":
+              matchConditions[condition.fieldName] = {
+                $gte: nextWeekStartDate,
+                $lt: nextWeekEndDate,
+              };
+              break;
+            case "$gte_thismonth_lte":
+              const { startDate: thisMonthStartDate, endDate: thisMonthEndDate } = getDateRange("thisMonth");
+              matchConditions[condition.fieldName] = {
+                $gte: thisMonthStartDate,
+                $lt: thisMonthEndDate,
+              };
+              break;
+            case "$gte_nextmonth_lte":
+              const { startDate: nextMonthStartDate, endDate: nextMonthEndDate } = getDateRange("nextMonth");
+              matchConditions[condition.fieldName] = {
+                $gte: nextMonthStartDate,
+                $lt: nextMonthEndDate,
+              };
+              break;
+            case "$gte_last7days_lte":
+              const { startDate: last7DaysStartDate, endDate: last7DaysEndDate } = getDateRange("last7days");
+              matchConditions[condition.fieldName] = {
+                $gte: last7DaysStartDate,
+                $lt: last7DaysEndDate,
+              };
+              break;
+            case "$gte_last30days_lte":
+              const { startDate: last30DaysStartDate, endDate: last30DaysEndDate } = getDateRange("last30days");
+              matchConditions[condition.fieldName] = {
+                $gte: last30DaysStartDate,
+                $lt: last30DaysEndDate,
+              };
+              break;
+            case "$gte_last45days_lte":
+              const { startDate: last45DaysStartDate, endDate: last45DaysEndDate } = getDateRange("last45days");
+              matchConditions[condition.fieldName] = {
+                $gte: last45DaysStartDate,
+                $lt: last45DaysEndDate,
+              };
+              break;
+            case "$gte_last60days_lte":
+              const { startDate: last60DaysStartDate, endDate: last60DaysEndDate } = getDateRange("last60days");
+              matchConditions[condition.fieldName] = {
+                $gte: last60DaysStartDate,
+                $lt: last60DaysEndDate,
+              };
+              break;
+            case "$gte_last90days_lte":
+              const { startDate: last90DaysStartDate, endDate: last90DaysEndDate } = getDateRange("last90days");
+              matchConditions[condition.fieldName] = {
+                $gte: last90DaysStartDate,
+                $lt: last90DaysEndDate,
+              };
+              break;
+            case "$gte_last120days_lte":
+              const { startDate: last120DaysStartDate, endDate: last120DaysEndDate } = getDateRange("last120days");
+              matchConditions[condition.fieldName] = {
+                $gte: last120DaysStartDate,
+                $lt: last120DaysEndDate,
+              };
+              break;
+            case "$gte_next7days_lte":
+              const { startDate: next7DaysStartDate, endDate: next7DaysEndDate } = getDateRange("next7days");
+              matchConditions[condition.fieldName] = {
+                $gte: next7DaysStartDate,
+                $lt: next7DaysEndDate,
+              };
+              break;
+            case "$gte_next30days_lte":
+              const { startDate: next30DaysStartDate, endDate: next30DaysEndDate } = getDateRange("next30days");
+              matchConditions[condition.fieldName] = {
+                $gte: next30DaysStartDate,
+                $lt: next30DaysEndDate,
+              };
+              break;
+            case "$gte_next45days_lte":
+              const { startDate: next45DaysStartDate, endDate: next45DaysEndDate } = getDateRange("next45days");
+              matchConditions[condition.fieldName] = {
+                $gte: next45DaysStartDate,
+                $lt: next45DaysEndDate,
+              };
+              break;
+            case "$gte_next60days_lte":
+              const { startDate: next60DaysStartDate, endDate: next60DaysEndDate } = getDateRange("next60days");
+              matchConditions[condition.fieldName] = {
+                $gte: next60DaysStartDate,
+                $lt: next60DaysEndDate,
+              };
+              break;
+            case "$gte_next90days_lte":
+              const { startDate: next90DaysStartDate, endDate: next90DaysEndDate } = getDateRange("next90days");
+              matchConditions[condition.fieldName] = {
+                $gte: next90DaysStartDate,
+                $lt: next90DaysEndDate,
+              };
+              break;
+            case "$gte_next120days_lte":
+              const { startDate: next120DaysStartDate, endDate: next120DaysEndDate } = getDateRange("next120days");
+              matchConditions[condition.fieldName] = {
+                $gte: next120DaysStartDate,
+                $lt: next120DaysEndDate,
+              };
+              break;
             case "$gte_previousFinancialYear_lte":
               const { startDate: previousFinancialYearStartDate, endDate: previousFinancialYearEndDate } = getDateRange("previousFinancialYear");
               matchConditions[condition.fieldName] = {
-                $gte: `${previousFinancialYearStartDate}T00:00:00.000Z`,
-                $lt: `${previousFinancialYearEndDate}T23:59:59.999Z`,
+                $gte: previousFinancialYearStartDate,
+                $lt: previousFinancialYearEndDate,
               };
               break;
-
             case "$gte_currentFinancialYear_lte":
               const { startDate: currentFinancialYearStartDate, endDate: currentFinancialYearEndDate } = getDateRange("currentFinancialYear");
               matchConditions[condition.fieldName] = {
-                $gte: `${currentFinancialYearStartDate}T00:00:00.000Z`,
-                $lt: `${currentFinancialYearEndDate}T23:59:59.999Z`,
+                $gte: currentFinancialYearStartDate,
+                $lt: currentFinancialYearEndDate,
               };
               break;
-
             case "$gte_nextFinancialYear_lte":
               const { startDate: nextFinancialYearStartDate, endDate: nextFinancialYearEndDate } = getDateRange("nextFinancialYear");
               matchConditions[condition.fieldName] = {
-                $gte: `${nextFinancialYearStartDate}T00:00:00.000Z`,
-                $lt: `${nextFinancialYearEndDate}T23:59:59.999Z`,
+                $gte: nextFinancialYearStartDate,
+                $lt: nextFinancialYearEndDate,
               };
               break;
-
             case "$gte_previousWeek_lte":
               const { startDate: previousWeekStartDate, endDate: previousWeekEndDate } = getDateRange("previousWeek");
               matchConditions[condition.fieldName] = {
-                $gte: `${previousWeekStartDate}T00:00:00.000Z`,
-                $lt: `${previousWeekEndDate}T23:59:59.999Z`,
+                $gte: previousWeekStartDate,
+                $lt: previousWeekEndDate,
               };
               break;
-
             default:
               console.warn("Operator not handled:", condition.operator);
           }
@@ -682,7 +646,7 @@ const getDateRange = (type) => {
           <div style={{ display: "flex", gap: "10px" }}>
             <input
               type="date"
-              value={condition.value.start}
+              value={condition.value.start || ""}
               onChange={(e) =>
                 handleConditionChange(index, "value", { ...condition.value, start: e.target.value })
               }
@@ -690,7 +654,7 @@ const getDateRange = (type) => {
             />
             <input
               type="date"
-              value={condition.value.end}
+              value={condition.value.end || ""}
               onChange={(e) =>
                 handleConditionChange(index, "value", { ...condition.value, end: e.target.value })
               }
@@ -755,21 +719,6 @@ const getDateRange = (type) => {
           <div style={{ display: "flex", gap: "10px" }}>
             <input
               type="date"
-              value={getDateRange("previousWeek").startDate.split('-').reverse().join('-')}
-              readOnly
-              style={{ padding: "5px", fontSize: "16px", width: "45%" }}
-            />
-            <input
-              type="date"
-              value={getDateRange("previousWeek").endDate.split('-').reverse().join('-')}
-              readOnly
-              style={{ padding: "5px", fontSize: "16px", width: "45%" }}
-            />
-          </div>
-        ) : condition.operator === "$gte_prevweek_lte" ? (
-          <div style={{ display: "flex", gap: "10px" }}>
-            <input
-              type="date"
               value={getDateRange("previousWeek").startDate}
               readOnly
               style={{ padding: "5px", fontSize: "16px", width: "45%" }}
@@ -815,13 +764,13 @@ const getDateRange = (type) => {
           <div style={{ display: "flex", gap: "10px" }}>
             <input
               type="date"
-              value={getDateRange("last7days").startDate.split('-').reverse().join('-')}
+              value={getDateRange("last7days").startDate}
               readOnly
               style={{ padding: "5px", fontSize: "16px", width: "45%" }}
             />
             <input
               type="date"
-              value={getDateRange("last7days").endDate.split('-').reverse().join('-')}
+              value={getDateRange("last7days").endDate}
               readOnly
               style={{ padding: "5px", fontSize: "16px", width: "45%" }}
             />
@@ -830,13 +779,13 @@ const getDateRange = (type) => {
           <div style={{ display: "flex", gap: "10px" }}>
             <input
               type="date"
-              value={getDateRange("last30days").startDate.split('-').reverse().join('-')}
+              value={getDateRange("last30days").startDate}
               readOnly
               style={{ padding: "5px", fontSize: "16px", width: "45%" }}
             />
             <input
               type="date"
-              value={getDateRange("last30days").endDate.split('-').reverse().join('-')}
+              value={getDateRange("last30days").endDate}
               readOnly
               style={{ padding: "5px", fontSize: "16px", width: "45%" }}
             />
@@ -845,13 +794,13 @@ const getDateRange = (type) => {
           <div style={{ display: "flex", gap: "10px" }}>
             <input
               type="date"
-              value={getDateRange("last45days").startDate.split('-').reverse().join('-')}
+              value={getDateRange("last45days").startDate}
               readOnly
               style={{ padding: "5px", fontSize: "16px", width: "45%" }}
             />
             <input
               type="date"
-              value={getDateRange("last45days").endDate.split('-').reverse().join('-')}
+              value={getDateRange("last45days").endDate}
               readOnly
               style={{ padding: "5px", fontSize: "16px", width: "45%" }}
             />
@@ -860,13 +809,13 @@ const getDateRange = (type) => {
           <div style={{ display: "flex", gap: "10px" }}>
             <input
               type="date"
-              value={getDateRange("last60days").startDate.split('-').reverse().join('-')}
+              value={getDateRange("last60days").startDate}
               readOnly
               style={{ padding: "5px", fontSize: "16px", width: "45%" }}
             />
             <input
               type="date"
-              value={getDateRange("last60days").endDate.split('-').reverse().join('-')}
+              value={getDateRange("last60days").endDate}
               readOnly
               style={{ padding: "5px", fontSize: "16px", width: "45%" }}
             />
@@ -875,13 +824,13 @@ const getDateRange = (type) => {
           <div style={{ display: "flex", gap: "10px" }}>
             <input
               type="date"
-              value={getDateRange("last90days").startDate.split('-').reverse().join('-')}
+              value={getDateRange("last90days").startDate}
               readOnly
               style={{ padding: "5px", fontSize: "16px", width: "45%" }}
             />
             <input
               type="date"
-              value={getDateRange("last90days").endDate.split('-').reverse().join('-')}
+              value={getDateRange("last90days").endDate}
               readOnly
               style={{ padding: "5px", fontSize: "16px", width: "45%" }}
             />
@@ -890,13 +839,13 @@ const getDateRange = (type) => {
           <div style={{ display: "flex", gap: "10px" }}>
             <input
               type="date"
-              value={getDateRange("last120days").startDate.split('-').reverse().join('-')}
+              value={getDateRange("last120days").startDate}
               readOnly
               style={{ padding: "5px", fontSize: "16px", width: "45%" }}
             />
             <input
               type="date"
-              value={getDateRange("last120days").endDate.split('-').reverse().join('-')}
+              value={getDateRange("last120days").endDate}
               readOnly
               style={{ padding: "5px", fontSize: "16px", width: "45%" }}
             />
@@ -905,13 +854,13 @@ const getDateRange = (type) => {
           <div style={{ display: "flex", gap: "10px" }}>
             <input
               type="date"
-              value={getDateRange("next7days").startDate.split('-').reverse().join('-')}
+              value={getDateRange("next7days").startDate}
               readOnly
               style={{ padding: "5px", fontSize: "16px", width: "45%" }}
             />
             <input
               type="date"
-              value={getDateRange("next7days").endDate.split('-').reverse().join('-')}
+              value={getDateRange("next7days").endDate}
               readOnly
               style={{ padding: "5px", fontSize: "16px", width: "45%" }}
             />
@@ -920,13 +869,13 @@ const getDateRange = (type) => {
           <div style={{ display: "flex", gap: "10px" }}>
             <input
               type="date"
-              value={getDateRange("next30days").startDate.split('-').reverse().join('-')}
+              value={getDateRange("next30days").startDate}
               readOnly
               style={{ padding: "5px", fontSize: "16px", width: "45%" }}
             />
             <input
               type="date"
-              value={getDateRange("next30days").endDate.split('-').reverse().join('-')}
+              value={getDateRange("next30days").endDate}
               readOnly
               style={{ padding: "5px", fontSize: "16px", width: "45%" }}
             />
@@ -935,13 +884,13 @@ const getDateRange = (type) => {
           <div style={{ display: "flex", gap: "10px" }}>
             <input
               type="date"
-              value={getDateRange("next45days").startDate.split('-').reverse().join('-')}
+              value={getDateRange("next45days").startDate}
               readOnly
               style={{ padding: "5px", fontSize: "16px", width: "45%" }}
             />
             <input
               type="date"
-              value={getDateRange("next45days").endDate.split('-').reverse().join('-')}
+              value={getDateRange("next45days").endDate}
               readOnly
               style={{ padding: "5px", fontSize: "16px", width: "45%" }}
             />
@@ -950,13 +899,13 @@ const getDateRange = (type) => {
           <div style={{ display: "flex", gap: "10px" }}>
             <input
               type="date"
-              value={getDateRange("next60days").startDate.split('-').reverse().join('-')}
+              value={getDateRange("next60days").startDate}
               readOnly
               style={{ padding: "5px", fontSize: "16px", width: "45%" }}
             />
             <input
               type="date"
-              value={getDateRange("next60days").endDate.split('-').reverse().join('-')}
+              value={getDateRange("next60days").endDate}
               readOnly
               style={{ padding: "5px", fontSize: "16px", width: "45%" }}
             />
@@ -965,13 +914,13 @@ const getDateRange = (type) => {
           <div style={{ display: "flex", gap: "10px" }}>
             <input
               type="date"
-              value={getDateRange("next90days").startDate.split('-').reverse().join('-')}
+              value={getDateRange("next90days").startDate}
               readOnly
               style={{ padding: "5px", fontSize: "16px", width: "45%" }}
             />
             <input
               type="date"
-              value={getDateRange("next90days").endDate.split('-').reverse().join('-')}
+              value={getDateRange("next90days").endDate}
               readOnly
               style={{ padding: "5px", fontSize: "16px", width: "45%" }}
             />
@@ -980,13 +929,13 @@ const getDateRange = (type) => {
           <div style={{ display: "flex", gap: "10px" }}>
             <input
               type="date"
-              value={getDateRange("next120days").startDate.split('-').reverse().join('-')}
+              value={getDateRange("next120days").startDate}
               readOnly
               style={{ padding: "5px", fontSize: "16px", width: "45%" }}
             />
             <input
               type="date"
-              value={getDateRange("next120days").endDate.split('-').reverse().join('-')}
+              value={getDateRange("next120days").endDate}
               readOnly
               style={{ padding: "5px", fontSize: "16px", width: "45%" }}
             />
@@ -995,13 +944,13 @@ const getDateRange = (type) => {
           <div style={{ display: "flex", gap: "10px" }}>
             <input
               type="date"
-              value={getDateRange("previousFinancialYear").startDate.split('-').reverse().join('-')}
+              value={getDateRange("previousFinancialYear").startDate}
               readOnly
               style={{ padding: "5px", fontSize: "16px", width: "45%" }}
             />
             <input
               type="date"
-              value={getDateRange("previousFinancialYear").endDate.split('-').reverse().join('-')}
+              value={getDateRange("previousFinancialYear").endDate}
               readOnly
               style={{ padding: "5px", fontSize: "16px", width: "45%" }}
             />
@@ -1010,13 +959,13 @@ const getDateRange = (type) => {
           <div style={{ display: "flex", gap: "10px" }}>
             <input
               type="date"
-              value={getDateRange("currentFinancialYear").startDate.split('-').reverse().join('-')}
+              value={getDateRange("currentFinancialYear").startDate}
               readOnly
               style={{ padding: "5px", fontSize: "16px", width: "45%" }}
             />
             <input
               type="date"
-              value={getDateRange("currentFinancialYear").endDate.split('-').reverse().join('-')}
+              value={getDateRange("currentFinancialYear").endDate}
               readOnly
               style={{ padding: "5px", fontSize: "16px", width: "45%" }}
             />
@@ -1025,13 +974,13 @@ const getDateRange = (type) => {
           <div style={{ display: "flex", gap: "10px" }}>
             <input
               type="date"
-              value={getDateRange("nextFinancialYear").startDate.split('-').reverse().join('-')}
+              value={getDateRange("nextFinancialYear").startDate}
               readOnly
               style={{ padding: "5px", fontSize: "16px", width: "45%" }}
             />
             <input
               type="date"
-              value={getDateRange("nextFinancialYear").endDate.split('-').reverse().join('-')}
+              value={getDateRange("nextFinancialYear").endDate}
               readOnly
               style={{ padding: "5px", fontSize: "16px", width: "45%" }}
             />
