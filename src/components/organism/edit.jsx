@@ -190,6 +190,26 @@ const validateForm = () => {
             />
           </FormControl>
         );
+        case 'date':
+        return (
+          <FormControl className='details_page_inputs' key={field.fieldName} style={formControlStyles} error={!!isError}>
+            <label style={labelStyles}>{label}</label>
+            <TextField
+              className='edit-field-input'
+              {...commonProps}
+              sx={{
+                width: '50%',
+                textAlign: 'left',
+                color: '#666',
+                fontSize: '12px',
+              }}
+              type={field.type || 'text'} // Use "text" for datetime-local
+              inputProps={inputProps}
+              disabled={field.display === 'disable'}
+            />
+          </FormControl>
+        );
+
 
         case 'audio':
           return (
