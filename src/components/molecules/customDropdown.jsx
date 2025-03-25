@@ -299,6 +299,12 @@ const getDateRange = (type) => {
             case "$regex":
               matchConditions[condition.fieldName] = { [condition.operator]: condition.value, $options: "i" };
               break;
+            case "$^regex":
+              matchConditions[condition.fieldName] = { $regex: `^${condition.value}`, $options: "i" };
+              break;
+            case "$regex$":
+              matchConditions[condition.fieldName] = { $regex: `${condition.value}$`, $options: "i" };
+              break;
             case "doesNotContain":
               matchConditions[condition.fieldName] = { $not: { $regex: condition.value, $options: "i" } };
               break;
@@ -320,13 +326,22 @@ const getDateRange = (type) => {
               matchConditions[condition.fieldName] = condition.value;
               break;
             case "$gte_today_lte":
-              matchConditions[condition.fieldName] = today;
+              matchConditions[condition.fieldName] = {
+                $regex: today,
+                $options: "i",
+              };
               break;
             case "$gte_yesterday_lte":
-              matchConditions[condition.fieldName] = yesterday;
+              matchConditions[condition.fieldName] = {
+                $regex: yesterday,
+                $options: "i",
+              };
               break;
             case "$gte_tomorrow_lte":
-              matchConditions[condition.fieldName] = tomorrow;
+              matchConditions[condition.fieldName] = {
+                $regex: tomorrow,
+                $options: "i",
+              };
               break;
             case "$gte_thisweek_lte":
               matchConditions[condition.fieldName] = {
