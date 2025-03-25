@@ -34,6 +34,7 @@ import {
   Dialog, DialogTitle, DialogContent, DialogActions 
 } from "@mui/material";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
+import WidgetsOutlinedIcon from '@mui/icons-material/WidgetsOutlined';
 import Loader from "../molecules/loader";
 import Pagination from "@mui/material/Pagination";
 import { useNotifications } from '../atoms/notification'; // Import the hook
@@ -827,7 +828,8 @@ const handleViewReport = async () => {
             style={{ padding: "0", color: "white" }}
             onClick={openColumnModal}
           >
-            <MoreVertIcon />
+            <WidgetsOutlinedIcon />
+            
           </IconButton>
         </div>
       ),
