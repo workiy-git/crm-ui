@@ -484,6 +484,28 @@ const [existingControl, setExistingControl] = useState([]);
                 }
               };
             }
+            if (key === "follow_up_on") {
+              return {
+                field: key,
+                headerName: "Follow Up On",
+                width: 200,
+                renderCell: (params) => {
+                  if (!params.value) return ""; // Return empty string if no data
+            
+                  const utcDate = new Date(params.value); // Convert to Date object (UTC time)
+            
+                  // Get the offset in minutes for local time relative to UTC
+                  const timezoneOffset = utcDate.getTimezoneOffset(); 
+            
+                  // Adjust the UTC time based on the offset
+                  const localTime = new Date(utcDate.getTime() - timezoneOffset * 60000); 
+            
+                  // Format the local time
+                  return localTime.toLocaleString();
+                }
+              };
+            }
+            
             return {
               field: key,
               headerName: key
