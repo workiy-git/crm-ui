@@ -198,9 +198,15 @@ const GridComponent = ({ pageName }) => {
   };
 
   const handleApplyColumns = () => {
-    setColumns(tempVisibleColumns);
-    closeColumnModal();
-  };
+  setColumns(tempVisibleColumns);
+
+  const columnsData = JSON.stringify(tempVisibleColumns);
+  sessionStorage.setItem(`visibleColumns_${pageName}`, columnsData);
+  localStorage.setItem(`visibleColumns_${pageName}`, columnsData);
+
+  closeColumnModal();
+};
+
   const handleDeleteClick = (row) => {
     console.log("row", row);
     handleMenuClose();
@@ -738,6 +744,10 @@ const handleEditReport = async () => {
     console.error('Error fetching report data:', error);
   }
 };
+const openColumnModal = () => {
+  setTempVisibleColumns(columns);
+  setShowColumnModal(true);
+};
 
 const handleViewReport = async () => {
   if (!selectedRow) return;
@@ -811,7 +821,16 @@ const handleViewReport = async () => {
     },
     {
       field: "actions",
-      headerName: "",
+      headerName: (
+        <div style={{ display: "flex", flexDirection: "column", margin: "auto", padding: "0 10px" }}>
+          <IconButton
+            style={{ padding: "0", color: "white" }}
+            onClick={openColumnModal}
+          >
+            <MoreVertIcon />
+          </IconButton>
+        </div>
+      ),
       sortable: false,
       disableColumnMenu: true,
       width: 20,
@@ -1075,10 +1094,7 @@ const handleViewReport = async () => {
     }
     
   };
-  const openColumnModal = () => {
-    setTempVisibleColumns(columns);
-    setShowColumnModal(true);
-  };
+
   const handleCheckboxChange = (column, isChecked) => {
     setTempVisibleColumns((prev) => {
       if (isChecked) {
@@ -1173,6 +1189,13 @@ const handleViewReport = async () => {
       setInputPage(1); // Reset the input page number when the pageName changes
       setFilterText({}); // Reset all filter fields
       setDateRange({ startDate: null, endDate: null }); // Reset date range
+    }
+  }, [pageName]);
+
+  useEffect(() => {
+    const savedColumns = sessionStorage.getItem(`visibleColumns_${pageName}`) || localStorage.getItem(`visibleColumns_${pageName}`);
+    if (savedColumns) {
+      setColumns(JSON.parse(savedColumns));
     }
   }, [pageName]);
 
@@ -1390,7 +1413,6 @@ const handleViewReport = async () => {
           <MenuItem value={75}>75</MenuItem>
         </Select>
         </div>
-       
         <Box>
       <Pagination
         count={Math.ceil(totalRecord / pageSize)}
