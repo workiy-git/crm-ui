@@ -377,7 +377,8 @@ const validateForm = () => {
                style={{
                 color: '#666',
               }}
-              disabled={field.display === 'disable'}
+              // disabled={field.display === 'disable'}
+              disabled={formData[field.fieldName] || field.display === "disable"}
 
                 className='edit-field-input'
                 name={field.fieldName}
