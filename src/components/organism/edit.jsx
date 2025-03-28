@@ -95,7 +95,21 @@ const validateForm = () => {
     validateForm,
   }));
 
-
+  useEffect(() => {
+    if (pageSchema.some(field => field.fieldName === 'Modified_at')) {
+      const today = new Date();
+      const localTime = new Date(today.getTime()); // Adjust to local time
+      console.log("localTime",localTime)
+      const formattedLocalTime = localTime.toLocaleString(); // Format to local time string
+      console.log("formattedLocalTime",formattedLocalTime)
+  
+      setFormData(prevState => ({
+        ...prevState,
+        Modified_at: formattedLocalTime,
+      }));
+    }
+  }, [setFormData, pageSchema]);
+  
   const renderInputField = (field) => {
     const isFileInput = field.type === 'file';
     const value = !isFileInput && (formData[field.fieldName] === 'N/A' ? '' : formData[field.fieldName] || '');
@@ -122,6 +136,7 @@ const validateForm = () => {
       commonProps.value = value;
     }
   
+    
     const formControlStyles = {
       display: 'flex',
       flexDirection: 'row',
@@ -169,6 +184,35 @@ const validateForm = () => {
         </FormControl>
       );
     }
+    
+    if (field.fieldName === 'Modified_at') {
+      const today = new Date();
+      const localTime = new Date(today.getTime()); // Adjust to local time
+      console.log("localTime",localTime)
+      const formattedLocalTime = localTime.toLocaleString(); // Format to local time string
+      console.log("formattedLocalTime",formattedLocalTime)
+
+    
+      return (
+        <FormControl className='details_page_inputs' key={field.fieldName} style={formControlStyles} error={!!isError}>
+          <label style={labelStyles}>{label}</label>
+          <TextField
+            className='edit-field-input'
+            {...commonProps}
+            sx={{
+              width: '50%',
+              textAlign: 'left',
+              color: '#666',
+              fontSize: '12px',
+            }}
+            value={formattedLocalTime}
+            type="text" // Force text type
+            disabled={field.display === 'disable'}
+          />
+        </FormControl>
+      );
+    }
+    
   
     switch (field.htmlControl) {
       case 'input':
