@@ -1279,7 +1279,7 @@ const handleViewReport = async () => {
           </Button>
         </DialogActions>
       </Dialog>
-        {menuData.add && menuData.add.title && pageName !== 'reports' && pageName !== 'calls' && (
+        {menuData.add && menuData.add.title && pageName !== 'reports' && pageName !== 'calls' && pageName !== 'leads' &&(
           <Button 
             onClick={() => handleadd("add")} 
             className='Action-btn' 
