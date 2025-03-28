@@ -467,7 +467,7 @@ const handleSave = async () => {
                     marginRight: "5%",
                   }}
                 >
-                {(!isAdding)  && pageName !== 'users' && (
+                {(!isAdding)  && pageName !== 'users' && pageName !== 'leads' && (
                 <Button
                   className="details-page-btns"
                   variant="contained"
