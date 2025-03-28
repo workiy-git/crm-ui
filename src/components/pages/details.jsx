@@ -136,9 +136,15 @@ useEffect(() => {
  
 
   useEffect(() => {
-    const hasChanges = JSON.stringify(formData) !== JSON.stringify(initialFormData);
+    // Create a new object excluding "Modified_at"
+    const { Modified_at, ...filteredFormData } = formData || {};
+    const { Modified_at: _, ...filteredInitialFormData } = initialFormData || {};
+  
+    // Compare the objects without "Modified_at"
+    const hasChanges = JSON.stringify(filteredFormData) !== JSON.stringify(filteredInitialFormData);
     setHasUnsavedChanges(hasChanges);
   }, [formData, initialFormData]);
+  
 
     // Update isEditing and isAdding states based on location changes
     useEffect(() => {
@@ -265,12 +271,18 @@ const handleSave = async () => {
     return;
   }
 
-  // Check if formData has changed from initialFormData
-  if (JSON.stringify(formData) === JSON.stringify(initialFormData)) {
+  const formDataCopy = { ...formData };
+  const initialFormDataCopy = { ...initialFormData };
+  
+  // Remove the 'Modified_at' field from both objects before comparing
+  delete formDataCopy.Modified_at;
+  delete initialFormDataCopy.Modified_at;
+  
+  // Check if anything else has changed
+  if (JSON.stringify(formDataCopy) === JSON.stringify(initialFormDataCopy)) {
     handleSaveError("No changes detected. Nothing to save.");
     return;
   }
-
   // Check if all fields are empty in Add mode
   if (isAdding && Object.values(formData).every((value) => value === "")) {
     handleSaveError("No data provided. Please fill in the form before submitting.");
