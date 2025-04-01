@@ -28,6 +28,7 @@ const DetailsPage = () => {
  
   // const [rowData, setrowData] = useState([]);
   const [formData, setFormData] = useState({});
+  const formDataMobilePhone = formData.mobile_phone || ""; 
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [webformsData, setWebformsData] = useState([]);
@@ -582,7 +583,7 @@ const handleSave = async () => {
                 height: "95%",
                 border: "1px solid gray",
                 position: "relative", width: '50%'}}>
-              <Tab mode={isAdding ? 'add' : isEditing ? 'edit' : 'view'} key={refreshTab} />
+              <Tab mode={isAdding ? 'add' : isEditing ? 'edit' : 'view'} key={refreshTab} mobile= {formDataMobilePhone} />
             </div>
           </div>
         </div>

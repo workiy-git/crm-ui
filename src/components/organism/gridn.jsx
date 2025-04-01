@@ -1453,20 +1453,14 @@ const handleViewReport = async () => {
         
         <div style={{height:'calc(100vh - 140px)'}}>
           <DataGrid
-            // rows={filteredRows}
             rows={loading ? [] : filteredRows}
             columns={columnsWithFilter}
-            // pageSize={pageSize}
             paginationMode="server"
-            // rowCount={totalRows}
-            // onPageChange={handlePageChange}
-            // page={page - 1}
             disableSelectionOnClick
             getRowHeight={() => 35}
             className="custom-data-grid-main"
             onRowDoubleClick={(params) => {
               console.log("Row double-clicked:", params.row);
-              // handleNavigate("view", params.row);
               handleDoubleClick("view", params)
             }}
             
