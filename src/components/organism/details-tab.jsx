@@ -7,15 +7,15 @@ import Tab from '@mui/material/Tab';
 import Updates from '../molecules/user-update';
 import Comments from '../molecules/user-comments';
 import SiteVisits from '../molecules/user-sitevisits';
+import Enquiry from '../molecules/user-enquiry';
 import '../../assets/styles/style.css';
 import { headers } from '../atoms/Authorization';
 
 
-export default function TabComponent({ mode }) {
+export default function TabComponent({ mode, mobile }) {
   const [value, setValue] = useState(0);
   const [companylogoData, setCompanylogoData] = useState({});
   const [pageName, setPageName] = useState('');
-
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };
@@ -80,6 +80,8 @@ export default function TabComponent({ mode }) {
         {value === 0 && <Box class="overflow-a" style={{background:'white', borderBottomLeftRadius:'5px', borderBottomRightRadius:'5px', height:'85%'}}><Updates mode= {mode}/></Box>}
         {value === 1 && <Box class="overflow-a" style={{background:'white', borderBottomLeftRadius:'5px', borderBottomRightRadius:'5px', height:'85%'}}><Comments mode= {mode}/></Box>}
         {value === 2 && <Box class="overflow-a" style={{background:'white', borderBottomLeftRadius:'5px', borderBottomRightRadius:'5px', height:'85%'}}><SiteVisits /></Box>}
+        {value === 3 && <Box class="overflow-a" style={{background:'white', borderBottomLeftRadius:'5px', borderBottomRightRadius:'5px', height:'85%'}}><Enquiry mobile={mobile} /></Box>}
+
         {/* Add similar conditional rendering for other tabs */}
       </Box>
     </div>
