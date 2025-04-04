@@ -62,33 +62,49 @@ const SelectedEditComponent = () => {
     try {
       console.log("Updated Data:", editedData);
   
-      // Only proceed if there is data to save
       if (editedData && editedData.length > 0) {
         for (const row of editedData) {
-            console.log("Row:", row);
-            console.log("Row ID:", row._id);
-          // Send each row in a separate PUT request
-          const dataToSend = { data: row }; // Structure your payload for each row
+          const originalRow = selectedData.find((r) => r._id === row._id) || {};
+          
+          // Extract only changed fields
+          const changedValues = Object.keys(row).reduce((acc, key) => {
+            if (row[key] !== originalRow[key]) {
+              acc[key] = row[key]; // Add only modified fields
+            }
+            return acc;
+          }, {});
+  
+          // Ensure we send required fields along with changes
+          const dataToSend = {
+            pageName: row.pageName,
+            pageId: row.pageId,
+            ...changedValues, // Only changed values will be sent
+          };
+  
+          if (Object.keys(changedValues).length === 0) {
+            console.log(`Skipping row ${row._id} as there are no changes.`);
+            continue; // Skip API call if nothing changed
+          }
+  
+          console.log("Updating Row ID:", row._id, "with Data:", dataToSend);
   
           await axios.put(
-            `${config.apiUrl}/appdata/${row._id}`, // API endpoint for the specific row
-            dataToSend, // Request body
-            {
-              headers: headers, // Configuration object with headers
-            }
+            `${config.apiUrl}/appdata/${row._id}`,
+            dataToSend, // Send only changed fields
+            { headers }
           );
   
-          console.log(`Row with _id ${row._id} successfully updated on the server`);
+          console.log(`Row with _id ${row._id} successfully updated`);
         }
       }
   
       alert("All rows updated successfully!");
-      // navigate(-1); // Navigate back to the previous page if needed
     } catch (error) {
-      console.error("Error updating data:", error);
-      alert("Failed to save changes for some rows. Please try again.");
+      console.error("Error updating data:", error.response?.data || error);
+      alert("Failed to save changes. Please try again.");
     }
   };
+  
   
   const leadMediumField = webformsData.find((field) => field.fieldName === "lead_medium");
   const leadMediumOptions = leadMediumField?.options || [];
