@@ -402,12 +402,11 @@ const [existingControl, setExistingControl] = useState([]);
   const handleChange = (event, currentPage, currentpageSize) => {
     const selectedValue = event.target.value;
     setSelectedValue(selectedValue);
-  
     if (selectedValue === "custom") {
       handleCustomDropDown(); // Call your custom dropdown function
       return; // Exit early to avoid fetching grid data
     }
-  
+    
     const filter = JSON.parse(selectedValue);
   
     const currentPageNumber = currentPage || 1;
@@ -484,10 +483,12 @@ const [existingControl, setExistingControl] = useState([]);
                 }
               };
             }
-            if (key === "follow_up_on") {
+            if (key === "follow_up_on" || key === "site_visit_on") {
               return {
                 field: key,
-                headerName: "Follow Up On",
+                headerName: key
+                  .replace(/_/g, " ")
+                  .replace(/\b\w/g, (char) => char.toUpperCase()),
                 width: 200,
                 renderCell: (params) => {
                   if (!params.value) return ""; // Return empty string if no data
