@@ -325,24 +325,31 @@ const CustomDynamicForm = () => {
             case "$eqto":
               matchConditions[condition.fieldName] = condition.value;
               break;
-            case "$gte_today_lte":
-              matchConditions["$expr"] = {
-                $eq: [
-                  {
-                    $dateToString: {
-                      format: "%Y-%m-%d",
-                      date: { $toDate: `$${condition.fieldName}` }
+              case "$gte_today_lte":
+                matchConditions["$expr"] = {
+                  $and: [
+                    { $ne: [`$${condition.fieldName}`, null] },
+                    { $ne: [`$${condition.fieldName}`, ""] },
+                    {
+                      $eq: [
+                        {
+                          $dateToString: {
+                            format: "%Y-%m-%d",
+                            date: { $toDate: `$${condition.fieldName}` }
+                          }
+                        },
+                        {
+                          $dateToString: {
+                            format: "%Y-%m-%d",
+                            date: "$$NOW"
+                          }
+                        }
+                      ]
                     }
-                  },
-                  {
-                    $dateToString: {
-                      format: "%Y-%m-%d",
-                      date: "$$NOW"
-                    }
-                  }
-                ]
-              };
-              break;
+                  ]
+                };
+                break;
+              
             case "$gte_yesterday_lte":
               matchConditions["$expr"] = {
                 $eq: [
