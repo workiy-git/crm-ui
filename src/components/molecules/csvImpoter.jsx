@@ -21,47 +21,36 @@ const CsvImporter = () => {
       setUploadStatus('Please select a CSV file to upload.');
       return;
     }
-
+  
     Papa.parse(csvFile, {
-      header: true, // Automatically use the first row as headers
-      skipEmptyLines: true, // Skip empty lines
+      header: true,
+      skipEmptyLines: true,
       complete: async (result) => {
         const records = result.data;
-
+  
         let successCount = 0;
         let errorCount = 0;
-
+  
         for (const record of records) {
           try {
-            // Dynamically create the record object
+            // Store all values as strings
             const transformedRecord = Object.entries(record).reduce((acc, [key, value]) => {
-                // Apply generic transformation rules
-                if (!isNaN(value) && value.trim() !== '') {
-                  // Convert numeric values to numbers
-                  acc[key] = Number(value);
-                } else if (value.match(/^\d{10}$/)) {
-                  // Example: Format phone numbers as objects
-                  acc[key] = { $numberLong: value };
-                } else {
-                  // Keep other fields as-is
-                  acc[key] = value;
-                }
-                return acc;
-              }, {});
-            
-
+              acc[key] = String(value ?? ''); // Ensure null/undefined are handled as empty strings
+              return acc;
+            }, {});
+  
             // Send record to the API
-            await axios.post(`${config.apiUrl}/appdata/create`, transformedRecord,  {
-                headers: headers // The configuration object where headers are passed
-              });
-
+            await axios.post(`${config.apiUrl}/appdata/create`, transformedRecord, {
+              headers: headers
+            });
+  
             successCount++;
           } catch (error) {
             console.error('Error uploading record:', error.message);
             errorCount++;
           }
         }
-
+  
         setUploadStatus(
           `Upload complete: ${successCount} records added successfully, ${errorCount} errors encountered.`
         );
@@ -72,6 +61,7 @@ const CsvImporter = () => {
       },
     });
   };
+  
 
   return (
     <div style={styles.container}>
