@@ -1,8 +1,10 @@
-import React, { useState, useEffect, useImperativeHandle, forwardRef } from 'react';
+import React, { useState, useEffect, useImperativeHandle, forwardRef, useRef } from 'react';
 import { Box, TextField, Select, MenuItem, FormControl, Checkbox, FormControlLabel } from '@mui/material';
 import axios from 'axios';
 import config from '../../config/config';
 import { headers } from '../atoms/Authorization';
+import { jwtDecode } from "jwt-decode";
+import { useNavigate } from "react-router-dom";
 
 const AddComponent = forwardRef(({ formData, setFormData, pageSchema, onSaveSuccess, onSaveError, pageName, pageId }, ref) => {
   const [validationError, setValidationError] = useState('');
@@ -10,26 +12,79 @@ const AddComponent = forwardRef(({ formData, setFormData, pageSchema, onSaveSucc
   const [moduleValue, setModuleValue] = useState('');
   const [fields, setFields] = useState([]);
 
+  const [userData, setUserData] = useState({});
+  const navigate = useNavigate();
+  const [jwtToken, setJwtToken] = useState("");
+  const [userName, setUserName] = useState("");
+  const profileRef = useRef(null); // Create a reference for the popup
+
+  useEffect(() => {
+    const token = sessionStorage.getItem("accessToken");
+    if (token) {
+      setJwtToken(token);
+      const decodedToken = jwtDecode(token);
+      const user = decodedToken.username;
+
+      axios
+        .post(
+          `${config.apiUrl}/appdata/retrieve`,
+          [
+            {
+              $match: {
+                pageName: "users",
+                username: user,
+              },
+            },
+          ],
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: token,
+              Access: "true",
+            },
+          }
+        )
+        .then((response) => {
+          setUserData(response.data.data[0]);
+          setUserName(user);
+        })
+        .catch((error) => {
+          console.error("Error fetching user data:", error);
+        });
+    } else {
+      // Redirect or handle the absence of the token as needed
+      navigate("/login"); // Redirect to login if no token found
+    }
+  }, [navigate]);
+
+
   // Initialize formData with default values based on schema
   useEffect(() => {
-    if (!formData || Object.keys(formData).length === 0) {
+    if (
+      (!formData || Object.keys(formData).length === 0) &&
+      userData?.role && userName // Wait until userData and userName are available
+    ) {
       const initializedFormData = {};
       pageSchema.forEach(field => {
-        if (field.type === 'checkbox') {
-          initializedFormData[field.fieldName] = false;  // Default for checkboxes
+        if (field.fieldName === 'assigned_to' &&
+            (userData.role === 'Presales Team' || userData.role === 'Sales Team')) {
+          initializedFormData[field.fieldName] = userName;
+        } else if (field.type === 'checkbox') {
+          initializedFormData[field.fieldName] = false;
         } else if (field.type === 'select') {
-          initializedFormData[field.fieldName] = ''; // Default for select
+          initializedFormData[field.fieldName] = '';
         } else if (field.type === 'datetime-local') {
-          // Default for datetime-local to current time
           const currentDate = new Date();
-          initializedFormData[field.fieldName] = currentDate.toISOString().slice(0, 16); 
+          initializedFormData[field.fieldName] = currentDate.toISOString().slice(0, 16);
         } else {
-          initializedFormData[field.fieldName] = ''; // Default for other input types
+          initializedFormData[field.fieldName] = '';
         }
       });
       setFormData(initializedFormData);
     }
-  }, [formData, setFormData, pageSchema]);
+  }, [formData, setFormData, pageSchema, userData, userName]);
+  
+  
 
   useEffect(() => {
     if (moduleValue) {
@@ -62,7 +117,7 @@ const AddComponent = forwardRef(({ formData, setFormData, pageSchema, onSaveSucc
 
     if (!fieldSchema) return "";
 
-    if (fieldSchema.required && !value) {
+    if (fieldSchema.required && !value ) {
       error = `${fieldSchema.label || fieldName} is required.`;
     }
 
@@ -145,7 +200,8 @@ const AddComponent = forwardRef(({ formData, setFormData, pageSchema, onSaveSucc
       helperText: isError && formErrors[field.fieldName],
       ...(isRequired && { required: true }) // Add the required property if isRequired is true
     };
-  
+
+    
     if (field.type === 'datetime-local') {
       // Convert UTC time to local time for display
       const utcValue = formData[field.fieldName];
