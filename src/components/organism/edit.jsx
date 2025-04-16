@@ -97,18 +97,16 @@ const validateForm = () => {
 
   useEffect(() => {
     if (pageSchema.some(field => field.fieldName === 'Modified_at')) {
-      const today = new Date();
-      const localTime = new Date(today.getTime()); // Adjust to local time
-      console.log("localTime",localTime)
-      const formattedLocalTime = localTime.toLocaleString(); // Format to local time string
-      console.log("formattedLocalTime",formattedLocalTime)
+      const nowUTC = new Date().toISOString().slice(0, 16); // Keep only YYYY-MM-DDTHH:mm
+      console.log("nowUTC (trimmed)", nowUTC);
   
       setFormData(prevState => ({
         ...prevState,
-        Modified_at: formattedLocalTime,
+        Modified_at: nowUTC,
       }));
     }
   }, [setFormData, pageSchema]);
+  
   
   const renderInputField = (field) => {
     const isFileInput = field.type === 'file';
