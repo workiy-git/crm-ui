@@ -89,24 +89,6 @@ const GridComponent = ({ pageName }) => {
       },
       []
     );
-  
-    useEffect(() => {
-      const fetchWebformsData = async () => {
-        try {
-          const apiUrl = `${config.apiUrl.replace(/\/$/, "")}/webforms`;
-          const response = await fetchDataWithRetry(apiUrl);
-          const fetchedWebformsData = response.data || [];
-          const currentPage = fetchedWebformsData.find(
-            (page) => page.pageName === pageName
-          );
-          setDynamicFields(currentPage.fields);
-          console.log("Dynamic Fields:", currentPage.fields); 
-        } catch (error) {
-          console.error("Error fetching Webform data:", error);
-        }
-      };
-      fetchWebformsData();
-    }, [fetchDataWithRetry]);
  
   // const [filteredRows, setFilteredRows] = useState(gridData);
   //not confirmed
@@ -455,13 +437,29 @@ const [existingControl, setExistingControl] = useState([]);
       setTotalRecord(response.data.pagination.totalCount);
       setGridData(dataWithIds); // Ensure gridData is set with the fetched data
       setTotalRows(dataWithIds.length);
-  
+
+
+          const apiUrl = `${config.apiUrl.replace(/\/$/, "")}/webforms`;
+          const fieldresponse = await fetchDataWithRetry(apiUrl);
+          const fetchedWebformsData = fieldresponse.data || [];
+          const currentPage = fetchedWebformsData.find(
+            (page) => page.pageName === pageName
+          );
+          const currentPageFields = currentPage.fields || [];
+          setDynamicFields(currentPageFields);
+
       if (response.data.data.length > 0) {
-        const dynamicColumns = Object.keys(dataWithIds[0])
-          .filter((key) => key !== "pageId" && key !== "pageName" &&  key !== "_id" && key !== "appdata" && key !== "history" 
-          && key !== "id" && key !== "comments" && key !== "pageID" && key !== "filter" && key !== "formatted_filter" && key !== "selected_columns" 
-          && key !== "profile_img" && key !== "roles") 
-          .map((key) => {
+        const excludedKeys = [
+          "pageId", "pageName", "_id", "appdata", "history", "id", "comments",
+          "pageID", "filter", "formatted_filter", "selected_columns",
+          "profile_img", "roles","created_by", "property_type", "project_name","fb_form_name", "fb_page_name", "fb_form_id", "landing_number", "acp", "alternative_email", "sm", "description"
+        ];
+        
+        const dynamicColumns = currentPageFields
+        .filter(field => field.fieldName && !excludedKeys.includes(field.fieldName))
+          .map((field) => {
+            const key = field.fieldName;
+            const label = field.label || key.replace(/_/g, " ").replace(/\b\w/g, char => char.toUpperCase());
             if (key === "created_time") {
               return {
                 field: key,
@@ -483,7 +481,7 @@ const [existingControl, setExistingControl] = useState([]);
                 }
               };
             }
-            if (key === "follow_up_on" || key === "site_visit_on") {
+            if (key === "follow_up_on" || key === "site_visit_on" || key === "Modified_at") {
               return {
                 field: key,
                 headerName: key
@@ -612,7 +610,7 @@ const performSearch = () => {
   const activeFilters = Object.entries(filterText)
     .filter(([key, val]) => (Array.isArray(val) ? val.length > 0 : String(val).trim() !== "")) // Exclude empty filters
     .reduce((acc, [key, val]) => {
-      if (key === "created_time") {
+      if (key === "created_time" || key === "follow_up_on" || key === "site_visit_on" || key === "Modified_at") {
         if (val.startDate && val.endDate) {
           // If both startDate and endDate are provided, use them as a range
           const startOfDay = `${dayjs(val.startDate).format("YYYY-MM-DD")}T00:00:00.000Z`;
