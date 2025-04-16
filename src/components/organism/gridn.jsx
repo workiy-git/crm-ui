@@ -452,7 +452,7 @@ const [existingControl, setExistingControl] = useState([]);
         const excludedKeys = [
           "pageId", "pageName", "_id", "appdata", "history", "id", "comments",
           "pageID", "filter", "formatted_filter", "selected_columns",
-          "profile_img", "roles","created_by", "property_type", "project_name","fb_form_name", "fb_page_name", "fb_form_id", "landing_number", "acp", "alternative_email", "sm", "description"
+          "profile_img", "roles", "property_type", "project_name","fb_form_name", "fb_page_name", "fb_form_id", "landing_number", "acp", "alternative_email", "sm", "description"
         ];
         
         const dynamicColumns = currentPageFields
@@ -466,21 +466,30 @@ const [existingControl, setExistingControl] = useState([]);
                 headerName: "Created Time",
                 width: 200,
                 renderCell: (params) => {
-                  const utcDate = new Date(params.value); // Convert to Date object (UTC time)
-      
-                  // Get the offset in minutes for local time relative to UTC
-                  const timezoneOffset = utcDate.getTimezoneOffset(); 
-      
-                  // Adjust the UTC time based on the offset (getTimezoneOffset is in minutes, so multiply by 60000 to get milliseconds)
-                  const localTime = new Date(utcDate.getTime() - timezoneOffset * 60000); 
-      
-                  // Format the local time
-                  const formattedLocalTime = localTime.toLocaleString();
-      
+                  const utcDate = new Date(params.value);
+            
+                  const timezoneOffset = utcDate.getTimezoneOffset();
+                  const localTime = new Date(utcDate.getTime() - timezoneOffset * 60000);
+            
+                  // Extract components
+                  const year = localTime.getFullYear();
+                  const month = String(localTime.getMonth() + 1).padStart(2, '0');
+                  const day = String(localTime.getDate()).padStart(2, '0');
+            
+                  const time = localTime.toLocaleTimeString(undefined, {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit',
+                    hour12: true,
+                  });
+            
+                  const formattedLocalTime = `${year}/${month}/${day}, ${time}`;
+            
                   return formattedLocalTime;
                 }
               };
             }
+            
             if (key === "follow_up_on" || key === "site_visit_on" || key === "Modified_at") {
               return {
                 field: key,
@@ -494,16 +503,28 @@ const [existingControl, setExistingControl] = useState([]);
                   const utcDate = new Date(params.value); // Convert to Date object (UTC time)
             
                   // Get the offset in minutes for local time relative to UTC
-                  const timezoneOffset = utcDate.getTimezoneOffset(); 
+                  const timezoneOffset = utcDate.getTimezoneOffset();
             
                   // Adjust the UTC time based on the offset
-                  const localTime = new Date(utcDate.getTime() - timezoneOffset * 60000); 
+                  const localTime = new Date(utcDate.getTime() - timezoneOffset * 60000);
             
-                  // Format the local time
-                  return localTime.toLocaleString();
+                  // Format the date manually to "YYYY/MM/DD, hh:mm:ss AM/PM"
+                  const year = localTime.getFullYear();
+                  const month = String(localTime.getMonth() + 1).padStart(2, '0');
+                  const day = String(localTime.getDate()).padStart(2, '0');
+            
+                  const time = localTime.toLocaleTimeString(undefined, {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit',
+                    hour12: true,
+                  });
+            
+                  return `${year}/${month}/${day}, ${time}`;
                 }
               };
             }
+            
             
             return {
               field: key,
