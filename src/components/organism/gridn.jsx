@@ -72,6 +72,7 @@ const GridComponent = ({ pageName }) => {
   const [inputPage, setInputPage] = useState("");
   const [dynamicFields, setDynamicFields] = useState([]);
   const [dateRange, setDateRange] = useState({ startDate: null, endDate: null });
+  const [sortModel, setSortModel] = useState([]);
 
     const fetchDataWithRetry = useCallback(
       async (url, retryCount = 3) => {
@@ -409,17 +410,27 @@ const [existingControl, setExistingControl] = useState([]);
     return res;
   };
   
-  const fetchGridData = async (filter, currentPageNumber, currentNumberofRow) => {
+  const fetchGridData = async (filter, currentPageNumber, currentNumberofRow, sortField = null, sortOrder = null) => {
     try {
       console.log("filter", filter);  
       console.log("current PAges", currentPageNumber);
       console.log("current PAges Size", currentNumberofRow);
+      const queryParams = new URLSearchParams({
+        page: currentPageNumber,
+        pageSize: currentNumberofRow,
+      });
+ 
+      if (sortField && sortOrder) {
+        queryParams.append("sortField", sortField);
+        queryParams.append("sortOrder", sortOrder);
+      }
+ 
+      // Make the API request
       const response = await axios.post(
-        `${config.apiUrl.replace(/\/$/, "")}/${gridEndpoint}?page=${currentPageNumber}&pageSize=${currentNumberofRow}`, 
-        filter, // This is the body (data you are sending)
-        
+        `${config.apiUrl.replace(/\/$/, "")}/${gridEndpoint}?${queryParams.toString()}`,
+        filter, // Send filter in the request body
         {
-          headers: headers, // This is the config object where headers go
+          headers: headers, // Include headers for authorization
         }
       );
       
@@ -551,6 +562,24 @@ const [existingControl, setExistingControl] = useState([]);
     }
   };
   ;
+
+  const handleSortModelChange = (newSortModel) => {
+      
+    setSortModel(newSortModel); // Update the sort model state
+ 
+    if (newSortModel.length > 0) {
+      const { field, sort } = newSortModel[0]; // Extract field and sort order
+      const currentPage = 1; // Reset to the first page when sorting changes
+      setLoading(true);
+      fetchGridData(JSON.parse(selectedValue), currentPage, pageSize, field, sort);
+      setPage(currentPage); // Reset the page state
+    } else {
+      // If no sorting is applied, fetch data without sort parameters
+      setLoading(true);
+      fetchGridData(JSON.parse(selectedValue), 1, pageSize);
+      setPage(1);
+    }
+  };
 
   const handleFilterChange = (field, value) => {
     setPage(1);
@@ -1479,6 +1508,8 @@ const handleViewReport = async () => {
             disableSelectionOnClick
             getRowHeight={() => 35}
             className="custom-data-grid-main"
+            onSortModelChange={handleSortModelChange}
+            sortModel={sortModel}
             onRowDoubleClick={(params) => {
               console.log("Row double-clicked:", params.row);
               handleDoubleClick("view", params)
