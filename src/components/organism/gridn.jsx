@@ -350,9 +350,12 @@ const [existingControl, setExistingControl] = useState([]);
     const currentpageSize = pageSize;
     setLoading(true);
     
-    // Use the existing filterText state to fetch data for the selected filter
+    // Use the existing filterText state and sortModel to fetch data for the selected filter
     const filter = JSON.parse(selectedValue);
-    fetchGridData(filter, currentPage, currentpageSize);
+    const sortField = sortModel[0]?.field || null;
+    const sortOrder = sortModel[0]?.sort || null;
+
+    fetchGridData(filter, currentPage, currentpageSize, sortField, sortOrder);
     
     setPage(value);
     setInputPage(value);
@@ -1203,6 +1206,7 @@ const handleViewReport = async () => {
   };
   
   const handleRowSelection = (rowId, isChecked) => {
+
     setSelectedRows((prevSelectedRows) => {
       if (isChecked) {
         return [...prevSelectedRows, rowId];
@@ -1314,6 +1318,7 @@ const handleViewReport = async () => {
             xs: "center",
           },}}
       >
+        <div>{selectedRows.length} out of {pageSize}</div>
         <Button onClick={openMenu} className='Action-btn' sx={{ color:'white', background:'#212529' }} >
           Actions
         </Button>
