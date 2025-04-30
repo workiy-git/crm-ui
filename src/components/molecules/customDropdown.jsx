@@ -15,6 +15,7 @@ const CustomDynamicForm = () => {
   const pageName = location.state?.pageName;
   const navigate = useNavigate();
   const [filterConditions, setFilterConditions] = useState({});
+  const [selectedFields, setSelectedFields] = useState([]); // State to store selected fields
 
   useEffect(() => {
     const fetchFilterConditions = async () => {
@@ -251,9 +252,24 @@ const CustomDynamicForm = () => {
     setFormData({ ...formData, [key]: value });
   };
 
+  // Function to handle field selection
+  const handleFieldSelection = (field) => {
+    setSelectedFields((prevFields) =>
+      prevFields.includes(field)
+        ? prevFields.filter((f) => f !== field) // Remove field if already selected
+        : [...prevFields, field] // Add field if not selected
+    );
+  };
+
   const handleSave = async () => {
     if (!formData["dynamicName"]) {
       setError("Custom Filter Name is required.");
+      setTimeout(() => setError(null), 3000);
+      return;
+    }
+
+    if (selectedFields.length === 0) {
+      setError("At least one field must be selected.");
       setTimeout(() => setError(null), 3000);
       return;
     }
@@ -1492,6 +1508,7 @@ const CustomDynamicForm = () => {
     const transformedData = {
       name: dynamicName,
       filter: [{ $match: matchConditions }],
+      fields: selectedFields, // Include selected fields
     };
 
     try {
@@ -1500,7 +1517,9 @@ const CustomDynamicForm = () => {
       const existingControl = controls.find((control) => control.pageName === pageName);
 
       if (existingControl) {
-        const updatedValue = existingControl.value ? [...existingControl.value, transformedData] : [transformedData];
+        const updatedValue = existingControl.value
+          ? [...existingControl.value, transformedData]
+          : [transformedData];
         const updatedControl = { ...existingControl, value: updatedValue };
 
         delete updatedControl._id;
@@ -2071,6 +2090,25 @@ const CustomDynamicForm = () => {
         >
           Save
         </button>
+      </div>
+
+      <div style={{ margin: "10px" }}>
+        <label>Select Fields:</label>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: "10px" }}>
+          {dynamicFields.map((field) => (
+            <div key={field.fieldName} style={{ display: "flex", alignItems: "center" }}>
+              <input
+                type="checkbox"
+                id={field.fieldName}
+                checked={selectedFields.includes(field.fieldName)}
+                onChange={() => handleFieldSelection(field.fieldName)}
+              />
+              <label htmlFor={field.fieldName} style={{ marginLeft: "5px" }}>
+                {field.label}
+              </label>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );
