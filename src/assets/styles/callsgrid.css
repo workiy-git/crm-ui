@@ -571,9 +571,15 @@
   top: 140px !important;
   height: 240px !important;
 }
-.grid_menu_delete_btn{
+.grid_menu_btn{
   visibility: hidden;
 }
-.grid_menu_option_list:hover .grid_menu_delete_btn{
+.grid_menu_delete_btn, .grid_menu_edit_btn{
+  visibility: hidden;
+}
+.grid_menu_option_list:hover .grid_menu_delete_btn, .grid_menu_option_list:hover .grid_menu_edit_btn{
   visibility: visible !important;
+}
+.grid_menu_btn{
+  display: flex;
 }

@@ -60,7 +60,7 @@ const App = () => {
           <Route path="/underconstruction" element={ <ProtectedRoute> <Underconstruction /> </ProtectedRoute> } />
           <Route path="/users/assignedto" element={<ProtectedRoute> <AssignedTo /> </ProtectedRoute>} />
           <Route path="/selected/edit" element={<ProtectedRoute> <SelectedEditComponent /> </ProtectedRoute>} />
-          <Route path="/customdropdown" element={<ProtectedRoute> <CustomDropdown /> </ProtectedRoute>} />
+          <Route path="/:pageName/customdropdown" element={<ProtectedRoute> <CustomDropdown /> </ProtectedRoute>} />
         </Routes>
       </Layout>
       </AuthProvider>
