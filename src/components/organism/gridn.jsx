@@ -11,6 +11,7 @@ import CsvImporter from "../molecules/csvImpoter";
 import OutlinedInput from '@mui/material/OutlinedInput';
 import Chip from '@mui/material/Chip';
 import DeleteIcon from '@mui/icons-material/Delete';
+import EditNoteOutlinedIcon from '@mui/icons-material/EditNoteOutlined';
 import dayjs from "dayjs";
 
 
@@ -73,6 +74,7 @@ const GridComponent = ({ pageName }) => {
   const [dynamicFields, setDynamicFields] = useState([]);
   const [dateRange, setDateRange] = useState({ startDate: null, endDate: null });
   const [sortModel, setSortModel] = useState([]);
+  const [SelectedColumns, setSelectedColumns] = useState([]);
 
     const fetchDataWithRetry = useCallback(
       async (url, retryCount = 3) => {
@@ -97,11 +99,11 @@ const GridComponent = ({ pageName }) => {
   useEffect(() => {
     axios.get(`${config.apiUrl}/menus`, {headers}) // Use apiUrl from the configuration file
       .then((response) => {
-        // console.log('dayData received:', response.data.data.menu_text);
+        // 
         const containerData = response.data.data.find(menu => menu.menu === 'container');
 
         setMenuData(containerData);
-        console.log("menusss", response.data.data)
+        
         
       })
       .catch((error) => {
@@ -147,7 +149,7 @@ const GridComponent = ({ pageName }) => {
       console.error("Token not found");
     }
   }, []);
-  console.log("userdata", userData);
+  
 
     // Open the Import Data Modal
     const handleOpenImportModal = () => {
@@ -192,7 +194,7 @@ const GridComponent = ({ pageName }) => {
 };
 
   const handleDeleteClick = (row) => {
-    console.log("row", row);
+    
     handleMenuClose();
     setRowToDelete(row); // Set the row to be deleted
     setDeleteDialogOpen(true); // Open the confirmation dialog
@@ -240,6 +242,7 @@ const GridComponent = ({ pageName }) => {
 
   useEffect(() => {
     if (pageName) {
+      setSelectedColumns([]); // Reset selected columns
       setIsLoading(true); // Set the loader to true when pageName changes
       setPage(1); // Reset to the first page when the pageName changes
       setInputPage(1); // Reset the input page number when the pageName changes
@@ -249,55 +252,59 @@ const GridComponent = ({ pageName }) => {
   
 const [existingControl, setExistingControl] = useState([]);
   // Fetch select options
-  useEffect(() => {
-    const fetchSelectOptions = async () => {
-      try {
-
-        const response = await axios.post(
-          
-          `${config.apiUrl.replace(/\/$/, "")}/${endpoint}`,
-          {
-            pageName: pageName,
-            control_type: "dropdown",
-          },
-          {
-            // This is the config object where headers should go
-            headers: headers, // Pass the headers here
-          }
-        );
-        setExistingControl(response.data.data.find((control) => control.pageName === pageName))
-        console.log("response Data", response);
-        const options = response.data.data[0].value.map((option) => ({
-          name: option.name,
-          filter: option.filter,
-        }));
-        setSelectOptions(options); // Assuming the API returns an object with an 'options' array
-        console.log("widget", widget);
-      setKey(prevKey => prevKey + 1);
-        if (options.length > 0) {
-          if (widget) {
-            const selectedOption = options.find(
-              (option) => option.name === widget
-            );
-            if (selectedOption) {
-              setSelectedValue(JSON.stringify(selectedOption.filter));
-            } else {
-              setSelectedValue(JSON.stringify(options[0].filter)); // Fallback to the first option if no match is found
-            }
-            setWidget(""); // Clear the widget value after initial use
-          } else {
-            setSelectedValue(JSON.stringify(options[0].filter)); // Set default value to the first option
-          }
-        }
-        // if (options.length > 0) {
-        //   setSelectedValue(JSON.stringify(options[0].filter)); // Set default value to the first option
-        // }
-      } catch (error) {
-        console.error("Error fetching select options:", error);
+  // Define the function outside of useEffect
+const fetchSelectOptions = async () => {
+  try {
+    const response = await axios.post(
+      `${config.apiUrl.replace(/\/$/, "")}/${endpoint}`,
+      {
+        pageName: pageName,
+        control_type: "dropdown",
+      },
+      {
+        headers: headers, // Pass the headers here
       }
-    };
-    fetchSelectOptions();
-  }, [pageName]);
+    );
+
+    setExistingControl(response.data.data.find((control) => control.pageName === pageName));
+
+    const options = response.data.data[0].value.map((option) => ({
+      name: option.name,
+      filter: option.filter,
+      fields: option.fields,
+    }));
+
+    setSelectOptions(options); // Assuming the API returns an object with an 'options' array
+
+    setKey((prevKey) => prevKey + 1);
+
+    if (options.length > 0) {
+      if (widget) {
+        const selectedOption = options.find(
+          (option) => option.name === widget
+        );
+        if (selectedOption) {
+          setSelectedValue(JSON.stringify(selectedOption.filter));
+          setSelectedColumns(JSON.stringify(selectedOption.fields));
+        } else {
+          setSelectedValue(JSON.stringify(options[0].filter)); // Fallback to the first option if no match is found
+          setSelectedColumns(JSON.stringify(options[0].fields));
+        }
+        setWidget(""); // Clear the widget value after initial use
+      } else {
+        setSelectedValue(JSON.stringify(options[0].filter)); // Set default value to the first option
+        setSelectedColumns(JSON.stringify(options[0].fields));
+      }
+    }
+  } catch (error) {
+    console.error("Error fetching select options:", error);
+  }
+};
+
+// Call fetchSelectOptions inside useEffect
+useEffect(() => {
+  fetchSelectOptions();
+}, [pageName]);
 
   const handleDeleteOption = async (index, option) => {
     
@@ -308,13 +315,13 @@ const [existingControl, setExistingControl] = useState([]);
         return; // Exit if user cancels
     }
 
-    console.log("existingControl", existingControl);
-    console.log("Deleting option:", option);
+    
+    
 
     try {
         // Remove the selected option from existingControl.value
         const updatedOptions = existingControl.value.filter((_, i) => i !== index);
-        console.log("Updated Options", updatedOptions);
+        
 
         // Create an object excluding `_id`
         const { _id, ...updatedControl } = existingControl; // Exclude `_id`
@@ -338,7 +345,10 @@ const [existingControl, setExistingControl] = useState([]);
     }
 };
 
-
+const handleEditOption = (index, option) => {
+  console.log("Edit option:", option);
+  navigate(`/${pageName}/customdropdown`, { state: { filters: option, pageName: pageName } });
+};
 
   
   
@@ -359,7 +369,7 @@ const [existingControl, setExistingControl] = useState([]);
     
     setPage(value);
     setInputPage(value);
-    console.log("current page", value);
+    
   };
 
   // Fetch grid data based on the selected filter
@@ -370,7 +380,7 @@ const [existingControl, setExistingControl] = useState([]);
   }, [selectedValue]);
 
   const handleCustomDropDown =() => {
-    navigate("/customdropdown", { state: { pageName: pageName } });
+    navigate(`/${pageName}/customdropdown`, { state: { pageName: pageName } });
   }
   
   useEffect(() => {
@@ -378,12 +388,17 @@ const [existingControl, setExistingControl] = useState([]);
       setIsLoading(true); // Show loading spinner when pageName changes
   
       // Clear filterText and reset pagination to initial state
+      setSelectedColumns([]); // Reset selected columns
       setFilterText({}); // Reset all filter fields
       setPage(1);        // Reset current page number
       setInputPage(1);   // Reset input page number
     }
   }, [pageName]);
   
+  const handleFieldOption = (index, option) => {
+    setSelectedColumns(option.fields);
+  };
+
   //Drop Down Change
   const handleChange = (event, currentPage, currentpageSize) => {
     const selectedValue = event.target.value;
@@ -415,9 +430,9 @@ const [existingControl, setExistingControl] = useState([]);
   
   const fetchGridData = async (filter, currentPageNumber, currentNumberofRow, sortField = null, sortOrder = null) => {
     try {
-      console.log("filter", filter);  
-      console.log("current PAges", currentPageNumber);
-      console.log("current PAges Size", currentNumberofRow);
+        
+      
+      
       const queryParams = new URLSearchParams({
         page: currentPageNumber,
         pageSize: currentNumberofRow,
@@ -437,7 +452,7 @@ const [existingControl, setExistingControl] = useState([]);
         }
       );
       
-      console.log("Response data:", response.data);
+      
 
       const dataWithIds = response.data.data.map((item, index) => {
         const flattenedItem = flattenObject(item); // Flatten the object
@@ -446,12 +461,23 @@ const [existingControl, setExistingControl] = useState([]);
           id: item._id || index,
         };
       });
-      console.log("Data with IDs:", dataWithIds);
+      
 
       setTotalRecord(response.data.pagination.totalCount);
       setGridData(dataWithIds); // Ensure gridData is set with the fetched data
       setTotalRows(dataWithIds.length);
 
+      const responses = await axios.post(
+        `${config.apiUrl.replace(/\/$/, "")}/${endpoint}`,
+        {
+          pageName: pageName,
+          control_type: "dropdown",
+        },
+        {
+          headers: headers, // Pass the headers here
+        }
+      );
+      const initialdropDowncolumn = responses.data.data[0].value[0].fields;
 
           const apiUrl = `${config.apiUrl.replace(/\/$/, "")}/webforms`;
           const fieldresponse = await fetchDataWithRetry(apiUrl);
@@ -468,8 +494,10 @@ const [existingControl, setExistingControl] = useState([]);
           "pageID", "filter", "formatted_filter", "selected_columns",
           "profile_img", "roles", "property_type", "project_name","fb_form_name", "fb_page_name", "fb_form_id", "landing_number", "acp", "alternative_email", "sm", "description"
         ];
-        
-        const dynamicColumns = currentPageFields
+        const dynamicfields = SelectedColumns.length > 0 ? SelectedColumns : initialdropDowncolumn;
+        const fieldsToUse = dynamicfields.length > 0 ? dynamicfields.map(field => ({ fieldName: field, label: field })) : currentPageFields;
+ 
+        const dynamicColumns = fieldsToUse
         .filter(field => field.fieldName && !excludedKeys.includes(field.fieldName))
           .map((field) => {
             const key = field.fieldName;
@@ -743,7 +771,7 @@ const filteredRows = gridData.map((row) => {
         navigate(`/${pageName}/${mode}/${selectedRow._id}`, {
             state: { rowData: selectedRow, pageName, mode },
         });
-        console.log("rowdata",selectedRow)
+        
         handleMenuClose();
     }
   };
@@ -753,7 +781,7 @@ const filteredRows = gridData.map((row) => {
       navigate(`/${pageName}/${mode}/${ params.row._id}`, {
           state: { rowData:  params.row, pageName, mode },
       });
-      console.log("rowdata", params.row)
+      
       handleMenuClose();
   }
 };
@@ -809,7 +837,7 @@ const handleEditReport = async () => {
     );
   
     const selectedReportData = reportResponse.data.data;
-    console.log('Fetched report data:', selectedReportData);
+    
 
     // Navigate to the edit report page and pass the selectedReportData
     navigate(`/edit-report/${reportId}`, { 
@@ -835,11 +863,11 @@ const handleViewReport = async () => {
     );
     
     const reportData = reportResponse.data.data;
-    console.log('Fetched report data:', reportData);
+    
 
     const pipeline = reportData.formatted_filter;
 
-    console.log('Pipeline array:', pipeline);
+    
 
     // Ensure the pipeline is sent directly as an array
     const appDataResponse = await axios.post(
@@ -849,7 +877,7 @@ const handleViewReport = async () => {
     );
     
     const filteredData_reportId = appDataResponse.data.data; // Store the fetched data
-    console.log('Fetched app data:', filteredData_reportId);
+    
 
     // Update the state with the fetched data
     setFilteredData(filteredData_reportId);
@@ -954,7 +982,7 @@ const handleViewReport = async () => {
       renderHeader: (params) => {
         // Get the field type from dynamicFields
         const fieldType = dynamicFields.find((field) => field.fieldName === params.field)?.type || "text";
-        // console.log("fieldType", fieldType);
+        // 
         
         return (
           <div
@@ -1098,7 +1126,7 @@ const handleViewReport = async () => {
     const selectedData = gridData.filter((row) =>
       selectedRows.includes(row.id)
     );
-    console.log("Selected Data:", selectedData);
+    
 
     if (selectedData.length === 0) {
       setError('No rows selected');
@@ -1117,7 +1145,7 @@ const handleViewReport = async () => {
     const emailAddresses = selectedData
       .map((row) => row.caller_email || row.email)  // Extract email addresses
       .filter((email) => typeof email === 'string' && email.trim() !== ""); // Remove undefined and empty emails
-    console.log("Filtered Emails:", emailAddresses);
+    
     return emailAddresses;
   };
   
@@ -1223,7 +1251,7 @@ const handleViewReport = async () => {
     const currentPage = 1;
     const currentpageSize = event.target.value;
     handleChange({ target: { value: selectedValue } }, currentPage, currentpageSize);
-    console.log("page size", event.target.value);
+    
   };
   
   const handlePageInputChange = (e) => {
@@ -1395,8 +1423,22 @@ const handleViewReport = async () => {
         key={index}
         value={JSON.stringify(option.filter)}
         style={{ display: "flex", justifyContent: "space-between" }}
+        onClick={(e) => {
+          handleFieldOption(index, option);
+        }}
       >
         <div>{option.name}</div>
+
+        <div className="grid_menu_btn">
+        <div className="grid_menu_edit_btn"
+          style={{ cursor: "pointer", color: "black", marginLeft: "10px" }}
+          onClick={(e) => {
+            e.stopPropagation(); // Prevent dropdown from closing
+            handleEditOption(index, option);
+          }}
+        >
+          <EditNoteOutlinedIcon style={{height:'35px', width:'20px'}} />
+        </div>
         <div className="grid_menu_delete_btn"
           style={{ cursor: "pointer", color: "black", marginLeft: "10px"}}
           onClick={(e) => {
@@ -1406,6 +1448,8 @@ const handleViewReport = async () => {
         >
           <DeleteIcon style={{height:'30px', width:'18px'}} />
         </div>
+        </div>
+        
       </MenuItem>
     ))}
     <MenuItem value="custom">Custom</MenuItem>
@@ -1516,7 +1560,7 @@ const handleViewReport = async () => {
             onSortModelChange={handleSortModelChange}
             sortModel={sortModel}
             onRowDoubleClick={(params) => {
-              console.log("Row double-clicked:", params.row);
+              
               handleDoubleClick("view", params)
             }}
             
