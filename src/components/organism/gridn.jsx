@@ -1394,8 +1394,8 @@ const handleViewReport = async () => {
         anchorEl={menuAnchor}
         open={Boolean(menuAnchor)}
         onClose={closeMenu}>
-            <MenuItem onClick={handleOpenImportModal}>Import Data</MenuItem>
-            <MenuItem onClick={handleExportClick}>Export Data</MenuItem>
+{/*             <MenuItem onClick={handleOpenImportModal}>Import Data</MenuItem>
+            <MenuItem onClick={handleExportClick}>Export Data</MenuItem> */}
             {pageName === 'leads' && (
               <MenuItem onClick={handleEditClick}>Edit</MenuItem>
             )}
