@@ -1394,11 +1394,15 @@ const handleViewReport = async () => {
         anchorEl={menuAnchor}
         open={Boolean(menuAnchor)}
         onClose={closeMenu}>
-{/*             <MenuItem onClick={handleOpenImportModal}>Import Data</MenuItem>
-            <MenuItem onClick={handleExportClick}>Export Data</MenuItem> */}
-            {pageName === 'leads' && (
+          {menuData.import && menuData.import.title &&
+            <MenuItem onClick={handleOpenImportModal}>{menuData.import.title}</MenuItem>
+          }
+          {menuData.export && menuData.export.title &&
+            <MenuItem onClick={handleExportClick}>{menuData.export.title}</MenuItem>
+          }
+          {pageName === 'leads' && (
               <MenuItem onClick={handleEditClick}>Edit</MenuItem>
-            )}
+          )}
         </Menu>
         
         <div className="dropdown" style={{ margin: "8px", width: "250px" }}>
