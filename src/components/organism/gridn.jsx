@@ -242,7 +242,6 @@ const GridComponent = ({ pageName }) => {
 
   useEffect(() => {
     if (pageName) {
-      setSelectedColumns([]); // Reset selected columns
       setIsLoading(true); // Set the loader to true when pageName changes
       setPage(1); // Reset to the first page when the pageName changes
       setInputPage(1); // Reset the input page number when the pageName changes
@@ -252,59 +251,56 @@ const GridComponent = ({ pageName }) => {
   
 const [existingControl, setExistingControl] = useState([]);
   // Fetch select options
-  // Define the function outside of useEffect
-const fetchSelectOptions = async () => {
-  try {
-    const response = await axios.post(
-      `${config.apiUrl.replace(/\/$/, "")}/${endpoint}`,
-      {
-        pageName: pageName,
-        control_type: "dropdown",
-      },
-      {
-        headers: headers, // Pass the headers here
-      }
-    );
+  useEffect(() => {
+    const fetchSelectOptions = async () => {
+      try {
 
-    setExistingControl(response.data.data.find((control) => control.pageName === pageName));
-
-    const options = response.data.data[0].value.map((option) => ({
-      name: option.name,
-      filter: option.filter,
-      fields: option.fields,
-    }));
-
-    setSelectOptions(options); // Assuming the API returns an object with an 'options' array
-
-    setKey((prevKey) => prevKey + 1);
-
-    if (options.length > 0) {
-      if (widget) {
-        const selectedOption = options.find(
-          (option) => option.name === widget
+        const response = await axios.post(
+          
+          `${config.apiUrl.replace(/\/$/, "")}/${endpoint}`,
+          {
+            pageName: pageName,
+            control_type: "dropdown",
+          },
+          {
+            // This is the config object where headers should go
+            headers: headers, // Pass the headers here
+          }
         );
-        if (selectedOption) {
-          setSelectedValue(JSON.stringify(selectedOption.filter));
-          setSelectedColumns(JSON.stringify(selectedOption.fields));
-        } else {
-          setSelectedValue(JSON.stringify(options[0].filter)); // Fallback to the first option if no match is found
-          setSelectedColumns(JSON.stringify(options[0].fields));
+        setExistingControl(response.data.data.find((control) => control.pageName === pageName))
+        
+        const options = response.data.data[0].value.map((option) => ({
+          name: option.name,
+          filter: option.filter,
+          fields: option.fields,
+        }));
+        setSelectOptions(options); // Assuming the API returns an object with an 'options' array
+        
+      setKey(prevKey => prevKey + 1);
+        if (options.length > 0) {
+          if (widget) {
+            const selectedOption = options.find(
+              (option) => option.name === widget
+            );
+            if (selectedOption) {
+              setSelectedValue(JSON.stringify(selectedOption.filter));
+            } else {
+              setSelectedValue(JSON.stringify(options[0].filter)); // Fallback to the first option if no match is found
+            }
+            setWidget(""); // Clear the widget value after initial use
+          } else {
+            setSelectedValue(JSON.stringify(options[0].filter)); // Set default value to the first option
+          }
         }
-        setWidget(""); // Clear the widget value after initial use
-      } else {
-        setSelectedValue(JSON.stringify(options[0].filter)); // Set default value to the first option
-        setSelectedColumns(JSON.stringify(options[0].fields));
+        // if (options.length > 0) {
+        //   setSelectedValue(JSON.stringify(options[0].filter)); // Set default value to the first option
+        // }
+      } catch (error) {
+        console.error("Error fetching select options:", error);
       }
-    }
-  } catch (error) {
-    console.error("Error fetching select options:", error);
-  }
-};
-
-// Call fetchSelectOptions inside useEffect
-useEffect(() => {
-  fetchSelectOptions();
-}, [pageName]);
+    };
+    fetchSelectOptions();
+  }, [pageName]);
 
   const handleDeleteOption = async (index, option) => {
     
@@ -349,7 +345,9 @@ const handleEditOption = (index, option) => {
   console.log("Edit option:", option);
   navigate(`/${pageName}/customdropdown`, { state: { filters: option, pageName: pageName } });
 };
-
+const handleFieldOption = (index, option) => {
+  setSelectedColumns(option.fields);
+};
   
   
   
@@ -388,17 +386,12 @@ const handleEditOption = (index, option) => {
       setIsLoading(true); // Show loading spinner when pageName changes
   
       // Clear filterText and reset pagination to initial state
-      setSelectedColumns([]); // Reset selected columns
       setFilterText({}); // Reset all filter fields
       setPage(1);        // Reset current page number
       setInputPage(1);   // Reset input page number
     }
   }, [pageName]);
   
-  const handleFieldOption = (index, option) => {
-    setSelectedColumns(option.fields);
-  };
-
   //Drop Down Change
   const handleChange = (event, currentPage, currentpageSize) => {
     const selectedValue = event.target.value;
@@ -467,17 +460,6 @@ const handleEditOption = (index, option) => {
       setGridData(dataWithIds); // Ensure gridData is set with the fetched data
       setTotalRows(dataWithIds.length);
 
-      const responses = await axios.post(
-        `${config.apiUrl.replace(/\/$/, "")}/${endpoint}`,
-        {
-          pageName: pageName,
-          control_type: "dropdown",
-        },
-        {
-          headers: headers, // Pass the headers here
-        }
-      );
-      const initialdropDowncolumn = responses.data.data[0].value[0].fields;
 
           const apiUrl = `${config.apiUrl.replace(/\/$/, "")}/webforms`;
           const fieldresponse = await fetchDataWithRetry(apiUrl);
@@ -494,10 +476,8 @@ const handleEditOption = (index, option) => {
           "pageID", "filter", "formatted_filter", "selected_columns",
           "profile_img", "roles", "property_type", "project_name","fb_form_name", "fb_page_name", "fb_form_id", "landing_number", "acp", "alternative_email", "sm", "description"
         ];
-        const dynamicfields = SelectedColumns.length > 0 ? SelectedColumns : initialdropDowncolumn;
-        const fieldsToUse = dynamicfields.length > 0 ? dynamicfields.map(field => ({ fieldName: field, label: field })) : currentPageFields;
- 
-        const dynamicColumns = fieldsToUse
+        
+        const dynamicColumns = currentPageFields
         .filter(field => field.fieldName && !excludedKeys.includes(field.fieldName))
           .map((field) => {
             const key = field.fieldName;
@@ -1400,9 +1380,9 @@ const handleViewReport = async () => {
           {menuData.export && menuData.export.title &&
             <MenuItem onClick={handleExportClick}>{menuData.export.title}</MenuItem>
           }
-          {pageName === 'leads' && (
+            {pageName === 'leads' && (
               <MenuItem onClick={handleEditClick}>Edit</MenuItem>
-          )}
+            )}
         </Menu>
         
         <div className="dropdown" style={{ margin: "8px", width: "250px" }}>
