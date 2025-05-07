@@ -101,20 +101,27 @@ const GridMenu = ({ anchorEl, handleMenuClose, handleNavigate, handleDeleteClick
  
   const [reportmenu, setReportmenu] = useState({});
 
-    useEffect(() => {
-      // Fetch the menu data and find the grid menu within the response
-      axios.get(`${config.apiUrl}/menus`, { headers })
-        .then((response) => {
-          const menuDataArray = response.data.data;
-          const gridData = menuDataArray.find(menu => menu.menu === 'grid');
-          if (gridData) {
-            setReportmenu(gridData.gridMenu);
-          }
-        })
-        .catch((error) => {
-          console.error("Error fetching menu data:", error);
-        });
-    }, []);
+  useEffect(() => {
+    const cachedGridMenu = sessionStorage.getItem('gridMenu');
+    if (cachedGridMenu) {
+      setReportmenu(JSON.parse(cachedGridMenu));
+      return;
+    }
+  
+    axios.get(`${config.apiUrl}/menus`, { headers })
+      .then((response) => {
+        const menuDataArray = response.data.data;
+        const gridData = menuDataArray.find(menu => menu.menu === 'grid');
+        if (gridData) {
+          setReportmenu(gridData.gridMenu);
+          sessionStorage.setItem('gridMenu', JSON.stringify(gridData.gridMenu));
+        }
+      })
+      .catch((error) => {
+        console.error("Error fetching menu data:", error);
+      });
+  }, []);
+  
 
     if (!reportmenu) {
       return null; // Return nothing if reportmenu is not available yet
