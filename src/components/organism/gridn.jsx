@@ -276,7 +276,6 @@ const GridComponent = ({ pageName }) => {
     setRowToDelete(null); // Clear the selected row
   };
   
-  
 const [existingControl, setExistingControl] = useState([]);
   // Fetch select options
   const fetchSelectOptions = async () => {
@@ -479,7 +478,6 @@ const handleFieldOption = (index, option) => {
       setGridData(dataWithIds); // Ensure gridData is set with the fetched data
       setTotalRows(dataWithIds.length);
 
-
       console.log("SelectedColumns", SelectedColumns);
 
        const responses = await axios.post(
@@ -514,9 +512,6 @@ const matchedDropdown = initialdropDowncolumn.find(item =>
 const matchedFields = matchedDropdown ? matchedDropdown.fields : [];
 
 console.log("Matched Fields:", matchedFields);
-
-
-
 
           const apiUrl = `${config.apiUrl.replace(/\/$/, "")}/webforms`;
           const fieldresponse = await fetchDataWithRetry(apiUrl);
