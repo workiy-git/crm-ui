@@ -1419,7 +1419,7 @@ const CustomDynamicForm = () => {
 
 
   return (
-    <div>
+    <div style={{ maxHeight: "90vh", overflow: "auto" }}>
       {(error || success) && (
         <Stack sx={{ width: "100%", position: "absolute", zIndex: "10" }} spacing={2}>
           <div style={{ width: "fit-content", margin: "auto" }}>
@@ -1947,19 +1947,34 @@ const CustomDynamicForm = () => {
 
       <div style={{ margin: "10px" }}>
         <label>Select Fields:</label>
-        <div style={{ display: "flex", flexWrap: "wrap", gap: "10px" }}>
+        <div style={{ columnCount:'6' }}>
           {dynamicFields.map((field) => (
-            <div key={field.fieldName} style={{ display: "flex", alignItems: "center" }}>
-              <input
-                type="checkbox"
-                id={field.fieldName}
-                checked={selectedFields.includes(field.fieldName)}
-                onChange={() => handleFieldSelection(field.fieldName)}
-              />
-              <label htmlFor={field.fieldName} style={{ marginLeft: "5px" }}>
-                {field.label}
-              </label>
-            </div>
+            <div
+            className="custom-dropdown-columns"
+            key={field.fieldName}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              padding: "5px",
+              margin: "5px",
+              ...(selectedFields.includes(field.fieldName) && {
+                backgroundColor: "rgb(245, 189, 113)",
+                color: "white",
+                borderRadius: "5px",
+              }),
+            }}
+          >
+            <input
+              type="checkbox"
+              id={field.fieldName}
+              checked={selectedFields.includes(field.fieldName)}
+              onChange={() => handleFieldSelection(field.fieldName)}
+            />
+            <label htmlFor={field.fieldName} style={{ marginLeft: "5px" }}>
+              {field.label}
+            </label>
+          </div>
+          
           ))}
         </div>
       </div>
