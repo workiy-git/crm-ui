@@ -125,7 +125,10 @@ useEffect(() => {
         // console.log('dayData received:', response.data.data.menu_text);
         const containerData = response.data.data.find(menu => menu.menu === 'container');
 
-        setMenuData(containerData);
+        if (containerData) {
+          setMenuData(containerData);
+          sessionStorage.setItem('containerMenu', JSON.stringify(containerData));
+        }
         console.log("menusss", response.data.data)
         
       })
