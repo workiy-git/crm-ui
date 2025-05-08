@@ -59,6 +59,7 @@ const SideMenu = () => {
               }));
 
             setMenuItems(mappedMenuItems);
+            sessionStorage.setItem('mappedMenuItems', JSON.stringify(mappedMenuItems));
 
             if (savedSelectedMenuItems.length === 0) {
               setSelectedMenuItems(mappedMenuItems.slice(0, maxVerticalItems)); // Default to first 7 items
