@@ -1384,7 +1384,7 @@ const handleViewReport = async () => {
         <Dialog open={isImportModalOpen} onClose={handleCloseImportModal} fullWidth maxWidth="sm">
         <DialogTitle>Import CSV Data</DialogTitle>
         <DialogContent>
-          <CsvImporter />
+          <CsvImporter pageName={pageName} />
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseImportModal} color="secondary">
@@ -1425,7 +1425,7 @@ const handleViewReport = async () => {
         anchorEl={menuAnchor}
         open={Boolean(menuAnchor)}
         onClose={closeMenu}>
-          {menuData.import && menuData.import.title &&
+          {pageName !== 'leads' &&  menuData.import && menuData.import.title &&
             <MenuItem onClick={handleOpenImportModal}>{menuData.import.title}</MenuItem>
           }
           {menuData.export && menuData.export.title &&
