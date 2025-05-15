@@ -127,7 +127,11 @@ const SiteVisits = ({ mode }) => {
                         {" — " + new Date(sitevisit.updated_at).toLocaleString()}
                       </React.Fragment>
                     }
-                    secondary={sitevisit.sitevisits}
+                    secondary={
+                      <p style={{maxHeight:'100px', overflowY:'auto', width:'90%',wordWrap:'break-word'}}>
+                      {sitevisit.sitevisits}
+                      </p>
+                    }
                   />
                 </ListItem>
               ))
