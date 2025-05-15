@@ -48,7 +48,7 @@ const Comment = ({ mode }) => {
   }, [id, mode]);
 
   const handlePost = async () => {
-    if (comment.trim() && comment.length <= 150) {
+    if (comment.trim() ) {
       try {
         const user = sessionStorage.getItem('CognitoIdentityServiceProvider.6258t5vdisgcu7rjkuc5c94ba9.LastAuthUser');
         console.log("user", user);
@@ -78,9 +78,6 @@ const Comment = ({ mode }) => {
       } catch (error) {
         console.error('Error:', error);
       }
-    } else if (comment.length > 150) {
-        setError("Comment cannot exceed 150 characters.");
-        setTimeout(() => setError(''), 2000);
     } else {
       console.warn('Comment is empty');
     }
@@ -110,24 +107,18 @@ const Comment = ({ mode }) => {
               value={comment}
               onChange={(e) => {
                 const newComment = e.target.value;
-                if (newComment.length > 150) {
-                  setError('Comment cannot exceed 150 characters.')
-                  setTimeout(() => setError(''), 2000);
-                }
                 setComment(newComment);
               }}
               multiline
               rows={3}
-              helperText={`${comment.length}/150`}
-              error={comment.length > 150}
               sx={{ marginBottom: 2 }}
             />
             <div style={{ display: 'flex', justifyContent: 'end' }}>
               <Button
                 variant="contained"
-                style={{ background: comment.length <= 150 ? '#12e5e5' : '#cccccc' }}
+                style={{ background: '#12e5e5'}}
                 onClick={handlePost}
-                disabled={comment.length > 150}
+                // disabled={comment.length > 150}
               >
                 Post
               </Button>
@@ -158,7 +149,11 @@ const Comment = ({ mode }) => {
                         {" — " + new Date(comment.updated_at).toLocaleString()}
                       </React.Fragment>
                     }
-                    secondary={comment.comments}
+                    secondary={
+                      <p style={{maxHeight:'100px', overflowY:'auto', width:'90%',wordWrap:'break-word'}}>
+                      {comment.comments}
+                      </p>
+                    }
                   />
                 </ListItem>
               ))
