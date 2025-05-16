@@ -75,6 +75,8 @@ const GridComponent = ({ pageName }) => {
   const [dateRange, setDateRange] = useState({ startDate: null, endDate: null });
   const [sortModel, setSortModel] = useState([]);
   const [SelectedColumns, setSelectedColumns] = useState([]);
+  const [dropdownFilter, setDropdownFilter] = useState([]);
+
 
   const postDataWithRetry = useCallback(
     async (url, payload, retryCount = 3) => {
@@ -412,7 +414,11 @@ const handleFieldOption = (index, option) => {
   
   //Drop Down Change
   const handleChange = (event, currentPage, currentpageSize) => {
+
+
     const selectedValue = event.target.value;
+    console.log("event", selectedValue);
+
     setSelectedValue(selectedValue);
     if (selectedValue === "custom") {
       handleCustomDropDown(); // Call your custom dropdown function
@@ -420,6 +426,7 @@ const handleFieldOption = (index, option) => {
     }
     
     const filter = JSON.parse(selectedValue);
+    setDropdownFilter(filter);
   
     const currentPageNumber = currentPage || 1;
     const currentNumberofRow = currentpageSize || 25;
@@ -775,11 +782,13 @@ const performSearch = () => {
     {
       $match: {
         pageName: pageName,
+        ...Object.assign({}, ...(dropdownFilter.map(obj => obj.$match || {}))),
         ...activeFilters, // Include all active filters dynamically
       },
     },
   ];
   setSelectedValue(JSON.stringify(filter)); // Update the selected value for the dropdown
+  
   const currentNumberOfRow = pageSize || 25;
   setPage(1);
   setInputPage(1);
