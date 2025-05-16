@@ -3,11 +3,14 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import config from '../../config/config';
 import { headers } from '../atoms/Authorization';
+import { Stack, Alert } from "@mui/material";
 
 const SelectedEditComponent = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { selectedData } = location.state || {};
+    const [error, setError] = useState('');
+    const [success, setSuccess] = useState('');
 
   const [editedData, setEditedData] = useState(selectedData || []);
   const [webformsData, setWebformsData] = useState([]);
@@ -19,6 +22,13 @@ const SelectedEditComponent = () => {
     lead_source: '',
   });
 
+  const [updateProgress, setUpdateProgress] = useState({
+    updated: 0,
+    total: 0,
+  });
+
+  const [isSaving, setIsSaving] = useState(false);
+
   useEffect(() => {
     if (selectedData) {
       setEditedData(selectedData);
@@ -28,6 +38,7 @@ const SelectedEditComponent = () => {
         lead_status: '',
         lead_source: '',
       });
+      setUpdateProgress({ updated: 0, total: selectedData.length }); // ✅ Set total immediately
     }
   }, [selectedData]);
 
@@ -82,7 +93,12 @@ const SelectedEditComponent = () => {
 
   const saveChanges = async () => {
     try {
-      if (editedData && editedData.length > 0) {
+      setIsSaving(true);
+      let updatedCount = 0;
+      const totalCount = editedData.length;
+      setUpdateProgress({ updated: 0, total: totalCount });
+
+      if (editedData && totalCount > 0) {
         for (const row of editedData) {
           const originalRow = selectedData.find((r) => r._id === row._id) || {};
           const changedValues = Object.keys(row).reduce((acc, key) => {
@@ -91,27 +107,42 @@ const SelectedEditComponent = () => {
             }
             return acc;
           }, {});
+
+          if (Object.keys(changedValues).length === 0) {
+            console.log(`Skipping row ${row._id} as there are no changes.`);
+            updatedCount += 1;
+            setUpdateProgress({ updated: updatedCount, total: totalCount });
+            continue;
+          }
+
           const dataToSend = {
             pageName: row.pageName,
             pageId: row.pageId,
             ...changedValues,
           };
-          if (Object.keys(changedValues).length === 0) {
-            console.log(`Skipping row ${row._id} as there are no changes.`);
-            continue;
-          }
-          await axios.put(
-            `${config.apiUrl}/appdata/${row._id}`,
-            dataToSend,
-            { headers }
-          );
+
+          await axios.put(`${config.apiUrl}/appdata/${row._id}`, dataToSend, {
+            headers,
+          });
+
+          updatedCount += 1;
+          setUpdateProgress({ updated: updatedCount, total: totalCount });
           console.log(`Row with _id ${row._id} successfully updated`);
         }
       }
-      alert("All rows updated successfully!");
+
+      setSuccess("All changes saved successfully!");
+      setTimeout(() => {
+        setSuccess('');
+        navigate(-1);
+      }, 1000);
     } catch (error) {
       console.error("Error updating data:", error.response?.data || error);
-      alert("Failed to save changes. Please try again.");
+      setError("Failed to save changes. Please try again.");
+      setTimeout(() => setError(''), 3000);
+    } finally {
+      setIsSaving(false);
+      
     }
   };
 
@@ -123,6 +154,14 @@ const SelectedEditComponent = () => {
 
   return (
     <div>
+       {(error || success) && (
+              <Stack sx={{ width:'100%',position: 'absolute', zIndex: '10'}} spacing={2}>
+                <div style={{width:'fit-content', margin:'auto'}}>
+                {success && <Alert severity="success">{success}</Alert>}
+                {error && <Alert severity="error">{error}</Alert>}
+                </div>
+              </Stack>
+            )}
       <div style={{ width: "100%" }}>
         <div style={{
           display: "flex",
@@ -141,7 +180,6 @@ const SelectedEditComponent = () => {
       </div>
 
       <div style={{ padding: '50px' }}>
-        {/* Assigned To */}
         <label>Assigned To:</label>
         <select
           style={{ width: '50%' }}
@@ -154,7 +192,6 @@ const SelectedEditComponent = () => {
           ))}
         </select>
 
-        {/* Lead Medium */}
         <label>Lead Medium:</label>
         <select
           style={{ width: '50%' }}
@@ -167,7 +204,6 @@ const SelectedEditComponent = () => {
           ))}
         </select>
 
-        {/* Lead Status */}
         <label>Lead Status:</label>
         <select
           style={{ width: '50%' }}
@@ -180,7 +216,6 @@ const SelectedEditComponent = () => {
           ))}
         </select>
 
-        {/* Lead Source */}
         <label>Lead Source:</label>
         <select
           style={{ width: '50%' }}
@@ -193,6 +228,13 @@ const SelectedEditComponent = () => {
           ))}
         </select>
 
+        {/* Live Update Progress */}
+        {updateProgress.total > 0 && (
+          <p style={{ marginTop: '20px' }}>
+            Updated {updateProgress.updated} of {updateProgress.total}
+          </p>
+        )}
+
         {/* Save Button */}
         <button
           style={{
@@ -203,10 +245,13 @@ const SelectedEditComponent = () => {
             background: 'rgba(255, 255, 255, 0.4)',
             height: '35px',
             borderRadius: '10px',
+            padding: '0 20px',
+            cursor: isSaving ? 'not-allowed' : 'pointer'
           }}
           onClick={saveChanges}
+          disabled={isSaving}
         >
-          Save Changes
+          {isSaving ? "Saving..." : "Save Changes"}
         </button>
       </div>
     </div>
