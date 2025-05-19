@@ -261,17 +261,23 @@ useEffect(() => {
     });
     return changedValues;
   };
-  
+
+const [isSaving, setIsSaving] = useState(false);  
 
 const handleSave = async () => {
+  setIsSaving(true); // Disable the button
   fetchNotifications();
 
-  if (!formData) return;
+   if (!formData) {
+    setIsSaving(false);
+    return;
+  }
   console.log("formdata", formData);
 
   // Perform validation
   if (editComponentRef.current && !editComponentRef.current.validateForm()) {
     handleSaveError("Please fix the validation errors before saving.");
+    setIsSaving(false);
     return;
   }
 
@@ -285,11 +291,13 @@ const handleSave = async () => {
   // Check if anything else has changed
   if (JSON.stringify(formDataCopy) === JSON.stringify(initialFormDataCopy)) {
     handleSaveError("No changes detected. Nothing to save.");
+    setIsSaving(false);
     return;
   }
   // Check if all fields are empty in Add mode
   if (isAdding && Object.values(formData).every((value) => value === "")) {
     handleSaveError("No data provided. Please fill in the form before submitting.");
+    setIsSaving(false);
     return;
   }
 
@@ -331,6 +339,8 @@ const handleSave = async () => {
   } catch (error) {
     handleSaveError("Error saving data.");
     console.error("Error saving data:", error);
+  } finally {
+    setIsSaving(false); // Re-enable the button in all cases
   }
 };
 
@@ -505,6 +515,7 @@ const handleSave = async () => {
                   variant="contained"
                   color="primary"
                   onClick={handleSave}
+                  disabled={isSaving}
                 style={{margin:'5px'}}
 
                 >
