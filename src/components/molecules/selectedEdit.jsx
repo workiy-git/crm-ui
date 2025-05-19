@@ -20,6 +20,7 @@ const SelectedEditComponent = () => {
     lead_medium: '',
     lead_status: '',
     lead_source: '',
+    re_enquired: '',
   });
 
   const [updateProgress, setUpdateProgress] = useState({
@@ -37,6 +38,7 @@ const SelectedEditComponent = () => {
         lead_medium: '',
         lead_status: '',
         lead_source: '',
+        re_enquired: '',
       });
       setUpdateProgress({ updated: 0, total: selectedData.length }); // ✅ Set total immediately
     }
@@ -224,6 +226,18 @@ const SelectedEditComponent = () => {
         >
           <option value="" disabled>Select Lead Source</option>
           {getOptions('lead_source').map((option, index) => (
+            <option key={index} value={option}>{option}</option>
+          ))}
+        </select>
+
+        <label>Re Enquired:</label>
+        <select
+          style={{ width: '50%' }}
+          value={globalSelects.re_enquired}
+          onChange={(e) => handleSelectChange('re_enquired', e.target.value)}
+        >
+          <option value="" disabled>Select Lead Source</option>
+          {getOptions('re_enquired').map((option, index) => (
             <option key={index} value={option}>{option}</option>
           ))}
         </select>
