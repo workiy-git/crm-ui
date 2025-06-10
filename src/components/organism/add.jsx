@@ -69,6 +69,11 @@ const AddComponent = forwardRef(({ formData, setFormData, pageSchema, onSaveSucc
         if (field.fieldName === 'assigned_to' &&
             (userData.role === 'Presales Team' || userData.role === 'Sales Team')) {
           initializedFormData[field.fieldName] = userName;
+          
+        }else if (field.fieldName === 'created_by' &&
+            (userData.role === 'Presales Team' || userData.role === 'Sales Team')) {
+          initializedFormData[field.fieldName] = userName;
+          
         } else if (field.type === 'checkbox') {
           initializedFormData[field.fieldName] = false;
         } else if (field.type === 'select') {
