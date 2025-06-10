@@ -23,10 +23,13 @@ const CustomDynamicForm = () => {
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
   const location = useLocation();
-  const pageName = location.state?.pageName;
+  // const pageName = location.state?.pageName;
+  const initialPageName = location.state?.pageName;
+  const [pageName, setPageName] = useState(initialPageName);
   const navigate = useNavigate();
   const [filterConditions, setFilterConditions] = useState({});
   const [selectedFields, setSelectedFields] = useState([]); // State to store selected fields
+
 
   useEffect(() => {
     const fetchFilterConditions = async () => {
@@ -68,22 +71,26 @@ const CustomDynamicForm = () => {
     []
   );
 
-  useEffect(() => {
-    const fetchWebformsData = async () => {
-      try {
-        const apiUrl = `${config.apiUrl.replace(/\/$/, "")}/webforms`;
-        const response = await fetchDataWithRetry(apiUrl);
-        const fetchedWebformsData = response.data || [];
-        const currentPage = fetchedWebformsData.find(
-          (page) => page.pageName === pageName
-        );
-        setDynamicFields(currentPage.fields);
-      } catch (error) {
-        console.error("Error fetching Webform data:", error);
-      }
-    };
-    fetchWebformsData();
-  }, [fetchDataWithRetry]);
+useEffect(() => {
+  if (!pageName) return; // prevent call if pageName is not set
+
+  const fetchWebformsData = async () => {
+    try {
+      const apiUrl = `${config.apiUrl.replace(/\/$/, "")}/webforms`;
+      const response = await fetchDataWithRetry(apiUrl);
+      const fetchedWebformsData = response.data || [];
+      const currentPage = fetchedWebformsData.find(
+        (page) => page.pageName === pageName
+      );
+      setDynamicFields(currentPage?.fields || []);
+    } catch (error) {
+      console.error("Error fetching Webform data:", error);
+    }
+  };
+
+  fetchWebformsData();
+}, [fetchDataWithRetry, pageName]);
+
 
   const handleAddCondition = () => {
     setConditions([...conditions, { fieldName: "", operator: "", value: "" }]);
@@ -1455,6 +1462,24 @@ const CustomDynamicForm = () => {
             style={{ padding: "5px", fontSize: "16px" }}
           />
         </div>
+        {initialPageName === "reports" && (
+        <div style={{ margin: "10px", width:'30%' }}>
+          <label htmlFor="dynamicName" style={{ marginRight: "10px" }}>
+            Select Module *
+          </label>
+          <select
+            id="dynamicName"
+            value={pageName}
+            onChange={(e) => setPageName(e.target.value)}
+            style={{ padding: "5px", fontSize: "16px"}}
+          >
+            <option value="">--Select--</option>
+            <option value="calls">Calls</option>
+            <option value="enquiry">Enquiry</option>
+            <option value="leads">Leads</option>
+          </select>
+        </div>
+        )}
 
         {conditions.map((condition, index) => {
           const selectedField = dynamicFields.find(
