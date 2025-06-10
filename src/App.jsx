@@ -14,6 +14,8 @@ import AssignedTo from "./components/pages/assignedTo";
 import SelectedEditComponent from "./components/molecules/selectedEdit";
 import ProtectedRoute from "./protectedRoute"; 
 import CustomDropdown from "./components/molecules/customDropdown";
+import ReportsPage from "./components/pages/ReportsPage";
+import ReportDetails from "./components/pages/ReportsDetailsView";
 import { AuthProvider } from "./AuthContext"; 
 
 const Layout = ({ children }) => {
@@ -61,6 +63,8 @@ const App = () => {
           <Route path="/users/assignedto" element={<ProtectedRoute> <AssignedTo /> </ProtectedRoute>} />
           <Route path="/selected/edit" element={<ProtectedRoute> <SelectedEditComponent /> </ProtectedRoute>} />
           <Route path="/:pageName/customdropdown" element={<ProtectedRoute> <CustomDropdown /> </ProtectedRoute>} />
+          <Route path="/reports" element={<ProtectedRoute> <ReportsPage /> </ProtectedRoute>} />
+          <Route path="/reports/detailsview" element={<ProtectedRoute> <ReportDetails /> </ProtectedRoute>} />
         </Routes>
       </Layout>
       </AuthProvider>
