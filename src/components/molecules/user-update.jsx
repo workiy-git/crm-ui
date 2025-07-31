@@ -320,7 +320,16 @@ const Updates = ({ mode }) => {
                 const currentDate = new Date();
                 console.log("current Time", currentDate )
                 // Original time in UTC
-                const utcDate = new Date(dateTime + " UTC"); // Convert to Date object assuming UTC
+                // const utcDate = new Date(dateTime + " UTC"); // Convert to Date object assuming UTC
+                let utcDate;
+                  try {
+                    utcDate = new Date(dateTime + " UTC");
+                    if (isNaN(utcDate.getTime())) throw new Error("Invalid Date");
+                  } catch (error) {
+                    console.error("Error parsing dateTime:", dateTime, error);
+                    return null;
+                  }
+
 
                 // Get the local date and time
                 const localDate = new Date(utcDate);
@@ -449,4 +458,3 @@ const Updates = ({ mode }) => {
 };
 
 export default Updates;
-
